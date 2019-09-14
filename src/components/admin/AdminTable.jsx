@@ -14,13 +14,27 @@ class CompalinerTable extends Component {
         <>
           <button
             onClick={() => this.props.onDetail(complaint)}
-            className="btn button-primary btn-sm"
+            className="btn btn-info btn-sm"
           >
-            Details
+            Detail
           </button>
         </>
       )
     }
+    // ,
+    // {
+    //   key: "assign",
+    //   content: complaint => (
+    //     <>
+    //       <button
+    //         onClick={() => this.props.onDetail(complaint)}
+    //         className="btn btn-info btn-sm"
+    //       >
+    //         Assign
+    //       </button>
+    //     </>
+    //   )
+    // }
   ];
 
   render() {
