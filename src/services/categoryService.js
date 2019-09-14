@@ -9,7 +9,7 @@ export function getAssigneeCategories() {
   return http.get(config.apiUrl + "/categories/assignee");
 }
 
-export function getSpecificCategories(categoryId) {
+export function getSpecificCategories() {
   return http.get(config.apiUrl + "/categories/assignee");
 }
 
@@ -33,4 +33,19 @@ export function getParentCategory(categoryId) {
   return http.get(
     config.apiUrl + `/categories/find/parent/category/${categoryId}`
   );
+}
+
+export function getSiblingsOf(categoryId) {
+  return http.get(config.apiUrl + "/categories/siblingsOf/" + categoryId);
+}
+
+export function getChildsOf(categoryId) {
+  return http.get(config.apiUrl + "/categories/childsOf/" + categoryId);
+}
+export function getCategoryById(categoryId) {
+  return http.get(config.apiUrl + "/categories/" + categoryId);
+}
+
+export function updateCategoryById(categoryId, body) {
+  return http.put(config.apiUrl + "/categories/" + categoryId, body);
 }
