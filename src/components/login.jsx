@@ -3,9 +3,7 @@ import { Link } from "react-router-dom";
 import Joi from "joi-browser";
 import Form from "./common/form";
 import auth from "../services/authService";
-
 import Spinner from "../components/common/Spinner/Spinner";
-
 class Login extends Form {
   state = {
     data: { email: "", password: "" },
@@ -29,43 +27,24 @@ class Login extends Form {
   async componentDidMount() {
     try {
       const user = await auth.getCurrentUser();
-      if (user.role === "complainer") {
-        // window.location = '/complainer';
-        this.props.history.replace("/complainer");
-      } else if (user.role === "assignee") {
-        this.props.history.replace("/assignee");
-        // window.location = '/assignee';
-      } else if (user.role === "admin") {
-        this.props.history.replace("/admin");
-        // window.location = '/admin';
-      } else {
-        this.props.history.replace("/login");
-        // window.location = '/';
-      }
+      this.props.history.replace(`/${user.role}`);
     } catch (ex) {}
   }
 
   doSubmit = async () => {
     const { data } = this.state;
     const role = this.role.current.value;
-
+    localStorage.setItem("login", role);
     try {
-      if (role === "complainer") {
-        await auth.login(data.email, data.password, "/auth-complainer");
-        window.location = "/complainer";
-        this.setState({ isLoading: true });
-      } else if (role === "assignee") {
-        await auth.login(data.email, data.password, "/auth-assignee");
-        this.setState({ isLoading: true });
+      const response = await auth.login(
+        data.email,
+        data.password,
+        `/auth-${role}`
+      );
+      localStorage.setItem("token", response.headers["x-auth-token"]);
 
-        window.location = "/assignee";
-        // this.props.history.push('/assignee');
-      } else if (role === "admin") {
-        await auth.login(data.email, data.password, "/auth-admin");
-        this.setState({ isLoading: true });
-
-        window.location = "/admin";
-      }
+      window.location = `/${role}`;
+      this.setState({ isLoading: true });
       // this.props.history.push('/complainer');
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
@@ -89,7 +68,7 @@ class Login extends Form {
           )}
         </div>
         {!this.state.isLoading && (
-          <>
+          <div>
             <div className="mt-5 d-flex justify-content-center align-items-center">
               <div
                 className="card mt-5 card-form"
@@ -124,7 +103,7 @@ class Login extends Form {
                       {this.renderButton("Login")}
                     </div>
                     <br />
-                    <Link to="/forgot-password">Forgot Password?</Link>
+                    <Link to="/recoverpassword">Forgot Password?</Link>
                     <br />
                     <Link to="/register">
                       Not Registered? Register by clicking here.
@@ -134,7 +113,7 @@ class Login extends Form {
                 </div>
               </div>
             </div>
-          </>
+          </div>
         )}
       </React.Fragment>
     );

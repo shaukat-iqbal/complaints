@@ -1,0 +1,13 @@
+.category option:hover {
+  background-color: bisque;
+  cursor: pointer;
+}
+
+.category option {
+  padding: 20px;
+  background-color: burlywood;
+}
+
+.Cli {
+  background-color: brown;
+}

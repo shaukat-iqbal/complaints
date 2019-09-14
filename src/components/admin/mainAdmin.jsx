@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
-// import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Route, Switch, Redirect } from "react-router-dom";
 
@@ -10,10 +9,14 @@ import Dashboard from "./dashboard/dashboard";
 import Chart from "./chart";
 import AdminComplaintDetail from "./AdminComplaintDetail";
 import NavbarAdmin from "./navbar/navbarAdmin";
+import UserManagementContainer from "./usersManagement/container/userManagement";
 
 const mainAdmin = props => {
+  const [user, setUser] = useState();
+
   useEffect(() => {
     const user = auth.getCurrentUser();
+    setUser(user);
 
     if (!user || user.role !== "admin") {
       toast.error("You are not Authorized to Access this Route!");
@@ -23,13 +26,49 @@ const mainAdmin = props => {
 
   return (
     <React.Fragment>
-      <NavbarAdmin />
       <div>
         <Switch>
-          <Route path="/admin/configuration" component={Configuration} />
-          <Route path="/admin/dashboard" component={Dashboard} />
-          <Route path="/admin/reports" component={Chart} />
-          <Route path="/admin/:id" component={AdminComplaintDetail} />
+          <Route path="/admin/users" component={UserManagementContainer} />
+          <Route
+            path="/admin/configuration"
+            render={props => (
+              <div>
+                {" "}
+                <NavbarAdmin />
+                <Configuration {...props} />{" "}
+              </div>
+            )}
+          />
+          <Route
+            path="/admin/dashboard"
+            render={props => (
+              <div>
+                {" "}
+                <NavbarAdmin />
+                <Dashboard {...props} />{" "}
+              </div>
+            )}
+          />
+          <Route
+            path="/admin/reports"
+            render={props => (
+              <div>
+                {" "}
+                <NavbarAdmin />
+                <Chart {...props} />{" "}
+              </div>
+            )}
+          />
+          <Route
+            path="/admin/:id"
+            render={props => (
+              <div>
+                {" "}
+                <NavbarAdmin />
+                <AdminComplaintDetail {...props} />{" "}
+              </div>
+            )}
+          />
 
           <Redirect exact from="/admin" to="/admin/dashboard" />
         </Switch>

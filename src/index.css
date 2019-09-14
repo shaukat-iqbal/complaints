@@ -175,6 +175,13 @@ main {
   border-radius: 300px !important;
 }
 
+.btn-round {
+  border-radius: 20px !important;
+  padding-right: 20px !important;
+  padding-left: 20px !important;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
 .sidebar-fixed {
   left: 0;
   top: 0;
