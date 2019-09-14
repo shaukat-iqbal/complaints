@@ -7,17 +7,26 @@ const tokenKey = "token";
 
 http.setJwt(getJwt());
 
-export async function login(email, password, apiEndpoint) {
+export function login(email, password, apiEndpoint) {
   const Endpoint = apiUrl + apiEndpoint;
-  const { data: jwt } = await http.post(Endpoint, {
+  return http.post(Endpoint, {
     email,
     password
   });
-  localStorage.setItem(tokenKey, jwt);
+  // console.log(response);
+  // let profilePicture = "";
+  // if (response.data.profilePicture)
+  //   profilePicture = convertToPicture(response.data.profilePicture.data);
+  // console.log(profilePicture);
+  // if (localStorage.getItem("profilePicture"))
+  //   localStorage.removeItem("profilePicture");
+  // localStorage.setItem("profilePicture", profilePicture);
 }
 
 export function logout() {
   localStorage.removeItem(tokenKey);
+  if (localStorage.getItem("profilePicture"))
+    localStorage.removeItem("profilePicture");
 }
 
 export function getCurrentUser() {
