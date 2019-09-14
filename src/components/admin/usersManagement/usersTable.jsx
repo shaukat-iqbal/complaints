@@ -13,19 +13,19 @@ class UsersTable extends Component {
         <>
           <Link
             to={`/profile/${user._id}/${this.props.role}`}
-            className="btn btn-danger btn-sm  mr-2 mb-2 "
+            className="btn button-primary btn-sm  mr-2 mb-2 "
           >
             Profile
           </Link>
           <button
             onClick={() => this.props.onEdit(user)}
-            className="btn btn-danger btn-sm  mr-2 mb-2"
+            className="btn button-primary btn-sm  mr-2 mb-2"
           >
             Edit
           </button>
           <button
             onClick={() => this.props.onDelete(user)}
-            className="btn btn-danger btn-sm mr-2 mb-2"
+            className="btn btn-danger btn-round btn-sm mr-2 mb-2"
           >
             Delete
           </button>

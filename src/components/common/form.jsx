@@ -63,7 +63,7 @@ class Form extends Component {
       <button
         disabled={this.validate()}
         type="submit"
-        className="btn btn-primary"
+        className="btn button-primary"
       >
         {label}
       </button>
@@ -142,7 +142,7 @@ class Form extends Component {
   renderEditButton() {
     return (
       <button
-        className="btn btn-info"
+        className="btn button-secondary"
         onClick={e => {
           e.preventDefault();
           this.setState({ isProfileView: false, isEditView: true });
