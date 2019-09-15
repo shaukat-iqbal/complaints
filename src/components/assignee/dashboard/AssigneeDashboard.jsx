@@ -151,6 +151,12 @@ class AssigneeDashboard extends Component {
       return (
         <div className="container mt-3">
           <h4>There are no complaints in the database</h4>
+          <button
+            className="btn button-outline-secondary btn-block mb-3"
+            onClick={this.getSpamList}
+          >
+            Spam List
+          </button>
           {displaySpamList && (
             <SpamList
               displaySpamList={displaySpamList}
