@@ -235,7 +235,10 @@ class RegisterForm extends Form {
 
     return (
       <div>
-        <div className="card w-50" style={{ minWidth: "400px" }}>
+        <div
+          className="card w-50"
+          style={{ minWidth: "400px", boxShadow: "5px 5px 25px 5px #e5e5e5" }}
+        >
           {this.state.isLoading && <Loading />}
           <div className="card-header d-flex justify-content-center">
             <h5 className="h5 pt-2">
@@ -310,7 +313,7 @@ class RegisterForm extends Form {
                 categories={this.state.categories}
               />
             </div>
-            <div className="card-footer">
+            <div className="d-flex justify-content-end pr-5 pb-2">
               {this.state.isProfileView
                 ? this.renderEditButton()
                 : userId

@@ -169,7 +169,12 @@ class Navbar extends React.Component {
                     className="dropdown-menu"
                     aria-labelledby="navbarDropdown"
                   >
-                    <NavLink className="dropdown-item" to="/profile">
+                    <NavLink
+                      className="dropdown-item"
+                      to={`/profile/${auth.getCurrentUser()._id}/${
+                        auth.getCurrentUser().role
+                      }s`}
+                    >
                       Profile
                     </NavLink>
 
