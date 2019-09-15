@@ -12,14 +12,14 @@ import Logout from "./components/logout";
 import ComplaintDetail from "./components/complainer/complaintDetail/complaintDetail";
 import Message from "./components/common/message/message";
 import AssigneeMessage from "./components/common/message/assigneeMessages";
-
-import "react-toastify/dist/ReactToastify.css";
-import "./App.css";
 import RegisterForm from "./components/admin/usersManagement/Register";
 import PasswordManagement from "./components/common/passwordManagement";
 import ResetPassword from "./components/common/resetPassword";
 import CategoriesList from "./categories/categoriesList";
 import Test from "./test";
+
+import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
 // const Complainer = lazy(() => import("./components/complainer/Complainer"));
 
 class App extends Component {
@@ -46,12 +46,12 @@ class App extends Component {
             render={props => (
               <div
                 className="d-flex justify-content-center py-5 "
-                style={{
-                  backgroundImage:
-                    "url(" +
-                    require("./resources/img/drawerProfileBackground.png") +
-                    ")"
-                }}
+                // style={{
+                //   backgroundImage:
+                //     "url(" +
+                //     require("./resources/img/drawerProfileBackground.png") +
+                //     ")"
+                // }}
               >
                 <RegisterForm isProfileView={true} {...props} />
               </div>
@@ -62,12 +62,12 @@ class App extends Component {
             render={props => (
               <div
                 className="d-flex justify-content-center py-5 "
-                style={{
-                  backgroundImage:
-                    "url(" +
-                    require("./resources/img/drawerProfileBackground.png") +
-                    ")"
-                }}
+                // style={{
+                //   backgroundImage:
+                //     "url(" +
+                //     require("./resources/img/drawerProfileBackground.png") +
+                //     ")"
+                // }}
               >
                 <RegisterForm {...props} />
               </div>

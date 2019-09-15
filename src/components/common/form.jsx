@@ -129,7 +129,7 @@ class Form extends Component {
   renderAssignResponsibilitiesButton(onClick, hidden = false) {
     return (
       <button
-        className="btn btn-primary"
+        className="btn button-primary"
         type="button"
         hidden={hidden}
         onClick={onClick}

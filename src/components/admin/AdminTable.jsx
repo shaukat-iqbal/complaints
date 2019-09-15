@@ -14,7 +14,7 @@ class CompalinerTable extends Component {
         <>
           <button
             onClick={() => this.props.onDetail(complaint)}
-            className="btn btn-info btn-sm"
+            className="btn button-primary btn-sm"
           >
             Detail
           </button>

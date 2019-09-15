@@ -36,6 +36,7 @@ class Category extends Component {
     if (sentimentCategory === "") {
       return;
     }
+
     if (!sentimentCategory.parentCategory) {
       setTimeout(() => {
         this.setState({ isLoading: false });

@@ -151,7 +151,7 @@ class ResetPassword extends Form {
             <div className="card-footer py-2 d-flex justify-content-end">
               {this.renderButton("Send")}
               <button
-                className="ml-1 btn btn-sm btn-danger"
+                className="ml-1 btn btn-sm button-secondary"
                 type="button"
                 onClick={this.handleCancel}
               >

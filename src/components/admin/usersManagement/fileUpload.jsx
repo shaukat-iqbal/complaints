@@ -68,7 +68,7 @@ class FileUpload extends Component {
           style={{ cursor: "pointer" }}
         />
         <button
-          className="mt-5 btn btn-sm btn-primary align-self-center"
+          className="mt-5 btn btn-sm button-primary align-self-center"
           onClick={onClick}
           name={name}
         >
