@@ -12,7 +12,7 @@ export function getAssigneeCategories() {
 export function getSpecificCategories() {
   return http.get(config.apiUrl + "/categories/assignee");
 }
-
+ 
 // getting categories for selection with no parent
 export function getCategoriesWithNoParent() {
   return http.get(config.apiUrl + "/categories/specific/noparent");

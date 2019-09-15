@@ -45,14 +45,14 @@ class AssigneeMessage extends React.Component {
 
     this.setState({ allMessages: msgs });
     this.scroll.current.scrollIntoView();
-    socket.once("msg", data => {
+    socket.on("msg", data => {
       console.log(data);
       this.setState(prevState => {
         const allMessages = [...prevState.allMessages];
         allMessages.push(data);
         return { allMessages: allMessages };
       });
-      // this.scroll.current.scrollIntoView();
+      this.scroll.current.scrollIntoView();
     });
     this.scroll.current.scrollIntoView();
   };
@@ -102,9 +102,7 @@ class AssigneeMessage extends React.Component {
   handleFileChange = async e => {
     this.setState({ selectedFile: e.target.files[0] });
 
-    setTimeout(() => {
-      this.setState({ message: this.state.selectedFile.name });
-    }, 3000);
+    this.setState({ message: e.target.files[0].name });
   };
 
   displayMessage = msg => {
@@ -163,7 +161,7 @@ class AssigneeMessage extends React.Component {
                             {this.state.complainer && (
                               <span>{this.state.complainer.name}</span>
                             )}
-                            :{" "}
+                            :
                           </span>
                         )}
                         {/* <span> {this.displayMessage(a)}</span> */}

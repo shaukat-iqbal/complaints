@@ -48,14 +48,14 @@ class Message extends React.Component {
     this.setState({ allMessages: msgs });
     this.scroll.current.scrollIntoView();
 
-    socket.once("msg", data => {
+    socket.on("msg", data => {
       console.log(data);
       this.setState(prevState => {
         const allMessages = [...prevState.allMessages];
         allMessages.push(data);
         return { allMessages: allMessages };
       });
-      // this.scroll.current.scrollIntoView();
+      this.scroll.current.scrollIntoView();
     });
     this.scroll.current.scrollIntoView();
   };
@@ -170,9 +170,9 @@ class Message extends React.Component {
                             :
                           </span>
                         )}
-                        <span> {a.messageBody && <> {a.messageBody}</>}</span>
+                        {/* <span> {a.messageBody && <> {a.messageBody}</>}</span> */}
                         {/* <span> {this.displayMessage(a)}</span> */}
-                        {/* <span>
+                        <span>
                           {a.messageBody.includes("cmp-") ? (
                             <span>
                               <a
@@ -187,7 +187,7 @@ class Message extends React.Component {
                           ) : (
                             <span>{a.messageBody}</span>
                           )}
-                        </span> */}
+                        </span>
                       </p>
                       <br />
                     </>

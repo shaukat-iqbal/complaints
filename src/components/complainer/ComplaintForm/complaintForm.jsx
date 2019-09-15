@@ -15,6 +15,7 @@ import {
 import { saveComplaint } from "../../../services/complaintService";
 import Modal from "../../common/Modal/Modal";
 import Spinner from "../../common/Spinner/Spinner";
+import Categories from "../../common/categories";
 
 class ComplaintForm extends Form {
   state = {
@@ -32,7 +33,8 @@ class ComplaintForm extends Form {
     isLoading: false,
     isDialogOpen: false,
     selectedFile: null,
-    open: true
+    open: true,
+    showCategoriesDialog: false
   };
 
   schema = {
@@ -67,8 +69,8 @@ class ComplaintForm extends Form {
 
   ToggleConfirmation = e => {
     e.preventDefault();
-
-    if (this.state.details.length <= 5) {
+    console.log(this.state);
+    if (this.state.details.length <= 10) {
       return this.setState({
         detailsError: "Details must be atleast 10 characters long."
       });
@@ -148,13 +150,35 @@ class ComplaintForm extends Form {
       };
     });
   };
+  handleCategoryButton = () => {
+    this.setState({ showCategoriesDialog: true });
+  };
+  handleOnCategorySeletion = id => {
+    const categories = this.state.categories;
+    const category = categories.find(c => c._id === id);
+
+    if (category) {
+      this.setState({
+        sentimentCategory: category,
+        categoryId: id,
+        showCategoriesDialog: false,
+        categoryError: ""
+      });
+      return;
+    }
+  };
+
+  handleDialogClose = () => {
+    this.setState({ showCategoriesDialog: false });
+  };
 
   handleDetailsBlur = async () => {
     const details = { details: this.state.details };
     const { data } = await getSentimentCategory(details);
     this.setState(prevState => {
       return {
-        sentimentCategory: data
+        sentimentCategory: data,
+        categoryId: data._id
       };
     });
     console.log(this.state.sentimentCategory);
@@ -235,11 +259,34 @@ class ComplaintForm extends Form {
 
                     {this.state.sentimentCategory && (
                       <>
-                        <label>Category</label>
-                        <Category
+                        <label>Selected Category</label>
+                        <button
+                          className="btn button-primary"
+                          onClick={this.handleCategoryButton}
+                        >
+                          {this.state.sentimentCategory.name}
+                          <i className="fa fa-edit pl-3"></i>
+                        </button>
+                        <p
+                          className="text-muted text-sm-left mt-2"
+                          style={{ fontSize: "10px" }}
+                        >
+                          You may change the category by clicking the category
+                          name
+                        </p>
+
+                        <Categories
+                          isLoading={true}
+                          onCategorySeletion={this.handleOnCategorySeletion}
+                          isOpen={this.state.showCategoriesDialog}
+                          onClose={this.handleDialogClose}
+                          categories={this.state.categories}
+                        />
+
+                        {/* <Category
                           onCategoryId={this.handleCategorySelect}
                           category={this.state.sentimentCategory}
-                        />
+                        /> */}
                       </>
                     )}
                     {/* category end  */}
