@@ -24,9 +24,9 @@ const PictureUpload = ({
             >
               <img
                 src={value ? value : require("../../resources/img/add.png")}
-                height="160px"
-                width="160px"
-                style={{ borderRadius: "50%" }}
+                height="130px"
+                width="130px"
+                className="rounded-circle"
                 alt="Paste logo here"
               />
               <input
@@ -42,23 +42,24 @@ const PictureUpload = ({
           </div>
           <div className={!disabled ? classes : "d-none"}>
             <span
-              className="icon p-1 rounded-circle "
-              style={{ cursor: "pointer" }}
+              className=" p-1 rounded-circle "
+              style={{ cursor: "pointer", fontSize: "12px" }}
               onClick={onRemove}
             >
               <i className="fa fa-2x fa-remove"></i>
             </span>
             <label
-              className="p-1 rounded-circle icon"
+              className="p-1 rounded-circle "
               htmlFor="fileInput"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", fontSize: "12px" }}
             >
               <i className="fa fa-2x fa-plus"></i>
             </label>
           </div>
         </div>
       </div>
-      {error && <div className="alert alert-danger">{error}</div>}
+
+      {error && <div className="mt-1 alert alert-danger">{error}</div>}
     </div>
   );
 };

@@ -133,15 +133,12 @@ class RegisterForm extends Form {
   };
 
   handleProfilePicture = async event => {
-    let profile = this.state.profile;
-    let profilePath = this.state.profilePath;
+    let { profile, profilePath } = this.state;
     if (event.target.files[0]) {
       profile = URL.createObjectURL(event.target.files[0]);
-      console.log("Old file size", event.target.files[0].size / 1024 / 1024);
       this.setState({ profile });
       profilePath = await compressImage(event.target.files[0]);
       profile = URL.createObjectURL(profilePath);
-      console.log("New file size", profilePath.size / 1024 / 1024);
     }
     this.setState({
       profilePath,
@@ -231,18 +228,29 @@ class RegisterForm extends Form {
   };
   render() {
     const { id: userId } = this.props.match.params;
-    const { role } = this.state.currentUser;
+    const {
+      isEditView,
+      isProfileView,
+      profile,
+      isAssignee,
+      currentUser,
+      showCategoriesDialog,
+      categories,
+      responsibilities,
+      isLoading
+    } = this.state;
+    const { role } = currentUser;
 
+    let heading = "Register";
+    if (isEditView) heading = "Edit";
+    if (isProfileView) heading = "Profile";
     return (
       <div>
-        <div
-          className="card w-50"
-          style={{ minWidth: "400px", boxShadow: "5px 5px 25px 5px #e5e5e5" }}
-        >
-          {this.state.isLoading && <Loading />}
+        <div className="card w-50 mb-4 shadow-lg" style={{ minWidth: "400px" }}>
+          {isLoading && <Loading />}
           <div className="card-header d-flex justify-content-center">
             <h5 className="h5 pt-2">
-              Register {this.state.isAssignee ? "Assignee" : "Complainer"}
+              {heading} {isAssignee ? "Assignee" : "Complainer"}
             </h5>
           </div>
           <form onSubmit={this.handleSubmit}>
@@ -251,8 +259,8 @@ class RegisterForm extends Form {
                 {this.renderPictureUpload(
                   "profilePath",
                   this.handleProfilePicture,
-                  this.state.profile,
-                  this.state.isProfileView,
+                  profile,
+                  isProfileView,
                   this.handleRemoveProfilePicture
                 )}
               </div>
@@ -260,47 +268,29 @@ class RegisterForm extends Form {
                 "userType",
                 "Is Assignee?",
                 this.handleUserType,
-                this.state.isAssignee,
-                this.state.isProfileView ||
-                  this.state.isEditView ||
-                  this.state.currentUser.role === "guest"
+                isAssignee,
+                isProfileView || isEditView || currentUser.role === "guest"
               )}
-              {this.renderInput(
-                "name",
-                "Name",
-                "text",
-                this.state.isProfileView
-              )}
-              {this.renderInput(
-                "email",
-                "Email",
-                "text",
-                this.state.isProfileView
-              )}
+              {this.renderInput("name", "Name", "text", isProfileView)}
+              {this.renderInput("email", "Email", "text", isProfileView)}
 
               {/* create new component and put passwords input into that */}
-              {!(this.state.isProfileView || this.state.isEditView) &&
-              role !== "admin"
+              {!(isProfileView || isEditView) && role !== "admin"
                 ? this.renderPasswords()
                 : null}
 
-              {this.renderInput(
-                "phone",
-                "Phone#",
-                "tel",
-                this.state.isProfileView
-              )}
+              {this.renderInput("phone", "Phone#", "tel", isProfileView)}
 
-              {this.state.isAssignee && (
+              {isAssignee && (
                 <React.Fragment>
                   <AssignedCategoriesList
-                    responsibilities={this.state.responsibilities}
+                    responsibilities={responsibilities}
                     onDelete={this.handleDelete}
-                    hidden={this.state.isProfileView}
+                    hidden={isProfileView}
                   />
                   {this.renderAssignResponsibilitiesButton(
                     this.handleResponsibilitiesAssignment,
-                    this.state.isProfileView
+                    isProfileView
                   )}
                 </React.Fragment>
               )}
@@ -308,13 +298,13 @@ class RegisterForm extends Form {
               <Categories
                 isLoading={true}
                 onCategorySeletion={this.handleOnCategorySeletion}
-                isOpen={this.state.showCategoriesDialog}
+                isOpen={showCategoriesDialog}
                 onClose={this.handleDialogClose}
-                categories={this.state.categories}
+                categories={categories}
               />
             </div>
-            <div className="d-flex justify-content-end pr-5 pb-2">
-              {this.state.isProfileView
+            <div className="d-flex justify-content-end pr-5  mb-4">
+              {isProfileView
                 ? this.renderEditButton()
                 : userId
                 ? this.renderButton("Update")
