@@ -13,7 +13,7 @@ const User = ({ user, onProfileView, onDelete, onEdit }) => {
             src={
               profilePicture
                 ? profilePicture
-                : require("./resources/img/add.png")
+                : require("./../../../resources/img/add.png")
             }
             alt="profile pic"
             width="100px"
