@@ -44,15 +44,7 @@ class App extends Component {
           <Route
             path="/profile/:id/:role"
             render={props => (
-              <div
-                className="d-flex justify-content-center py-5 "
-                // style={{
-                //   backgroundImage:
-                //     "url(" +
-                //     require("./resources/img/drawerProfileBackground.png") +
-                //     ")"
-                // }}
-              >
+              <div className="d-flex justify-content-center py-5 ">
                 <RegisterForm isProfileView={true} {...props} />
               </div>
             )}
@@ -60,15 +52,7 @@ class App extends Component {
           <Route
             path="/register"
             render={props => (
-              <div
-                className="d-flex justify-content-center py-5 "
-                // style={{
-                //   backgroundImage:
-                //     "url(" +
-                //     require("./resources/img/drawerProfileBackground.png") +
-                //     ")"
-                // }}
-              >
+              <div className="d-flex justify-content-center py-5 ">
                 <RegisterForm {...props} />
               </div>
             )}
