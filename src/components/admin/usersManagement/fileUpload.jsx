@@ -56,9 +56,9 @@ class FileUpload extends Component {
 
   renderDiv = (userType, name, onClick) => {
     return (
-      <div className="d-flex jumbotron border-primary bg-white flex-column">
+      <div className="d-flex jumbotron bg-white flex-column shadow-lg ">
         <p className="display-5">
-          Upload Csv File to create {userType + "s"} accounts
+          Upload <strong>Csv File</strong> to create {userType + "s"} accounts
         </p>
         <input
           type="file"

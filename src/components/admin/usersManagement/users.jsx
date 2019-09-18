@@ -9,12 +9,15 @@ import { getAllUsers } from "../../../services/userService";
 import { deleteComplainer } from "../../../services/complainerService";
 import { Link } from "react-router-dom";
 import Loading from "../../common/loading";
+import User from "./user";
+import { confirmAlert } from "react-confirm-alert"; // Import
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 
 class Users extends Component {
   state = {
     users: [],
     currentPage: 1,
-    pageSize: 8,
+    pageSize: 4,
     searchQuery: "",
     selectedGenre: null,
     sortColumn: { path: "name", order: "asc" },
@@ -28,6 +31,22 @@ class Users extends Component {
   }
 
   handleDelete = async user => {
+    confirmAlert({
+      title: "Confirm to submit",
+      message: "Are you sure to do this.",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => this.deleteUser(user)
+        },
+        {
+          label: "No"
+        }
+      ]
+    });
+  };
+
+  deleteUser = async user => {
     const originalUsers = this.state.users;
     const users = originalUsers.filter(u => u._id !== user._id);
     this.setState({ users });
@@ -41,6 +60,9 @@ class Users extends Component {
         // toast.error("This user has already been deleted.");
       }
     }
+  };
+  handleProfile = user => {
+    this.props.history.push(`/profile/${user._id}/${this.props.role}`);
   };
   handleEdit = user => {
     this.props.history.replace(
@@ -113,14 +135,26 @@ class Users extends Component {
                   style={{ minHeight: "500px" }}
                   className="d-flex flex-column align-content-between justify-content-between "
                 >
-                  <UsersTable
+                  {/* <UsersTable
                     users={users}
                     sortColumn={sortColumn}
                     onDelete={this.handleDelete}
                     onEdit={this.handleEdit}
                     onSort={this.handleSort}
                     role={this.props.role}
-                  />
+                  /> */}
+                  <div className="card container shadow-lg mb-3">
+                    <div className="card-body">
+                      {users.map(user => (
+                        <User
+                          user={user}
+                          onProfileView={this.handleProfile}
+                          onDelete={this.handleDelete}
+                          onEdit={this.handleEdit}
+                        />
+                      ))}
+                    </div>
+                  </div>
 
                   <Pagination
                     itemsCount={totalCount}
