@@ -19,6 +19,7 @@ class Childs extends Component {
 
   render() {
     const { onDragOver, onDrop, category, onDragStart } = this.props;
+    const { childs } = this.state;
     return (
       <div
         id={category._id}
@@ -26,36 +27,29 @@ class Childs extends Component {
         onDragOver={onDragOver}
         onDrop={onDrop}
       >
-        {this.state.childs.length > 0
-          ? this.state.childs.map(childCategory =>
-              childCategory.hasChild ? (
-                <React.Fragment>
-                  <Category
-                    category={childCategory}
-                    onDragStart={onDragStart}
-                  />
-                  <Childs
-                    category={childCategory}
-                    onDragOver={onDragOver}
-                    onDragStart={onDragStart}
-                    onDrop={onDrop}
-                  />
-                </React.Fragment>
-              ) : (
-                <div
-                  className="m-1 p-1 bg-info border border-dark"
-                  onDragOver={this.onDragOver}
-                  id={childCategory._id}
-                  onDrop={this.onDrop}
-                >
-                  <Category
-                    category={childCategory}
-                    onDragStart={onDragStart}
-                  />
-                </div>
-              )
+        {childs.length &&
+          childs.map(childCategory =>
+            childCategory.hasChild ? (
+              <React.Fragment>
+                <Category category={childCategory} onDragStart={onDragStart} />
+                <Childs
+                  category={childCategory}
+                  onDragOver={onDragOver}
+                  onDragStart={onDragStart}
+                  onDrop={onDrop}
+                />
+              </React.Fragment>
+            ) : (
+              <div
+                className="m-1 p-1 bg-info border border-dark"
+                onDragOver={this.onDragOver}
+                id={childCategory._id}
+                onDrop={this.onDrop}
+              >
+                <Category category={childCategory} onDragStart={onDragStart} />
+              </div>
             )
-          : null}
+          )}
       </div>
     );
   }

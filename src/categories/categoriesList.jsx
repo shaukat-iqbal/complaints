@@ -1,13 +1,15 @@
 import React, { Component } from "react";
 import Childs from "./child";
 import { getCategories, updateCategoryById } from "../services/categoryService";
+import Category from "./category";
 class CategoriesList extends Component {
-  state = {};
+  state = {
+    allCategories: []
+  };
   async componentDidMount() {
     const { data: allCategories } = await getCategories();
-    const root = allCategories.filter(category => !category.parentCategory)[0];
     // const { data: categories } = await getCategoriesWithNoParent();
-    this.setState({ root, allCategories });
+    this.setState({ allCategories });
   }
 
   onDragStart = (ev, categoryId) => {
@@ -98,51 +100,36 @@ class CategoriesList extends Component {
   };
 
   render() {
-    let { root, allCategories } = this.state;
+    const { allCategories } = this.state;
+    const rootCategories = allCategories.filter(c => !c.parentCategory);
+    const length = rootCategories.length;
 
     return (
-      <div className="p-1 bg-dark" id={root ? root._id : null}>
-        {root && (
-          <Childs
-            category={root}
-            onDragOver={this.onDragOver}
-            onDrop={this.onDrop}
-            onDragStart={this.onDragStart}
-            allCategories={allCategories}
-          />
-        )
-        // ) : (
-        // ? root.map(category =>
-        //     category.hasChild ? (
-        //       <React.Fragment>
-        //         <Category
-        //           category={category}
-        //           onDragStart={this.onDragStart}
-        //         />
-        //         <Childs
-        //           category={category}
-        //           onDragOver={this.onDragOver}
-        //           onDrop={this.onDrop}
-        //           onDragStart={this.onDragStart}
-        //         />
-        //       </React.Fragment>
-        //     ) : (
-        //       <div
-        //         className="border border-dark"
-        //         onDragOver={this.onDragOver}
-        //         id={category._id}
-        //         onDrop={this.onDrop}
-        //       >
-        //         <Category
-        //           category={category}
-        //           onDragStart={this.onDragStart}
-        //         />
-        //       </div>
-        //     )
-        //   )
-        // "no category"
-        // )
-        }
+      <div className="p-1 bg-dark" id="noParent">
+        {length &&
+          rootCategories.map(category =>
+            category.hasChild ? (
+              <div>
+                <Category category={category} onDragStart={this.onDragStart} />
+                <Childs
+                  category={category}
+                  allCategories={allCategories}
+                  onDragOver={this.onDragOver}
+                  onDrop={this.onDrop}
+                  onDragStart={this.onDragStart}
+                />
+              </div>
+            ) : (
+              <div
+                className="border border-dark"
+                onDragOver={this.onDragOver}
+                id={category._id}
+                onDrop={this.onDrop}
+              >
+                <Category category={category} onDragStart={this.onDragStart} />
+              </div>
+            )
+          )}
       </div>
     );
   }
