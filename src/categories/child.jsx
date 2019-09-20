@@ -9,9 +9,23 @@ class Childs extends Component {
     if (category && category._id) {
       let childs = this.getChildsOf(category, allCategories);
       // const { data: childs } = await getChildsOf(category._id);
-      this.setState({ childs });
+      this.setState({ childs, allCategories });
     }
   }
+  componentDidUpdate(prevProps, prevState) {
+    const { category, allCategories } = this.props;
+    //getChildsOfCategory
+    if (category && category._id) {
+      let childs = this.getChildsOf(category, allCategories);
+      // const { data: childs } = await getChildsOf(category._id);
+      if (
+        prevState.childs.length < childs.length ||
+        prevState.allCategories !== this.props.allCategories
+      )
+        this.setState({ childs, allCategories });
+    }
+  }
+
   getChildsOf = (category, allCategories) => {
     const childs = allCategories.filter(c => category._id === c.parentCategory);
     return childs;
@@ -19,20 +33,27 @@ class Childs extends Component {
 
   render() {
     const { onDragOver, onDrop, category, onDragStart } = this.props;
+    // alert("Child of" + category.name);
     const { childs } = this.state;
     return (
       <div
         id={category._id}
-        className="pl-5"
+        className="pl-5 bordrr border-left bg-info"
         onDragOver={onDragOver}
         onDrop={onDrop}
+        key={category.id + "parentInChilds"}
       >
         {childs.length &&
           childs.map(childCategory =>
             childCategory.hasChild ? (
               <React.Fragment>
-                <Category category={childCategory} onDragStart={onDragStart} />
+                <Category
+                  category={childCategory}
+                  onDragOver={onDragOver}
+                  onDragStart={onDragStart}
+                />
                 <Childs
+                  allCategories={this.props.allCategories}
                   category={childCategory}
                   onDragOver={onDragOver}
                   onDragStart={onDragStart}
@@ -41,12 +62,17 @@ class Childs extends Component {
               </React.Fragment>
             ) : (
               <div
-                className="m-1 p-1 bg-info border border-dark"
+                className=" bg-info "
                 onDragOver={this.onDragOver}
                 id={childCategory._id}
                 onDrop={this.onDrop}
+                key={category._id + "singleInChilds"}
               >
-                <Category category={childCategory} onDragStart={onDragStart} />
+                <Category
+                  category={childCategory}
+                  onDragOver={onDragOver}
+                  onDragStart={onDragStart}
+                />
               </div>
             )
           )}
