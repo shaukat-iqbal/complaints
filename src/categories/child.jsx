@@ -49,12 +49,18 @@ class Childs extends Component {
               <React.Fragment>
                 <Category
                   category={childCategory}
+                  onEdit={this.props.onEdit}
+                  onAddChild={this.props.onAddChild}
+                  onDelete={this.props.onDelete}
                   onDragOver={onDragOver}
                   onDragStart={onDragStart}
                 />
                 <Childs
                   allCategories={this.props.allCategories}
                   category={childCategory}
+                  onEdit={this.props.onEdit}
+                  onAddChild={this.props.onAddChild}
+                  onDelete={this.props.onDelete}
                   onDragOver={onDragOver}
                   onDragStart={onDragStart}
                   onDrop={onDrop}
@@ -70,6 +76,9 @@ class Childs extends Component {
               >
                 <Category
                   category={childCategory}
+                  onEdit={this.props.onEdit}
+                  onAddChild={this.props.onAddChild}
+                  onDelete={this.props.onDelete}
                   onDragOver={onDragOver}
                   onDragStart={onDragStart}
                 />

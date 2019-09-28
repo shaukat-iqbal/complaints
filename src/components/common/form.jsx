@@ -6,7 +6,7 @@ import Switch from "./switch";
 import PictureUpload from "./pictureUpload";
 
 class Form extends Component {
-  state = { data: {}, errors: {} };
+  state = { data: {}, errors: {}, showCategoriesDialog: false };
 
   validate = () => {
     const { error } = Joi.validate(this.state.data, this.schema, {
@@ -47,6 +47,21 @@ class Form extends Component {
     const data = { ...this.state.data };
     data[input.name] = input.value;
     this.setState({ data, errors });
+  };
+
+  handleDialogClose = () => {
+    this.setState({ showCategoriesDialog: false });
+  };
+
+  handleOnCategorySeletion = id => {
+    const categories = this.state.categories;
+    const category = categories.find(c => c._id === id);
+
+    if (category) {
+      this.setState({
+        selectedCategory: category
+      });
+    }
   };
 
   validatePassword() {
@@ -126,15 +141,29 @@ class Form extends Component {
       />
     );
   }
-  renderAssignResponsibilitiesButton(onClick, hidden = false) {
+
+  handleCategoryDialogButton = () => {
+    this.setState({ showCategoriesDialog: true });
+  };
+  // to close the opened categories dialog
+  handleDialogClose = () => {
+    this.setState({ showCategoriesDialog: false });
+  };
+  renderCategoriesDialogButton(
+    onClick,
+    hidden = false,
+    text,
+    disabled = false
+  ) {
     return (
       <button
         className="btn button-primary"
+        disabled={disabled}
         type="button"
         hidden={hidden}
         onClick={onClick}
       >
-        Assign responsibilities
+        {text ? text : "Assign responsibilities"}
       </button>
     );
   }

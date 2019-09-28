@@ -124,10 +124,6 @@ class RegisterForm extends Form {
     }
   };
 
-  handleResponsibilitiesAssignment = () => {
-    this.setState({ showCategoriesDialog: true });
-  };
-
   handleRemoveProfilePicture = () => {
     this.setState({ profile: null, profilePath: null });
   };
@@ -163,11 +159,6 @@ class RegisterForm extends Form {
       return;
     }
     this.setState({ isAssignee: !this.state.isAssignee });
-  };
-
-  // to close the opened categories dialog
-  handleDialogClose = () => {
-    this.setState({ showCategoriesDialog: false });
   };
 
   handleOnCategorySeletion = async id => {
@@ -288,8 +279,8 @@ class RegisterForm extends Form {
                     onDelete={this.handleDelete}
                     hidden={isProfileView}
                   />
-                  {this.renderAssignResponsibilitiesButton(
-                    this.handleResponsibilitiesAssignment,
+                  {this.renderCategoriesDialogButton(
+                    this.handleCategoryDialogButton,
                     isProfileView
                   )}
                 </React.Fragment>

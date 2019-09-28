@@ -78,12 +78,14 @@ const Category = ({
             </Card>
           </Accordion>
         </div>
-        <div
+        {/* <div
           onDragStart={e => onDragStart(e, category._id)}
           draggable
           onDragOver={onDragOver}
           key={category._id + " " + category.name}
           id={category._id}
+          data-toggle="collapse"
+          data-target={category._id}
           style={{
             height: "50px",
             width: "100%",
@@ -91,7 +93,7 @@ const Category = ({
             top: "0",
             right: "0"
           }}
-        ></div>
+        ></div> */}
       </div>
     </div>
   );
