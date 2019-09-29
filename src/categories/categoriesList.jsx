@@ -3,6 +3,7 @@ import Childs from "./child";
 import { getCategories, deleteCategory } from "../services/categoryService";
 import Category from "./category";
 import CategoryForm from "./categoryForm";
+import { Accordion } from "react-bootstrap";
 
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
@@ -12,7 +13,6 @@ class CategoriesList extends Component {
     categoryFormEnabled: false,
     selectedCategory: ""
   };
-
   async componentDidMount() {
     const { data: allCategories } = await getCategories();
     // const { data: categories } = await getCategoriesWithNoParent();
@@ -26,6 +26,8 @@ class CategoriesList extends Component {
 
   onDragOver = ev => {
     ev.preventDefault();
+    let div = ev.target;
+    console.log(div);
   };
 
   onDrop = async event => {
@@ -162,59 +164,61 @@ class CategoriesList extends Component {
     return (
       <div className="container p-5 ">
         <button
-          className="btn btn-primary rounded-pill "
+          className="btn button-secondary rounded-pill mb-3"
           onClick={this.handleNewCategory}
         >
-          Create Category
+          Create Category...
         </button>
-        <div
-          className="p-3 bg-dark shadow-lg"
-          onDragOver={this.onDragOver}
-          onDrop={this.onDrop}
-          id={null}
-        >
-          {length &&
-            rootCategories.map(category =>
-              category.hasChild ? (
-                <div key={category._id + "parent"}>
-                  <Category
-                    category={category}
-                    onEdit={this.handleEditCategory}
-                    onAddChild={this.handleAddChild}
-                    onDelete={this.handleDeleteCategory}
-                    onDragStart={this.onDragStart}
-                  />
-                  <Childs
-                    category={category}
-                    onEdit={this.handleEditCategory}
-                    onAddChild={this.handleAddChild}
-                    onDelete={this.handleDeleteCategory}
-                    allCategories={allCategories}
+        <Accordion defaultActiveKey="">
+          <div
+            className="p-3 bg-dark shadow-lg"
+            onDragOver={this.onDragOver}
+            onDrop={this.onDrop}
+            id={null}
+          >
+            {length &&
+              rootCategories.map(category =>
+                category.hasChild ? (
+                  <div key={category._id + "parent"}>
+                    <Category
+                      category={category}
+                      onEdit={this.handleEditCategory}
+                      onAddChild={this.handleAddChild}
+                      onDelete={this.handleDeleteCategory}
+                      onDragStart={this.onDragStart}
+                    />
+                    <Childs
+                      category={category}
+                      onEdit={this.handleEditCategory}
+                      onAddChild={this.handleAddChild}
+                      onDelete={this.handleDeleteCategory}
+                      allCategories={allCategories}
+                      onDragOver={this.onDragOver}
+                      onDrop={this.onDrop}
+                      onDragStart={this.onDragStart}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="border border-dark"
                     onDragOver={this.onDragOver}
+                    id={category._id}
                     onDrop={this.onDrop}
-                    onDragStart={this.onDragStart}
-                  />
-                </div>
-              ) : (
-                <div
-                  className="border border-dark"
-                  onDragOver={this.onDragOver}
-                  id={category._id}
-                  onDrop={this.onDrop}
-                  key={category._id + "single"}
-                >
-                  <Category
-                    category={category}
-                    onEdit={this.handleEditCategory}
-                    onAddChild={this.handleAddChild}
-                    onDelete={this.handleDeleteCategory}
-                    onDragOver={this.onDragOver}
-                    onDragStart={this.onDragStart}
-                  />
-                </div>
-              )
-            )}
-        </div>
+                    key={category._id + "single"}
+                  >
+                    <Category
+                      category={category}
+                      onEdit={this.handleEditCategory}
+                      onAddChild={this.handleAddChild}
+                      onDelete={this.handleDeleteCategory}
+                      onDragOver={this.onDragOver}
+                      onDragStart={this.onDragStart}
+                    />
+                  </div>
+                )
+              )}
+          </div>
+        </Accordion>
         {this.state.categoryFormEnabled && (
           <CategoryForm
             requestType={this.state.requestType}
