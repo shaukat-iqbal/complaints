@@ -8,7 +8,7 @@ const Showcase = ({ resolved, inprogress, closed }) => {
         <div className="row justify-content-center align-items-center">
           <div className="col-lg-4 col-md-6 mb-4 ">
             <div
-              className="card mt-4 bg-primary-color navbar-shadow rounded text-white text-center"
+              className="card mt-4 bg-light shadow-lg rounded text-dark text-center"
               style={{ width: "18rem", borderRadius: "15px" }}
             >
               <div className="card-body">
@@ -44,7 +44,7 @@ const Showcase = ({ resolved, inprogress, closed }) => {
 
           <div className="col-lg-4 col-md-6 mb-4 ">
             <div
-              className="card mt-4 bg-primary-color navbar-shadow rounded text-white text-center"
+              className="card mt-4 bg-light shadow-lg rounded text-dark text-center"
               style={{ width: "18rem" }}
             >
               <div className="card-body">

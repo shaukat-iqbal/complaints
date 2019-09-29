@@ -72,7 +72,7 @@ class Navbar extends React.Component {
         )}
 
         <nav
-          className="navbar navbar-expand-sm navbar-light bg-light navbar-shadow"
+          className="navbar navbar-expand-sm navbar-light bg-light shadow-sm"
           id="main-nav"
         >
           <div className="container">

@@ -54,9 +54,6 @@ export default function ComplaintDetail(props) {
       feedbackRemarks: data.feedbackRemarks,
       feedbackTags: data.feedbackTags
     });
-
-    // const { data: image } = await fetchFile(id);
-    // setImage(image);
   };
 
   // handle give feedback
@@ -199,28 +196,56 @@ export default function ComplaintDetail(props) {
         >
           &larr; Back to Dashboard
         </button>
-        <div className="card">
+        <div className="card shadow-lg">
           <div className="card-header">
-            <h3>Details</h3>
+            <h3>Complaint Details</h3>
           </div>
           <div className="card-body m-2">
             {!complaint && <h3>No Complaint found with this ID.</h3>}
             <div className="row">
-              <div className="overflow-auto">
-                <strong> Title:</strong> {complaint.title} <br /> <br />
-                <strong> Details:</strong> {complaint.details} <br /> <br />
-                <strong> Location:</strong> {complaint.location} <br /> <br />
-                {complaint.assignedTo && complaint.category && (
-                  <>
-                    <strong> Assigned to:</strong> {complaint.assignedTo.name}{" "}
-                    <br />
-                    <br />
-                    <strong> Category:</strong> {complaint.category.name} <b />
-                  </>
-                )}
-                <br />
-                <br />
-                <strong> Remarks:</strong> &nbsp;
+              <div className="col-md-3">
+                <strong> Title:</strong>
+              </div>
+              <div className="col-md-3">{complaint.title} </div>
+
+              <div className="col-md-3">
+                <strong> Details:</strong>
+              </div>
+              <div className="col-md-3">{complaint.details} </div>
+            </div>
+            <div className="row">
+              <div className="col-md-3">
+                <strong> Location:</strong>
+              </div>
+              <div className="col-md-3">{complaint.location} </div>
+
+              <div className="col-md-3">
+                <strong> Status:</strong>
+              </div>
+              <div className="col-md-3">{complaint.Status} </div>
+            </div>
+
+            {complaint.assignedTo && complaint.category && (
+              <>
+                <div className="row">
+                  <div className="col-md-3">
+                    <strong> Assigned to:</strong>
+                  </div>
+                  <div className="col-md-3"> {complaint.assignedTo.name} </div>
+
+                  <div className="col-md-3">
+                    <strong> Category:</strong>
+                  </div>
+                  <div className="col-md-3">{complaint.category.name} </div>
+                </div>
+              </>
+            )}
+
+            <div className="row">
+              <div className="col-md-3">
+                <strong> Remarks:</strong>
+              </div>
+              <div className="col-md-3">
                 {complaint.remarks === "" ? (
                   <>
                     <span>No Remarks yet</span> <br /> <br />{" "}
@@ -230,21 +255,20 @@ export default function ComplaintDetail(props) {
                     {complaint.remarks} <br /> <br />
                   </span>
                 )}
-                <b> Status:</b> {complaint.status} <br />
               </div>
             </div>
-            <br />
+
             <button
               className="btn button-outline-primary"
               onClick={() => handleMessaging(complaint.assignedTo)}
             >
               Message
             </button>
-            <br />
+
             {/* display feedback */}
             {complaint.status !== "in-progress" && (
               <button
-                className="btn btn-block button-outline-primary mt-2"
+                className="btn  button-outline-primary ml-2"
                 onClick={() => handleDisplayFeedback(complaint._id)}
               >
                 Give Feedback <i className="fa fa-comment-o ml-2"></i>
