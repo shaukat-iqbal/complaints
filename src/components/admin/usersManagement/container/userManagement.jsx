@@ -79,16 +79,8 @@ function UserManagement(props) {
           }}
         >
           <UserLogo width="70px" height="70px" />
-          <div className="text-white m-0 d-inline">
-            <span
-              className="d-inline"
-              style={{ color: "orange", marginRight: "2px" }}
-            >
-              <i className="fa fa-circle " />
-            </span>
-            <p className="d-inline">Online</p>
-          </div>
-          <p className="text-white m-0">{getCurrentUser().name}</p>
+          <p className="text-white m-0 mt-1">{getCurrentUser().name}</p>
+          <p className="text-white text-center m-0">Admin</p>
         </div>
       </div>
       <Divider />
