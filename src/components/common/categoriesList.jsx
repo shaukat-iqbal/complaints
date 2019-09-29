@@ -44,7 +44,7 @@ const CategoriesList = ({
                 <div className="container" style={{ height: "450px" }}>
                   {categories.map((category, index) => {
                     let cat = (
-                      <div className="category col p-0 d-flex m-1">
+                      <div className="category col p-3 d-flex m-1">
                         <option
                           key={category._id}
                           className="w-100"
@@ -55,7 +55,7 @@ const CategoriesList = ({
                         </option>
                         {isCrud && (
                           <button
-                            className="badge"
+                            className="badge badge-light"
                             onClick={() => onTick(category._id)}
                           >
                             <i className="fa fa-check"></i>

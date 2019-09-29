@@ -1,13 +1,23 @@
-.category option:hover {
-  background-color: bisque;
+.category:hover {
+  background-color: #84dcdc;
   cursor: pointer;
+  color: black;
 }
 
-.category option {
+/* .category option {
   padding: 20px;
-  background-color: burlywood;
+  background-color: rgb(147, 172, 171);
+} */
+.category {
+  color: white;
+  /* padding: 20px; */
+  background-color: #544464;
+  border-radius: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 20px;
+  padding-right: 20px;
 }
-
 .Cli {
   background-color: brown;
 }

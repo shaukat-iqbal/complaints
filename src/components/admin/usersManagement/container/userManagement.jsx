@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Link } from "react-router-dom";
+import { Route, Link, Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -238,6 +238,7 @@ function UserManagement(props) {
           render={props => <Users role="complainers" {...props} />}
         />
         <Route path="/admin/users/categories" component={CategoriesList} />
+        <Redirect from="/admin/users" to="/admin/users/register" />
       </main>
     </div>
   );

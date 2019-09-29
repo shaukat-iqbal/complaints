@@ -9,14 +9,22 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 
-import auth from "../../../services/authService";
+import auth, { getCurrentUser } from "../../../services/authService";
 import { deleteConversation } from "../../../services/messageService";
+import { setProfilePictureToken } from "../../../services/imageService";
+import UserLogo from "../../common/logo";
 
 const url = "/a/message";
 
 class Navbar extends React.Component {
   state = { complainers: [], confirmation: false, complainer: "" };
 
+  async componentDidMount() {
+    if (!localStorage.getItem("profilePicture")) {
+      await setProfilePictureToken(getCurrentUser()._id, "assignee");
+      this.setState({ profilePicture: true });
+    }
+  }
   handleDelete = async complainer => {
     console.log(complainer.name);
     const data = {
@@ -92,6 +100,48 @@ class Navbar extends React.Component {
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
               <div className="navbar-nav ml-auto ">
+                <UserLogo />
+                <NavLink
+                  className="nav-item nav-link text-dark "
+                  to={`/profile/${getCurrentUser()._id}/assignees`}
+                >
+                  {getCurrentUser() && getCurrentUser().name.split(" ", 1)}
+                </NavLink>
+                <a className="nav-item dropdown">
+                  <Link
+                    className="nav-link dropdown-toggle"
+                    to="#"
+                    id="navbarDropdown"
+                    role="button"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    <span className="text-dark navbar-custom"> More</span>
+                  </Link>
+                  <div
+                    className="dropdown-menu"
+                    aria-labelledby="navbarDropdown"
+                  >
+                    <NavLink
+                      className="dropdown-item "
+                      to={`/profile/${auth.getCurrentUser()._id}/${
+                        auth.getCurrentUser().role
+                      }s`}
+                    >
+                      Profile
+                    </NavLink>
+                    <Link className="dropdown-item " to="/assignee/dashboard">
+                      Dashboard
+                    </Link>
+                    <NavLink className="dropdown-item" to="/resetpassword">
+                      Reset Password
+                    </NavLink>
+                    <NavLink className="dropdown-item" to="/logout">
+                      <i className="fa fa-sign-out mr-1"></i>Logout
+                    </NavLink>
+                  </div>
+                </a>
                 <div className="dropdown">
                   <button
                     className="nav-button mt-2 mr-4 navbar-custom"
@@ -140,41 +190,6 @@ class Navbar extends React.Component {
                     )}
                   </div>
                 </div>
-                <a className="nav-item dropdown">
-                  <Link
-                    className="nav-link dropdown-toggle"
-                    to="#"
-                    id="navbarDropdown"
-                    role="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <span className="text-dark navbar-custom"> More</span>
-                  </Link>
-                  <div
-                    className="dropdown-menu"
-                    aria-labelledby="navbarDropdown"
-                  >
-                    <NavLink
-                      className="dropdown-item "
-                      to={`/profile/${auth.getCurrentUser()._id}/${
-                        auth.getCurrentUser().role
-                      }s`}
-                    >
-                      Profile
-                    </NavLink>
-                    <Link className="dropdown-item " to="/assignee/dashboard">
-                      Dashboard
-                    </Link>
-                    <NavLink className="dropdown-item" to="/resetpassword">
-                      Reset Password
-                    </NavLink>
-                    <NavLink className="dropdown-item" to="/logout">
-                      Logout
-                    </NavLink>
-                  </div>
-                </a>
               </div>
             </div>
           </div>

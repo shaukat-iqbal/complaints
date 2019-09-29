@@ -42,7 +42,6 @@ class Login extends Form {
         `/auth-${role}`
       );
       localStorage.setItem("token", response.headers["x-auth-token"]);
-
       window.location = `/${role}`;
       this.setState({ isLoading: true });
       // this.props.history.push('/complainer');

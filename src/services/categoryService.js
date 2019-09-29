@@ -6,7 +6,7 @@ export function getCategories() {
 }
 
 export function getAssigneeCategories() {
-  return http.get(config.apiUrl + "/categories/assignee");
+  return http.get(config.apiUrl + "/categories/assignee/allCategories/all");
 }
 
 export function getSpecificCategories() {
