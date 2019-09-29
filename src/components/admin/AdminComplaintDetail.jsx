@@ -12,6 +12,7 @@ import {
 } from "../../services/complaintService";
 import { getAllAssignees } from "../../services/assigneeService.js";
 import { toast } from "react-toastify";
+import Users from "./usersManagement/users";
 
 export default function ComplaintDetail(props) {
   const [openAssigneeDialog, setopenAssigneeDialog] = useState(true);
@@ -114,16 +115,19 @@ export default function ComplaintDetail(props) {
   //     </ul>
   //   );
   // };
+  const handleUserSelected = user => {
+    setAssignees(user);
+    setopenAssigneeDialog(false);
+    handleAssignTask(user);
+  };
 
   // handle Assign Task
-  const handleAssignTask = async () => {
-    console.log(selectedAssignee.current.value);
+  const handleAssignTask = async user => {
     const { data: newcomplaint } = await taskAssignment(
       complaint._id,
-      selectedAssignee.current.value
+      user._id
     );
     setComplaint(newcomplaint);
-    setopenAssigneeDialog(false);
     props.history.replace("/admin");
     toast.success("Complaint is successfully assigned.");
   };
@@ -136,7 +140,7 @@ export default function ComplaintDetail(props) {
       >
         &larr; Back to Dashboard
       </button>
-      {complaint.assigned === false && (
+      {!complaint.assignedTo && (
         <button
           onClick={() => handleAssign(complaint)}
           className="btn button-outline-primary mb-2 ml-2"
@@ -156,8 +160,14 @@ export default function ComplaintDetail(props) {
           <div className="card-header mb-2">
             <h5>Assignees List</h5>
           </div>
-
           <DialogContent>
+            <Users
+              role="assignees"
+              isAssigning={true}
+              onUserSelected={handleUserSelected}
+            />
+          </DialogContent>
+          {/* <DialogContent>
             <div className="row">
               <div className="form-group d-inline">
                 <strong className="mb-4">Name</strong> &nbsp; &nbsp;
@@ -173,16 +183,13 @@ export default function ComplaintDetail(props) {
 
               {/* <div className="col-md-6">
                  Categories will go here
-                </div> */}
-            </div>
-          </DialogContent>
-
+                </div> 
+           </div>
+          </DialogContent> 
+          */}
           <DialogActions>
             <Button onClick={handleCloseAssigneeDialog} color="secondary">
               Cancel
-            </Button>
-            <Button onClick={handleAssignTask} color="primary">
-              Assign Task
             </Button>
           </DialogActions>
         </Dialog>
@@ -221,7 +228,6 @@ export default function ComplaintDetail(props) {
                 <div className="col-md-3">
                   {complaint.complainer && (
                     <>
-                      <strong> Complainer:</strong>
                       <span> {complaint.complainer.name}</span> <br />
                     </>
                   )}
@@ -258,7 +264,9 @@ export default function ComplaintDetail(props) {
                     <span>{complaint.remarks}</span>
                   )}
                 </div>
-                <div className="col-md-3">Status</div>
+                <div className="col-md-3">
+                  <strong>Status</strong>
+                </div>
                 <div className="col-md-3"> {complaint.status} </div>
               </div>
 
@@ -267,7 +275,10 @@ export default function ComplaintDetail(props) {
                   {" "}
                   <strong>Feedback:</strong>
                 </div>
-                <div className="col-md-6"> {complaint.feedbackRemarks}</div>
+                <div className="col-md-6">
+                  {" "}
+                  {complaint.feedbackRemarks || "No Feedback Yet"}
+                </div>
               </div>
 
               {complaint.files !== "" && (

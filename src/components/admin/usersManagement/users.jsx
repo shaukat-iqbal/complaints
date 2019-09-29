@@ -105,15 +105,7 @@ class Users extends Component {
 
   render() {
     const { length: count } = this.state.users;
-    const { pageSize, currentPage, sortColumn, searchQuery } = this.state;
-
-    // if (count === 0)
-    //   return (
-    //     <p className="alert alert-info p-4">
-    //       There are no users in the database.
-    //       <Link to="/admin/users/register">Create an Account</Link>
-    //     </p>
-    //   );
+    const { pageSize, currentPage, searchQuery } = this.state;
 
     const { totalCount, data: users } = this.getPagedData();
     return (
@@ -135,22 +127,16 @@ class Users extends Component {
                   style={{ minHeight: "500px" }}
                   className="d-flex flex-column align-content-between justify-content-between "
                 >
-                  {/* <UsersTable
-                    users={users}
-                    sortColumn={sortColumn}
-                    onDelete={this.handleDelete}
-                    onEdit={this.handleEdit}
-                    onSort={this.handleSort}
-                    role={this.props.role}
-                  /> */}
                   <div className="card container shadow-lg mb-3">
                     <div className="card-body">
                       {users.map(user => (
                         <User
+                          showCrudBtns={!this.props.isAssigning}
                           user={user}
                           onProfileView={this.handleProfile}
                           onDelete={this.handleDelete}
                           onEdit={this.handleEdit}
+                          onUserSelected={this.props.onUserSelected}
                         />
                       ))}
                     </div>

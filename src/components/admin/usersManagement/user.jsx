@@ -1,6 +1,13 @@
 import React from "react";
 import { convertToPicture } from "../../../services/userService";
-const User = ({ user, onProfileView, onDelete, onEdit }) => {
+const User = ({
+  user,
+  onProfileView,
+  onDelete,
+  onEdit,
+  showCrudBtns,
+  onUserSelected
+}) => {
   let profilePicture = "";
   if (user.profilePicture)
     profilePicture = convertToPicture(user.profilePicture.data);
@@ -33,30 +40,44 @@ const User = ({ user, onProfileView, onDelete, onEdit }) => {
         </div>
       </div>
       <div>
-        <button
-          className="btn button-primary mr-2 mb-1"
-          onClick={() => {
-            onProfileView(user);
-          }}
-        >
-          <i className="fa fa-user-circle-o"></i> Profile
-        </button>
-        <button
-          className="btn button-secondary mr-2 mb-1"
-          onClick={() => {
-            onEdit(user);
-          }}
-        >
-          <i className="fa fa-pencil"></i> Edit
-        </button>
-        <button
-          className="btn btn-danger rounded-pill"
-          onClick={() => {
-            onDelete(user);
-          }}
-        >
-          <i className="fa fa-trash"></i> Delete
-        </button>
+        {showCrudBtns ? (
+          <>
+            {" "}
+            <button
+              className="btn button-primary mr-2 mb-1"
+              onClick={() => {
+                onProfileView(user);
+              }}
+            >
+              <i className="fa fa-user-circle-o"></i> Profile
+            </button>
+            <button
+              className="btn button-secondary mr-2 mb-1"
+              onClick={() => {
+                onEdit(user);
+              }}
+            >
+              <i className="fa fa-pencil"></i> Edit
+            </button>
+            <button
+              className="btn btn-danger rounded-pill"
+              onClick={() => {
+                onDelete(user);
+              }}
+            >
+              <i className="fa fa-trash"></i> Delete
+            </button>
+          </>
+        ) : (
+          <button
+            className="btn btn-info rounded-pill  "
+            onClick={() => {
+              onUserSelected(user);
+            }}
+          >
+            Select
+          </button>
+        )}
       </div>
     </div>
   );

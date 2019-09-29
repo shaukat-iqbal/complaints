@@ -207,11 +207,20 @@ export default function ComplaintDetail(props) {
                 <strong> Title:</strong>
               </div>
               <div className="col-md-3">{complaint.title} </div>
-
               <div className="col-md-3">
-                <strong> Details:</strong>
+                <strong> Remarks:</strong>
               </div>
-              <div className="col-md-3">{complaint.details} </div>
+              <div className="col-md-3">
+                {complaint.remarks === "" ? (
+                  <>
+                    <span>No Remarks yet</span> <br /> <br />{" "}
+                  </>
+                ) : (
+                  <span>
+                    {complaint.remarks} <br /> <br />
+                  </span>
+                )}
+              </div>
             </div>
             <div className="row">
               <div className="col-md-3">
@@ -222,7 +231,7 @@ export default function ComplaintDetail(props) {
               <div className="col-md-3">
                 <strong> Status:</strong>
               </div>
-              <div className="col-md-3">{complaint.Status} </div>
+              <div className="col-md-3">{complaint.status} </div>
             </div>
 
             {complaint.assignedTo && complaint.category && (
@@ -243,27 +252,19 @@ export default function ComplaintDetail(props) {
 
             <div className="row">
               <div className="col-md-3">
-                <strong> Remarks:</strong>
+                <strong> Details:</strong>
               </div>
-              <div className="col-md-3">
-                {complaint.remarks === "" ? (
-                  <>
-                    <span>No Remarks yet</span> <br /> <br />{" "}
-                  </>
-                ) : (
-                  <span>
-                    {complaint.remarks} <br /> <br />
-                  </span>
-                )}
-              </div>
+              <div className="col-md-6">{complaint.details} </div>
             </div>
 
-            <button
-              className="btn button-outline-primary"
-              onClick={() => handleMessaging(complaint.assignedTo)}
-            >
-              Message
-            </button>
+            {complaint.assignedTo && (
+              <button
+                className="btn button-outline-primary"
+                onClick={() => handleMessaging(complaint.assignedTo)}
+              >
+                Message
+              </button>
+            )}
 
             {/* display feedback */}
             {complaint.status !== "in-progress" && (
