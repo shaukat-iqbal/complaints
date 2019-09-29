@@ -17,7 +17,9 @@ const Showcase = ({ resolved, inprogress, closed }) => {
                 </h3>
                 <h3>In Progress</h3>
                 <br />
-                <CountUp duration={3} end={inprogress} />
+                <div className="badge badge-secondary rounded-circle p-2">
+                  <CountUp duration={3} end={inprogress} />
+                </div>
                 <br />
               </div>
             </div>
@@ -34,9 +36,9 @@ const Showcase = ({ resolved, inprogress, closed }) => {
                 </h3>
                 <h3>Resolved</h3>
                 <br />
-
-                <CountUp duration={5} end={resolved} />
-
+                <div className="badge badge-secondary rounded-circle p-2">
+                  <CountUp duration={5} end={resolved} />
+                </div>
                 <br />
               </div>
             </div>
@@ -53,7 +55,9 @@ const Showcase = ({ resolved, inprogress, closed }) => {
                 </h3>
                 <h3>Closed</h3>
                 <br />
-                <CountUp duration={5} end={closed} />
+                <div className="badge badge-secondary rounded-circle p-2">
+                  <CountUp duration={5} end={closed} />
+                </div>
                 <br />
               </div>
             </div>

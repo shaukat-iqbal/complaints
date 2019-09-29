@@ -45,9 +45,9 @@ class Navbar extends Component {
               <NavLink className="nav-item nav-link text-dark" to="/logout">
                 Logout
               </NavLink>
-              <button className=" nav-button dropdown ">
-                <Link
-                  className="nav-link dropdown-toggle"
+              <button className=" nav-button nav-item nav-link dropdown ">
+                <NavLink
+                  className=" text-dark dropdown-toggle "
                   to="#"
                   id="navbarDropdown"
                   role="button"
@@ -55,10 +55,8 @@ class Navbar extends Component {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  <span className="text-dark navbar-custom">
-                    {getCurrentUser() && getCurrentUser().name}
-                  </span>
-                </Link>
+                  {getCurrentUser() && getCurrentUser().name}
+                </NavLink>
 
                 <div className="dropdown-menu" aria-labelledby="navbarDropdown">
                   <NavLink className="dropdown-item" to="/admin/dashboard">

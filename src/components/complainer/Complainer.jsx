@@ -215,22 +215,31 @@ class Complainer extends Component {
                   New Complaint &rarr;
                 </Link>
 
-                <p>Showing {filtered.length} complaints</p>
+                {sorted.length > 0 ? (
+                  <>
+                    <p>Showing {filtered.length} complaints</p>
 
-                <SearchBox value={searchQuery} onChange={this.handleSearch} />
+                    <SearchBox
+                      value={searchQuery}
+                      onChange={this.handleSearch}
+                    />
 
-                <CompalinerTable
-                  complaints={complaints}
-                  sortColumn={sortColumn}
-                  onSort={this.handleSort}
-                  onDetail={this.handleDetail}
-                />
-                <Pagination
-                  itemsCount={filtered.length}
-                  pageSize={pageSize}
-                  currentPage={currentPage}
-                  onPageChange={this.handlePageChange}
-                />
+                    <CompalinerTable
+                      complaints={complaints}
+                      sortColumn={sortColumn}
+                      onSort={this.handleSort}
+                      onDetail={this.handleDetail}
+                    />
+                    <Pagination
+                      itemsCount={filtered.length}
+                      pageSize={pageSize}
+                      currentPage={currentPage}
+                      onPageChange={this.handlePageChange}
+                    />
+                  </>
+                ) : (
+                  <h4 className="mt-2">No Complaint </h4>
+                )}
               </div>
             </div>
           )}
