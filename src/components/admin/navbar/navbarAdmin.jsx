@@ -39,7 +39,7 @@ class Navbar extends Component {
                 className="nav-item nav-link text-dark "
                 to={`/profile/${getCurrentUser()._id}/admins`}
               >
-                Profile
+                {getCurrentUser() && getCurrentUser().name.split(" ", 1)}
               </NavLink>
 
               <NavLink className="nav-item nav-link text-dark" to="/logout">
@@ -55,7 +55,7 @@ class Navbar extends Component {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  {getCurrentUser() && getCurrentUser().name}
+                  More
                 </NavLink>
 
                 <div className="dropdown-menu" aria-labelledby="navbarDropdown">

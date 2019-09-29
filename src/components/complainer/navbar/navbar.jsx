@@ -150,7 +150,6 @@ class Navbar extends React.Component {
                     )}
                   </div>
                 </div>
-
                 <a className="nav-item dropdown">
                   <Link
                     className="nav-link dropdown-toggle"
@@ -161,9 +160,7 @@ class Navbar extends React.Component {
                     aria-haspopup="true"
                     aria-expanded="false"
                   >
-                    <span className="text-dark navbar-custom">
-                      {user && user.name}
-                    </span>
+                    <span className="text-dark navbar-custom">More</span>
                   </Link>
                   <div
                     className="dropdown-menu"
@@ -177,7 +174,9 @@ class Navbar extends React.Component {
                     >
                       Profile
                     </NavLink>
-
+                    <NavLink className="dropdown-item" to="/resetpassword">
+                      Reset Password
+                    </NavLink>
                     <NavLink className="dropdown-item" to="/logout">
                       Logout
                     </NavLink>
