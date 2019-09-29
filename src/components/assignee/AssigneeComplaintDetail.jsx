@@ -90,95 +90,120 @@ export default function ComplaintDetail(props) {
       >
         &larr; Back to Dashboard
       </button>
-      <div className="card">
+      <div className="card shadow-lg">
         <div className="card-header">
-          <h3>Details</h3>
+          <h3>Complaint Details</h3>
         </div>
 
         <div className="card-body">
           {!complaint && <h3>No Complaint found with this ID.</h3>}
           <div className="row">
             <div className="col-md-12 col-sm-12 mb-2 overflow-auto">
-              <strong> Title:</strong> {complaint.title} <br /> <br />
-              <strong> Details:</strong> {complaint.details} <br /> <br />
-              <strong> Location:</strong> {complaint.location} <br /> <br />
-              {/* {complaint.assignedTo && complaint.category && (
-                <>
-                  <strong> Assigned to:</strong> {complaint.assignedTo.name}{" "}
-                  <br />
-                  <br />
-                  <strong> Category:</strong> {complaint.category.name}
-                </>
-              )} */}
-              <span>
-                <strong> Remarks:</strong> &nbsp;
-                {complaint.remarks === "" ? (
-                  <>
-                    {" "}
-                    <span>No Remarks yet</span> <br />
-                  </>
-                ) : (
+              <div className="row">
+                <div className="col-md-3">
+                  <strong> Title:</strong>
+                </div>
+                <div className="col-md-3">{complaint.title} </div>
+
+                <div className="col-md-3">
+                  <strong> Details:</strong>
+                </div>
+                <div className="col-md-3">{complaint.details} </div>
+              </div>
+              <div className="row">
+                <div className="col-md-3">
+                  <strong> Location:</strong>
+                </div>
+                <div className="col-md-3">{complaint.location} </div>
+
+                <div className="col-md-3">
+                  <strong> Remarks:</strong>
+                </div>
+                <div className="col-md-3">
+                  {" "}
+                  {complaint.remarks === "" ? (
+                    <>
+                      {" "}
+                      <span>No Remarks yet</span> <br />
+                    </>
+                  ) : (
+                    <span>
+                      {complaint.remarks} <br />
+                    </span>
+                  )}{" "}
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-md-3">
+                  <strong> Feedback:</strong>
+                </div>
+                <div className="col-md-3">{complaint.feedbackRemarks}</div>
+              </div>
+              <div className="row">
+                <div className="col-md-3">
+                  <strong> Status:</strong>
+                </div>
+
+                <div className="col-md-6">
                   <span>
-                    {complaint.remarks} <br />
+                    {!edit && <span>{complaint.status}</span>}
+                    {/* display drop down */}
+                    {edit && (
+                      <>
+                        <div className="form-group d-inline">
+                          <select
+                            className="form-control-sm"
+                            name="editOptions"
+                            id="editOption"
+                            ref={statusValue}
+                          >
+                            <option value="in-progress">in-progress</option>
+                            <option value="closed - relief granted">
+                              closed - relief granted
+                            </option>
+                            <option value="closed - partial relief granted">
+                              closed - partial relief granted
+                            </option>
+                            <option value="closed - relief can't be granted">
+                              closed - relief can't be granted
+                            </option>
+                          </select>
+                        </div>
+                        <div className="form-group mt-4">
+                          <textarea
+                            className="form-control"
+                            name="remarks"
+                            id="remarks"
+                            value={remarks}
+                            onChange={e => handleRemarks(e)}
+                            cols="10"
+                            rows="5"
+                            minLength="5"
+                            placeholder="Your remarks..."
+                          />
+                        </div>
+                        {error && (
+                          <div className="alert alert-danger">{error}</div>
+                        )}
+                      </>
+                    )}
+                    <button className="btn  ml-2 mb-2" onClick={handleEdit}>
+                      <i className="fa fa-pencil" /> &nbsp;
+                    </button>
                   </span>
-                )}
-                <br />
-                <strong>Feedback:</strong>&nbsp; &nbsp;
-                {complaint.feedbackRemarks} <br /> <br />
-                <strong>Status:</strong>&nbsp; &nbsp;
-                {!edit && <span>{complaint.status}</span>}
-                {/* display drop down */}
-                {edit && (
-                  <>
-                    <div className="form-group d-inline">
-                      <select
-                        className="form-control-sm"
-                        name="editOptions"
-                        id="editOption"
-                        ref={statusValue}
-                      >
-                        <option value="in-progress">in-progress</option>
-                        <option value="closed - relief granted">
-                          closed - relief granted
-                        </option>
-                        <option value="closed - partial relief granted">
-                          closed - partial relief granted
-                        </option>
-                        <option value="closed - relief can't be granted">
-                          closed - relief can't be granted
-                        </option>
-                      </select>
-                    </div>
-                    <div className="form-group mt-4">
-                      <textarea
-                        className="form-control"
-                        name="remarks"
-                        id="remarks"
-                        value={remarks}
-                        onChange={e => handleRemarks(e)}
-                        cols="10"
-                        rows="5"
-                        minLength="5"
-                        placeholder="Your remarks..."
-                      />
-                    </div>
-                    {error && <div className="alert alert-danger">{error}</div>}
-                  </>
-                )}
-                <button className="btn  ml-2 mb-2" onClick={handleEdit}>
-                  <i className="fa fa-pencil" /> &nbsp;
-                </button>
-              </span>
-              {edit && (
-                <button
-                  className="btn button-primary ml-2 mb-2"
-                  onClick={() => {
-                    return handleSave(complaint._id);
-                  }}
-                >
-                  Save
-                </button>
-              )}
+                  {edit && (
+                    <button
+                      className="btn button-primary ml-2 mb-2"
+                      onClick={() => {
+                        return handleSave(complaint._id);
+                      }}
+                    >
+                      Save
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 

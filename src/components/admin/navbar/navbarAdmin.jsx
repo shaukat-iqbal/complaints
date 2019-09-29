@@ -14,7 +14,7 @@ class Navbar extends Component {
   render() {
     return (
       <nav
-        className="navbar navbar-expand-sm text-white navbar-light navbar-shadow"
+        className="navbar navbar-expand-sm text-white navbar-light shadow-sm"
         id="main-nav"
       >
         <div className="container">

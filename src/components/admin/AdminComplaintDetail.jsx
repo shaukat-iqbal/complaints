@@ -191,54 +191,85 @@ export default function ComplaintDetail(props) {
 
       {!error ? (
         <>
-          <div className="card">
+          <div className="card shadow-lg">
             <div className="card-header">
-              <h3>Details</h3>
+              <h3>Complaint Details</h3>
             </div>
             <div className="card-body m-2">
               {!complaint && <h3>No Complaint found with this ID.</h3>}
+
               <div className="row">
-                <div className="overflow-auto">
-                  <strong> Title:</strong> {complaint.title} <br /> <br />
-                  <strong> Details:</strong> {complaint.details} <br /> <br />
-                  <strong> Location:</strong> {complaint.location} <br /> <br />
+                <div className="col-md-3">
+                  <strong> Title:</strong>
+                </div>
+                <div className="col-md-3">{complaint.title} </div>
+
+                <div className="col-md-3">
+                  <strong> Details:</strong>
+                </div>
+                <div className="col-md-3">{complaint.details} </div>
+              </div>
+              <div className="row">
+                <div className="col-md-3">
+                  <strong> Location:</strong>
+                </div>
+                <div className="col-md-3">{complaint.location} </div>
+
+                <div className="col-md-3">
+                  <strong> Complainer:</strong>
+                </div>
+                <div className="col-md-3">
                   {complaint.complainer && (
                     <>
                       <strong> Complainer:</strong>
                       <span> {complaint.complainer.name}</span> <br />
                     </>
                   )}
-                  <br />
-                  {complaint.assignedTo && complaint.category && (
-                    <>
-                      <strong> Assigned to:</strong> {complaint.assignedTo.name}
-                      <br />
-                      <br />
-                      <strong> Category:</strong> {complaint.category.name}{" "}
-                      <b />
-                    </>
-                  )}
-                  <br />
-                  <br />
-                  <strong> Remarks:</strong> &nbsp;
+                </div>
+              </div>
+              {complaint.assignedTo && complaint.category && (
+                <>
+                  <div className="row">
+                    <div className="col-md-3">
+                      <strong> Assigned to:</strong>
+                    </div>
+                    <div className="col-md-3">{complaint.assignedTo.name}</div>
+
+                    <div className="col-md-3">
+                      <strong> Category:</strong>
+                    </div>
+                    <div className="col-md-3">{complaint.category.name}</div>
+                  </div>
+                </>
+              )}
+
+              <div className="row">
+                <div className="col-md-3">
+                  {" "}
+                  <strong> Remarks:</strong>
+                </div>
+                <div className="col-md-3">
                   {complaint.remarks === "" ? (
                     <>
                       {" "}
                       <span>No Remarks yet</span> <br /> <br />{" "}
                     </>
                   ) : (
-                    <span>
-                      {complaint.remarks} <br /> <br />
-                    </span>
+                    <span>{complaint.remarks}</span>
                   )}
-                  <strong>Status:</strong>&nbsp; &nbsp; {complaint.status}{" "}
-                  <br /> <br />
-                  <strong>Feedback:</strong>&nbsp; &nbsp;{" "}
-                  {complaint.feedbackRemarks}
                 </div>
-
-                <br />
+                <div className="col-md-3">Status</div>
+                <div className="col-md-3"> {complaint.status} </div>
               </div>
+
+              <div className="row">
+                <div className="col-md-3 ">
+                  {" "}
+                  <strong>Feedback:</strong>
+                </div>
+                <div className="col-md-6"> {complaint.feedbackRemarks}</div>
+              </div>
+
               {complaint.files !== "" && (
                 <>
                   <button

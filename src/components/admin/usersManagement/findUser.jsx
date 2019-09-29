@@ -42,7 +42,7 @@ const FindUser = ({ onChange, onSearch, onCancel, data, error }) => {
           </div>
         </div>
         <div className="card-footer py-2 d-flex justify-content-end">
-          <button className="btn btn-sm btn-primary mx-1" onClick={onSearch}>
+          <button className="btn btn-sm button-primary mx-1" onClick={onSearch}>
             Search
           </button>
           <button className="btn btn-sm btn-danger" onClick={onCancel}>
