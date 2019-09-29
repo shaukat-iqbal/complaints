@@ -98,17 +98,17 @@ function UserManagement(props) {
           {
             label: "Create Account",
             path: "/admin/users/register",
-            icon: "add_circle"
+            icon: <i className="fa fa-plus mr-4 fa-2x"></i>
           },
           {
             label: "Assignees",
             path: "/admin/users/assignees",
-            icon: "list"
+            icon: <i className="fa fa-list mr-4 fa-2x"></i>
           },
           {
             label: "Complainers",
             path: "/admin/users/complainers",
-            icon: "list_alt"
+            icon: <i className="fa fa-list-alt mr-4 fa-2x"></i>
           }
         ].map(item => (
           <Link
@@ -118,13 +118,7 @@ function UserManagement(props) {
             style={{ textDecoration: "none" }}
           >
             <ListItem button key={item.label}>
-              <Icon
-                style={{ marginRight: "9px" }}
-                color="primary"
-                fontSize="large"
-              >
-                {item.icon || "person"}
-              </Icon>
+              {item.icon}
               <ListItemText primary={item.label} />
             </ListItem>
           </Link>
@@ -137,22 +131,23 @@ function UserManagement(props) {
           {
             label: "Home",
             path: "/admin/",
-            icon: "home"
+            icon: <i className="fa fa-home mr-4 fa-2x"></i>
           },
           {
             label: "Configuration",
             path: "/admin/configuration",
-            icon: "person"
+            icon: <i className="fa fa-cog mr-4 fa-2x"></i>
           },
           {
             label: "Categories",
             path: "/admin/users/categories",
-            icon: "person"
+            icon: <i className="fa fa-list-alt mr-4 fa-2x"></i>
           },
+
           {
-            label: "Complainers",
-            path: "/admin/users/complainers",
-            icon: "person"
+            label: "Logout",
+            path: "/logout",
+            icon: <i className="fa fa-sign-out mr-4 fa-2x"></i>
           }
         ].map(item => (
           <Link
@@ -162,13 +157,7 @@ function UserManagement(props) {
             style={{ textDecoration: "none" }}
           >
             <ListItem button key={item.label}>
-              <Icon
-                style={{ marginRight: "9px" }}
-                color="primary"
-                fontSize="large"
-              >
-                {item.icon || "person"}
-              </Icon>
+              {item.icon}
               <ListItemText primary={item.label} />
             </ListItem>
           </Link>

@@ -80,7 +80,6 @@ const Category = ({
         </div>
         <div
           onDragStart={e => onDragStart(e, category._id)}
-          draggable
           onDragOver={onDragOver}
           key={category._id + "64t " + category.name}
           id={category._id}
