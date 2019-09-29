@@ -43,7 +43,7 @@ class Navbar extends Component {
               </NavLink>
 
               <NavLink className="nav-item nav-link text-dark" to="/logout">
-                Logout
+                <i className="fa fa-sign-out mr-1"></i>Logout
               </NavLink>
               <button className=" nav-button nav-item nav-link dropdown ">
                 <NavLink

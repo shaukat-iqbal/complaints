@@ -8,7 +8,8 @@ import DialogActions from "@material-ui/core/DialogActions";
 import Joi from "joi-browser";
 import {
   createCategory,
-  updateCategoryById
+  updateCategoryById,
+  getCategories
 } from "../services/categoryService";
 class CategoryForm extends Form {
   state = {
@@ -26,10 +27,12 @@ class CategoryForm extends Form {
     parentCategory: Joi.string(),
     hasChild: Joi.boolean()
   };
-  componentDidMount() {
-    this.populateForm(this.props.category);
+  async componentDidMount() {
+    const { data: allCategories } = await getCategories();
+    this.setState({ allCategories });
+    this.populateForm(this.props.category, allCategories);
   }
-  populateForm = category => {
+  populateForm = (category, allCategories) => {
     let { data } = this.state;
     let parentCategoryName = null;
     if (this.props.requestType === "addChild") {
@@ -45,6 +48,7 @@ class CategoryForm extends Form {
       }
     } else if (this.props.requestType === "new") {
       data.hasChild = false;
+      data.parentCategory = allCategories.find(c => c.name === "Root")._id;
     }
     this.setState({
       data,
@@ -55,7 +59,7 @@ class CategoryForm extends Form {
   };
 
   getparentCategoryName = id => {
-    let parentCategory = this.props.allCategories.find(c => c._id === id);
+    let parentCategory = this.state.allCategories.find(c => c._id === id);
     return parentCategory;
   };
   handleOnCategorySeletion = id => {
@@ -71,20 +75,21 @@ class CategoryForm extends Form {
 
   doSubmit = async () => {
     try {
+      let category = null;
       if (this.state.requestType === "edit") {
         let { data } = await updateCategoryById(
           this.state.category._id,
           this.state.data
         );
-        console.log(data);
+        category = data;
       } else if (this.state.requestType === "addChild") {
-        let { data: category } = await createCategory(this.state.data);
-        console.log(category);
+        let { data } = await createCategory(this.state.data);
+        category = data;
       } else if (this.state.requestType === "new") {
-        let { data: category } = await createCategory(this.state.data);
-        console.log(category);
+        let { data } = await createCategory(this.state.data);
+        category = data;
       }
-      this.props.onClose();
+      this.props.onClose(category);
     } catch (error) {
       console.log(error);
     }

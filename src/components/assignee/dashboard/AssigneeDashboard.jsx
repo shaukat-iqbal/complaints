@@ -27,7 +27,7 @@ class AssigneeDashboard extends Component {
     spamComplaints: [],
     displaySpamList: false,
     categories: [],
-    pageSize: 9,
+    pageSize: 7,
     currentPage: 1,
     sortColumn: { path: "title", order: "asc" },
     searchQuery: "",
@@ -44,8 +44,12 @@ class AssigneeDashboard extends Component {
 
   //getting categories
   getAllCategories = async () => {
-    const { data: allcategories } = await getAssigneeCategories();
-    const categories = [{ _id: "", name: "All Categories" }, ...allcategories];
+    const { data: responsibilities } = await getAssigneeCategories();
+    console.log(responsibilities);
+    const categories = [
+      { _id: "", name: "All Categories" },
+      ...responsibilities
+    ];
     this.setState({ categories });
   };
 
@@ -107,7 +111,13 @@ class AssigneeDashboard extends Component {
 
   // handle drop responsibility
   handleDropResponsibility = async complaint => {
-    await dropResponsibility(complaint._id);
+    try {
+      await dropResponsibility(complaint._id);
+    } catch (ex) {
+      if (ex.response && ex.response.status == "400") {
+        return toast.warn("Something went wrong");
+      }
+    }
 
     toast.success("You have successfully dropped Responsibility");
 
@@ -281,7 +291,7 @@ class AssigneeDashboard extends Component {
                     this.setState({ confirmSpam: true });
                   }}
                 >
-                  marks as spam
+                  Mark Spam
                 </button>
                 <button
                   className="btn button-primary"
@@ -289,7 +299,7 @@ class AssigneeDashboard extends Component {
                     this.setState({ confirmDrop: true });
                   }}
                 >
-                  drop from responsibility
+                  Drop responsibility
                 </button>
                 {/* </span> */}
                 <button
@@ -320,30 +330,34 @@ class AssigneeDashboard extends Component {
                       onItemSelect={this.handleCategorySelect}
                     />
                   </div>
-                  <div className="col-md-10">
-                    <p>Showing {filtered.length} complaints</p>
+                  {sorted.length > 0 ? (
+                    <div className="col-md-10">
+                      <p>Showing {filtered.length} complaints</p>
 
-                    <SearchBox
-                      value={searchQuery}
-                      onChange={this.handleSearch}
-                    />
+                      <SearchBox
+                        value={searchQuery}
+                        onChange={this.handleSearch}
+                      />
 
-                    <AssigneeTable
-                      complaints={complaints}
-                      sortColumn={sortColumn}
-                      onSort={this.handleSort}
-                      onDetail={this.handleDetail}
-                      onCheckBoxChecked={this.handleCheckBoxChecked}
-                      // defaultChecked={defaultChecked}
-                      checkedComplaint={checkedComplaint}
-                    />
-                    <Pagination
-                      itemsCount={filtered.length}
-                      pageSize={pageSize}
-                      currentPage={currentPage}
-                      onPageChange={this.handlePageChange}
-                    />
-                  </div>
+                      <AssigneeTable
+                        complaints={complaints}
+                        sortColumn={sortColumn}
+                        onSort={this.handleSort}
+                        onDetail={this.handleDetail}
+                        onCheckBoxChecked={this.handleCheckBoxChecked}
+                        // defaultChecked={defaultChecked}
+                        checkedComplaint={checkedComplaint}
+                      />
+                      <Pagination
+                        itemsCount={filtered.length}
+                        pageSize={pageSize}
+                        currentPage={currentPage}
+                        onPageChange={this.handlePageChange}
+                      />
+                    </div>
+                  ) : (
+                    <h4>No Complaint</h4>
+                  )}
                 </div>
               </>
             )}

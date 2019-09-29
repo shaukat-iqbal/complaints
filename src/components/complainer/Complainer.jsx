@@ -53,11 +53,6 @@ class Complainer extends Component {
       }
     });
 
-    this.setState({ isLoading: true });
-    const { data: allcategories } = await getCategories();
-    const categories = [{ _id: "", name: "All Categories" }, ...allcategories];
-
-    this.setState({ categories });
     this.setState({ isLoading: false });
   }
 
@@ -65,7 +60,18 @@ class Complainer extends Component {
   getAllComplaints = async () => {
     this.setState({ isLoading: true });
     const { data: complaints } = await getComplaints();
-    this.setState({ complaints });
+    const { data: allcategories } = await getCategories();
+
+    let temp = [];
+    complaints.forEach(complaint => {
+      console.log(complaint);
+      let cat = allcategories.find(c => c._id === complaint.category._id);
+      let available = temp.find(ca => ca._id === cat._id);
+      if (!available) temp.push(cat);
+    });
+    const categories = [{ _id: "", name: "All Categories" }, ...temp];
+
+    this.setState({ complaints, categories });
     this.setState({ isLoading: false });
 
     let arr = [];

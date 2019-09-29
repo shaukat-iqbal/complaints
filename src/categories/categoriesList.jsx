@@ -16,7 +16,8 @@ class CategoriesList extends Component {
   async componentDidMount() {
     const { data: allCategories } = await getCategories();
     // const { data: categories } = await getCategoriesWithNoParent();
-    this.setState({ allCategories });
+    let categories = allCategories.filter(c => c.name !== "Root");
+    this.setState({ allCategories: categories });
   }
 
   onDragStart = (ev, categoryId) => {
@@ -107,9 +108,11 @@ class CategoriesList extends Component {
     return false;
   };
 
-  handleCLoseCategoryForm = () => {
-    this.setState({ categoryFormEnabled: false });
-    window.location.reload();
+  handleCLoseCategoryForm = category => {
+    let { allCategories } = this.state;
+    allCategories.push(category);
+    this.setState({ allCategories, categoryFormEnabled: false });
+    // window.location.reload();
   };
   handleNewCategory = () => {
     this.setState({ requestType: "new", categoryFormEnabled: true });
@@ -141,7 +144,9 @@ class CategoriesList extends Component {
             try {
               if (!category.hasChild) {
                 await deleteCategory(category._id);
-                window.location.reload();
+                let { allCategories } = this.state;
+                let updated = allCategories.filter(c => c._id !== category._id);
+                this.setState({ allCategories: updated });
               } else {
                 alert("We are sorry its no leaf node");
               }
@@ -162,63 +167,68 @@ class CategoriesList extends Component {
     const length = rootCategories.length;
 
     return (
-      <div className="container p-5 ">
-        <button
-          className="btn button-secondary rounded-pill mb-3"
-          onClick={this.handleNewCategory}
-        >
-          Create Category...
-        </button>
-        <Accordion defaultActiveKey="">
-          <div
-            className="p-3 bg-dark shadow-lg"
-            onDragOver={this.onDragOver}
-            onDrop={this.onDrop}
-            id={null}
+      <div className="container card p-1  ">
+        <div className="card-header">
+          <p className="h5">All categories</p>
+        </div>
+        <div className="card-body">
+          <button
+            className="btn button-secondary rounded-pill mb-3"
+            onClick={this.handleNewCategory}
           >
-            {length &&
-              rootCategories.map(category =>
-                category.hasChild ? (
-                  <div key={category._id + "parent"}>
-                    <Category
-                      category={category}
-                      onEdit={this.handleEditCategory}
-                      onAddChild={this.handleAddChild}
-                      onDelete={this.handleDeleteCategory}
-                      onDragStart={this.onDragStart}
-                    />
-                    <Childs
-                      category={category}
-                      onEdit={this.handleEditCategory}
-                      onAddChild={this.handleAddChild}
-                      onDelete={this.handleDeleteCategory}
-                      allCategories={allCategories}
+            Create Category...
+          </button>
+          <Accordion defaultActiveKey="">
+            <div
+              className="p-3 shadow-lg"
+              onDragOver={this.onDragOver}
+              onDrop={this.onDrop}
+              id={null}
+            >
+              {length &&
+                rootCategories.map(category =>
+                  category.hasChild ? (
+                    <div key={category._id + "parent"}>
+                      <Category
+                        category={category}
+                        onEdit={this.handleEditCategory}
+                        onAddChild={this.handleAddChild}
+                        onDelete={this.handleDeleteCategory}
+                        onDragStart={this.onDragStart}
+                      />
+                      <Childs
+                        category={category}
+                        onEdit={this.handleEditCategory}
+                        onAddChild={this.handleAddChild}
+                        onDelete={this.handleDeleteCategory}
+                        allCategories={allCategories}
+                        onDragOver={this.onDragOver}
+                        onDrop={this.onDrop}
+                        onDragStart={this.onDragStart}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="border border-success"
                       onDragOver={this.onDragOver}
+                      id={category._id}
                       onDrop={this.onDrop}
-                      onDragStart={this.onDragStart}
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className="border border-dark"
-                    onDragOver={this.onDragOver}
-                    id={category._id}
-                    onDrop={this.onDrop}
-                    key={category._id + "single"}
-                  >
-                    <Category
-                      category={category}
-                      onEdit={this.handleEditCategory}
-                      onAddChild={this.handleAddChild}
-                      onDelete={this.handleDeleteCategory}
-                      onDragOver={this.onDragOver}
-                      onDragStart={this.onDragStart}
-                    />
-                  </div>
-                )
-              )}
-          </div>
-        </Accordion>
+                      key={category._id + "single"}
+                    >
+                      <Category
+                        category={category}
+                        onEdit={this.handleEditCategory}
+                        onAddChild={this.handleAddChild}
+                        onDelete={this.handleDeleteCategory}
+                        onDragOver={this.onDragOver}
+                        onDragStart={this.onDragStart}
+                      />
+                    </div>
+                  )
+                )}
+            </div>
+          </Accordion>
+        </div>
         {this.state.categoryFormEnabled && (
           <CategoryForm
             requestType={this.state.requestType}

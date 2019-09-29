@@ -38,7 +38,7 @@ class Childs extends Component {
     return (
       <div
         id={category._id}
-        className="ml-5 bordrr border-left bg-info"
+        className="ml-5"
         onDragOver={onDragOver}
         onDrop={onDrop}
         key={category.id + "parentInChilds"}
@@ -68,7 +68,6 @@ class Childs extends Component {
               </React.Fragment>
             ) : (
               <div
-                className=" bg-info "
                 onDragOver={this.onDragOver}
                 id={childCategory._id}
                 onDrop={this.onDrop}

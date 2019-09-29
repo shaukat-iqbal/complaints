@@ -102,11 +102,10 @@ class Message extends React.Component {
   };
 
   handleFileChange = async e => {
-    this.setState({ selectedFile: e.target.files[0] });
-
-    setTimeout(() => {
-      this.setState({ message: this.state.selectedFile.name });
-    }, 3000);
+    this.setState({
+      selectedFile: e.target.files[0],
+      message: e.target.files[0]
+    });
   };
 
   displayMessage = msg => {

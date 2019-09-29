@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Link } from "react-router-dom";
+import { Route, Link, Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -79,16 +79,8 @@ function UserManagement(props) {
           }}
         >
           <UserLogo width="70px" height="70px" />
-          <div className="text-white m-0 d-inline">
-            <span
-              className="d-inline"
-              style={{ color: "orange", marginRight: "2px" }}
-            >
-              <i className="fa fa-circle " />
-            </span>
-            <p className="d-inline">Online</p>
-          </div>
-          <p className="text-white m-0">{getCurrentUser().name}</p>
+          <p className="text-white m-0 mt-1">{getCurrentUser().name}</p>
+          <p className="text-white text-center m-0">Admin</p>
         </div>
       </div>
       <Divider />
@@ -238,6 +230,7 @@ function UserManagement(props) {
           render={props => <Users role="complainers" {...props} />}
         />
         <Route path="/admin/users/categories" component={CategoriesList} />
+        <Redirect from="/admin/users" to="/admin/users/register" />
       </main>
     </div>
   );

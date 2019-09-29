@@ -28,10 +28,10 @@ class Dashboard extends Component {
     this.getComplaints();
     this.checkingSocketConnection();
 
-    const { data: allcategories } = await getCategories();
-    const categories = [{ _id: "", name: "All Categories" }, ...allcategories];
+    // const { data: allcategories } = await getCategories();
+    // const categories = [{ _id: "", name: "All Categories" }, ...allcategories];
 
-    this.setState({ categories });
+    // this.setState({ categories });
     // console.log("i am in CDM", complaints);
   }
 
@@ -98,7 +98,17 @@ class Dashboard extends Component {
   getComplaints = async () => {
     this.setState({ isLoading: true });
     const { data: complaints } = await getAdminComplaints();
-    this.setState({ complaints });
+    const { data: allcategories } = await getCategories();
+
+    let temp = [];
+    complaints.forEach(complaint => {
+      console.log(complaint);
+      let cat = allcategories.find(c => c._id === complaint.category._id);
+      let available = temp.find(ca => ca._id === cat._id);
+      if (!available) temp.push(cat);
+    });
+    const categories = [{ _id: "", name: "All Categories" }, ...temp];
+    this.setState({ complaints, categories });
     this.setState({ isLoading: false });
   };
 
