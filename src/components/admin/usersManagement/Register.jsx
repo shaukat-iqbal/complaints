@@ -179,7 +179,6 @@ class RegisterForm extends Form {
   };
 
   doSubmit = async () => {
-    alert("i am");
     //only compare passwrods when complainer or assignee is creating account by themselves
     const { id: userId } = this.props.match.params;
     const { role } = this.state.currentUser;
