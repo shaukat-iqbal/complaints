@@ -132,7 +132,13 @@ class Assignee extends React.Component {
 
   // handle mark as spam
   handleSpam = async complaint => {
-    await markSpam(complaint._id, true);
+    try {
+      await markSpam(complaint._id, true);
+    } catch (ex) {
+      if (ex.response && ex.response.status == "400") {
+        return toast.warn("Something went wrong");
+      }
+    }
 
     this.setState({ checkedComplaint: null });
     // this.props.history.replace("/assignee");

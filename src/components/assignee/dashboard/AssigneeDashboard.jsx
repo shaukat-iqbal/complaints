@@ -107,7 +107,13 @@ class AssigneeDashboard extends Component {
 
   // handle drop responsibility
   handleDropResponsibility = async complaint => {
-    await dropResponsibility(complaint._id);
+    try {
+      await dropResponsibility(complaint._id);
+    } catch (ex) {
+      if (ex.response && ex.response.status == "400") {
+        return toast.warn("Something went wrong");
+      }
+    }
 
     toast.success("You have successfully dropped Responsibility");
 
@@ -281,7 +287,7 @@ class AssigneeDashboard extends Component {
                     this.setState({ confirmSpam: true });
                   }}
                 >
-                  marks as spam
+                  Mark Spam
                 </button>
                 <button
                   className="btn button-primary"
@@ -289,7 +295,7 @@ class AssigneeDashboard extends Component {
                     this.setState({ confirmDrop: true });
                   }}
                 >
-                  drop from responsibility
+                  Drop responsibility
                 </button>
                 {/* </span> */}
                 <button

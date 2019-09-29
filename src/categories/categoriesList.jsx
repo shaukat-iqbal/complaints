@@ -162,7 +162,7 @@ class CategoriesList extends Component {
     const length = rootCategories.length;
 
     return (
-      <div className="container p-5 ">
+      <div className="container p-1 mt-5 ">
         <button
           className="btn button-secondary rounded-pill mb-3"
           onClick={this.handleNewCategory}
@@ -171,7 +171,7 @@ class CategoriesList extends Component {
         </button>
         <Accordion defaultActiveKey="">
           <div
-            className="p-3 bg-dark shadow-lg"
+            className="p-3 shadow-lg"
             onDragOver={this.onDragOver}
             onDrop={this.onDrop}
             id={null}
@@ -200,7 +200,7 @@ class CategoriesList extends Component {
                   </div>
                 ) : (
                   <div
-                    className="border border-dark"
+                    className="border border-success"
                     onDragOver={this.onDragOver}
                     id={category._id}
                     onDrop={this.onDrop}
