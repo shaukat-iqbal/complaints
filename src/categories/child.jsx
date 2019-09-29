@@ -19,7 +19,7 @@ class Childs extends Component {
       let childs = this.getChildsOf(category, allCategories);
       // const { data: childs } = await getChildsOf(category._id);
       if (
-        prevState.childs.length < childs.length ||
+        prevState.childs.length !== childs.length ||
         prevState.allCategories !== this.props.allCategories
       )
         this.setState({ childs, allCategories });
@@ -38,7 +38,7 @@ class Childs extends Component {
     return (
       <div
         id={category._id}
-        className="pl-5 bordrr border-left bg-info"
+        className="ml-5 bordrr border-left bg-info"
         onDragOver={onDragOver}
         onDrop={onDrop}
         key={category.id + "parentInChilds"}

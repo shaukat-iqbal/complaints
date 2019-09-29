@@ -12,7 +12,9 @@ const CategoriesList = ({
   onClick,
   isOpen,
   onClose,
-  onBack
+  onBack,
+  onTick,
+  isCrud
 }) => {
   let pair = [];
   return (
@@ -51,6 +53,14 @@ const CategoriesList = ({
                         >
                           {category.name}
                         </option>
+                        {isCrud && (
+                          <button
+                            className="badge"
+                            onClick={() => onTick(category._id)}
+                          >
+                            <i className="fa fa-check"></i>
+                          </button>
+                        )}
                       </div>
                     );
 

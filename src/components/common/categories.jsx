@@ -55,6 +55,8 @@ class Categories extends Component {
         isOpen={this.props.isOpen}
         onClose={this.props.onClose}
         onBack={this.handleBack}
+        onTick={this.props.onCategorySeletion}
+        isCrud={this.props.isCrud}
       />
     );
   }
