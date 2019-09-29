@@ -12,7 +12,7 @@ export function getAssigneeCategories() {
 export function getSpecificCategories() {
   return http.get(config.apiUrl + "/categories/assignee");
 }
- 
+
 // getting categories for selection with no parent
 export function getCategoriesWithNoParent() {
   return http.get(config.apiUrl + "/categories/specific/noparent");
@@ -48,4 +48,11 @@ export function getCategoryById(categoryId) {
 
 export function updateCategoryById(categoryId, body) {
   return http.put(config.apiUrl + "/categories/" + categoryId, body);
+}
+
+export function createCategory(body) {
+  return http.post(config.apiUrl + "/categories/", body);
+}
+export function deleteCategory(id) {
+  return http.delete(config.apiUrl + "/categories/" + id);
 }

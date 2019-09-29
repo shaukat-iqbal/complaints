@@ -21,6 +21,7 @@ import FileUpload from "../fileUpload";
 
 import { getCurrentUser } from "../../../../services/authService";
 import UserLogo from "../../../common/logo";
+import CategoriesList from "../../../../categories/categoriesList";
 const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
@@ -144,6 +145,11 @@ function UserManagement(props) {
             icon: "person"
           },
           {
+            label: "Categories",
+            path: "/admin/users/categories",
+            icon: "person"
+          },
+          {
             label: "Complainers",
             path: "/admin/users/complainers",
             icon: "person"
@@ -242,6 +248,7 @@ function UserManagement(props) {
           path="/admin/users/complainers"
           render={props => <Users role="complainers" {...props} />}
         />
+        <Route path="/admin/users/categories" component={CategoriesList} />
       </main>
     </div>
   );
