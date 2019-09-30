@@ -37,17 +37,19 @@ class RecoverPassword extends Component {
                 </div>
                 <div className="col-4 border-left">
                   <div className="my-5 ml-3">
-                    {user.profilePicture ? (
-                      <img
-                        src={convertToPicture(user.profilePicture.data)}
-                        width="80px"
-                        height="80px"
-                        alt="userProfile"
-                      />
-                    ) : (
-                      <Avatar>{user.name.substring(0, 1)}</Avatar>
-                    )}
-                    {user.name}
+                    <div>
+                      {user.profilePicture ? (
+                        <img
+                          src={convertToPicture(user.profilePicture.data)}
+                          width="80px"
+                          height="80px"
+                          alt="userProfile"
+                        />
+                      ) : (
+                        <Avatar>{user.name.substring(0, 1)}</Avatar>
+                      )}
+                    </div>
+                    <p className="p-1">{user.name}</p>
                   </div>
                 </div>
               </div>

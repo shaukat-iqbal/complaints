@@ -118,7 +118,7 @@ class Users extends Component {
             </p>
           ) : (
             <div className="d-flex flex-wrap flex-column mx-5 ">
-              <div className="align-self-end ">
+              <div className="align-self-end mr-4 ">
                 <p>Showing {totalCount} Users.</p>
                 <SearchBox value={searchQuery} onChange={this.handleSearch} />
               </div>

@@ -112,7 +112,7 @@ class SpamChart extends Component {
                 height={50}
                 options={{
                   maintainAspectRatio: true,
-                  title: { display: true, text: "Spam Complaintsss" },
+                  title: { display: true, text: "Spam Complaints" },
                   legend: { display: true, position: "top" }
                 }}
                 // options={}
