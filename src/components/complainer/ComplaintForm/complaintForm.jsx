@@ -164,7 +164,6 @@ class ComplaintForm extends Form {
         showCategoriesDialog: false,
         categoryError: ""
       });
-      return;
     }
   };
 
@@ -266,7 +265,7 @@ class ComplaintForm extends Form {
                         >
                           {this.state.sentimentCategory.name}
                           <i className="fa fa-edit pl-3"></i>
-                        </button> 
+                        </button>
                         <p
                           className="text-muted text-sm-left mt-2"
                           style={{ fontSize: "10px" }}
