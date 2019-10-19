@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 
 class Attachments extends Component {
   state = {
-    users: [],
+    attachments: [],
     currentPage: 1,
     pageSize: 5,
     searchQuery: "",
@@ -28,7 +28,7 @@ class Attachments extends Component {
 
   async componentDidMount() {
     const { data: attachments } = await getAllowedAttachments();
-    this.setState({ users: attachments, isLoading: false });
+    this.setState({ attachments: attachments, isLoading: false });
   }
 
   handleDelete = async user => {
@@ -48,14 +48,15 @@ class Attachments extends Component {
   };
 
   deleteUser = async user => {
-    const originalUsers = this.state.users;
-    const users = originalUsers.filter(u => u._id !== user._id);
-    this.setState({ users });
+    const originalAttachments = this.state.attachments;
+    const attachments = originalAttachments.filter(u => u._id !== user._id);
+    this.setState({ attachments });
 
     try {
       await deleteAttachment(user._id);
+      toast.info("Deleted Successfully");
     } catch (ex) {
-      this.setState({ users: originalUsers });
+      this.setState({ attachments: originalAttachments });
       if (ex.response && ex.response.status === 404) {
         toast.warn("Already deleted");
         // toast.error("This user has already been deleted.");
@@ -88,27 +89,29 @@ class Attachments extends Component {
       currentPage,
       sortColumn,
       searchQuery,
-      users: allAssignees
+      attachments: allAttachments
     } = this.state;
 
-    let filtered = allAssignees;
+    let filtered = allAttachments;
     if (searchQuery)
-      filtered = allAssignees.filter(assignee =>
-        assignee.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      filtered = allAttachments.filter(attachment =>
+        attachment.extentionName
+          .toLowerCase()
+          .startsWith(searchQuery.toLowerCase())
       );
 
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
-    const users = paginate(sorted, currentPage, pageSize);
+    const attachments = paginate(sorted, currentPage, pageSize);
 
-    return { totalCount: filtered.length, data: users };
+    return { totalCount: filtered.length, data: attachments };
   };
   handleShowForm = () => {
     this.setState({ showMemberForm: true });
   };
 
   handleAddMember = attachment => {
-    let attachments = [...this.state.users];
+    let attachments = [...this.state.attachments];
     if (this.state.isEditView) {
       let index = attachments.findIndex(a => a._id === attachment._id);
       attachments[index] = attachment;
@@ -116,7 +119,7 @@ class Attachments extends Component {
       attachments.unshift(attachment);
     }
     this.setState({
-      users: attachments,
+      attachments: attachments,
       showMemberForm: false,
       isEditView: false,
       selectedAttachment: null
@@ -132,9 +135,9 @@ class Attachments extends Component {
   };
 
   render() {
-    const { length: count } = this.state.users;
+    const { length: count } = this.state.attachments;
     const { pageSize, currentPage, searchQuery } = this.state;
-    const { totalCount, data: users } = this.getPagedData();
+    const { totalCount, data: attachments } = this.getPagedData();
 
     return (
       <div>
@@ -166,7 +169,7 @@ class Attachments extends Component {
                         Add New...
                       </button>
                       <AttachmentsTable
-                        attachments={users}
+                        attachments={attachments}
                         onDelete={this.handleDelete}
                         onEdit={this.handleEdit}
                         onSort={this.handleSort}

@@ -17,7 +17,7 @@ import {
 
 class Members extends Component {
   state = {
-    users: [],
+    members: [],
     currentPage: 1,
     pageSize: 5,
     searchQuery: "",
@@ -28,7 +28,7 @@ class Members extends Component {
 
   async componentDidMount() {
     const { data: members } = await getHigherAuthorityMembers();
-    this.setState({ users: members, isLoading: false });
+    this.setState({ members: members, isLoading: false });
   }
 
   handleDelete = async user => {
@@ -48,14 +48,14 @@ class Members extends Component {
   };
 
   deleteUser = async user => {
-    const originalUsers = this.state.users;
-    const users = originalUsers.filter(u => u._id !== user._id);
-    this.setState({ users });
+    const originalUsers = this.state.members;
+    const members = originalUsers.filter(u => u._id !== user._id);
+    this.setState({ members });
 
     try {
       await deleteMember(user._id);
     } catch (ex) {
-      this.setState({ users: originalUsers });
+      this.setState({ members: originalUsers });
       if (ex.response && ex.response.status === 404) {
         // toast.error("This user has already been deleted.");
       }
@@ -87,27 +87,27 @@ class Members extends Component {
       currentPage,
       sortColumn,
       searchQuery,
-      users: allAssignees
+      members: allMembers
     } = this.state;
 
-    let filtered = allAssignees;
+    let filtered = allMembers;
     if (searchQuery)
-      filtered = allAssignees.filter(assignee =>
-        assignee.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      filtered = allMembers.filter(member =>
+        member.name.toLowerCase().startsWith(searchQuery.toLowerCase())
       );
 
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
-    const users = paginate(sorted, currentPage, pageSize);
+    const members = paginate(sorted, currentPage, pageSize);
 
-    return { totalCount: filtered.length, data: users };
+    return { totalCount: filtered.length, data: members };
   };
   handleShowForm = () => {
     this.setState({ showMemberForm: true });
   };
 
   handleAddMember = member => {
-    let members = [...this.state.users];
+    let members = [...this.state.members];
     if (this.state.isEditView) {
       let index = members.findIndex(m => m._id === member._id);
       members[index] = member;
@@ -115,7 +115,7 @@ class Members extends Component {
       members.unshift(member);
     }
     this.setState({
-      users: members,
+      members: members,
       showMemberForm: false,
       isEditView: false,
       selectedMember: null
@@ -131,9 +131,9 @@ class Members extends Component {
   };
 
   render() {
-    const { length: count } = this.state.users;
+    const { length: count } = this.state.members;
     const { pageSize, currentPage, searchQuery } = this.state;
-    const { totalCount, data: users } = this.getPagedData();
+    const { totalCount, data: members } = this.getPagedData();
 
     return (
       <div>
@@ -141,12 +141,17 @@ class Members extends Component {
           count < 1 ? (
             <p className="alert alert-info p-4">
               There are no Members in the database.
-              <Link to="/admin/users/register">Create an Account</Link>
+              <button
+                className="btn btn-sm btn-info rounded-pill mb-1"
+                onClick={this.handleShowForm}
+              >
+                Add New...
+              </button>
             </p>
           ) : (
             <div className="d-flex flex-wrap flex-column mx-1 ">
               <div className="align-self-end mr-4 ">
-                <p>Showing {totalCount} Users.</p>
+                <p>Showing {totalCount} members.</p>
                 <SearchBox value={searchQuery} onChange={this.handleSearch} />
               </div>
               {totalCount > 0 ? (
@@ -160,7 +165,7 @@ class Members extends Component {
                         Add New...
                       </button>
                       <HigherAuthoritiesTable
-                        members={users}
+                        members={members}
                         onDelete={this.handleDelete}
                         onEdit={this.handleEdit}
                         onSort={this.handleSort}
