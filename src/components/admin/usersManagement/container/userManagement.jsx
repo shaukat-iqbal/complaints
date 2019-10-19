@@ -22,6 +22,7 @@ import FileUpload from "../fileUpload";
 import { getCurrentUser } from "../../../../services/authService";
 import UserLogo from "../../../common/logo";
 import CategoriesList from "../../../../categories/categoriesList";
+import Settings from "../../Configuration/Settings";
 const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
@@ -127,7 +128,7 @@ function UserManagement(props) {
           },
           {
             label: "Configuration",
-            path: "/admin/configuration",
+            path: "/admin/users/configuration",
             icon: <i className="fa fa-cog mr-4 fa-2x"></i>
           },
           {
@@ -230,7 +231,8 @@ function UserManagement(props) {
           render={props => <Users role="complainers" {...props} />}
         />
         <Route path="/admin/users/categories" component={CategoriesList} />
-        <Redirect from="/admin/users" to="/admin/users/register" />
+        <Route path="/admin/users/configuration" component={Settings} />
+        {/* <Redirect from="/admin/users" to="/admin/users/register" /> */}
       </main>
     </div>
   );

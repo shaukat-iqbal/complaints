@@ -1,6 +1,5 @@
 import imageCompression from "browser-image-compression";
 import { getUser, convertToPicture } from "./userService";
-import { getCurrentUser } from "./authService";
 
 export async function compressImage(imageFile) {
   var options = {
