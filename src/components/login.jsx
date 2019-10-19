@@ -4,6 +4,7 @@ import Joi from "joi-browser";
 import Form from "./common/form";
 import auth from "../services/authService";
 import Spinner from "../components/common/Spinner/Spinner";
+import { getConfiguration } from "../services/configurationService";
 class Login extends Form {
   state = {
     data: { email: "", password: "" },
@@ -41,6 +42,8 @@ class Login extends Form {
         data.password,
         `/auth-${role}`
       );
+      const { data: configuration } = await getConfiguration();
+      localStorage.setItem("configuration", JSON.stringify(configuration));
       localStorage.setItem("token", response.headers["x-auth-token"]);
       window.location = `/${role}`;
       this.setState({ isLoading: true });
