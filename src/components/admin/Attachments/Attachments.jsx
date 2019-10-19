@@ -3,19 +3,19 @@ import _ from "lodash";
 import { paginate } from "../../../utils/paginate";
 import Pagination from "../../common/pagination";
 import SearchBox from "../../common/searchBox";
-import HigherAuthoritiesTable from "./membersTable";
-import { Link } from "react-router-dom";
 import Loading from "../../common/loading";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
-import MemberForm from "./memberForm";
 
 import {
-  deleteMember,
-  getHigherAuthorityMembers
-} from "../../../services/HigherAuthoritiesService";
+  getAllowedAttachments,
+  deleteAttachment
+} from "../../../services/attachmentsService";
+import AttachmentsTable from "./attachmentsTable";
+import AttachmentForm from "./attachmentForm";
+import { toast } from "react-toastify";
 
-class Members extends Component {
+class Attachments extends Component {
   state = {
     users: [],
     currentPage: 1,
@@ -27,8 +27,8 @@ class Members extends Component {
   };
 
   async componentDidMount() {
-    const { data: members } = await getHigherAuthorityMembers();
-    this.setState({ users: members, isLoading: false });
+    const { data: attachments } = await getAllowedAttachments();
+    this.setState({ users: attachments, isLoading: false });
   }
 
   handleDelete = async user => {
@@ -53,10 +53,11 @@ class Members extends Component {
     this.setState({ users });
 
     try {
-      await deleteMember(user._id);
+      await deleteAttachment(user._id);
     } catch (ex) {
       this.setState({ users: originalUsers });
       if (ex.response && ex.response.status === 404) {
+        toast.warn("Already deleted");
         // toast.error("This user has already been deleted.");
       }
     }
@@ -64,7 +65,7 @@ class Members extends Component {
 
   handleEdit = user => {
     this.setState({
-      selectedMember: user,
+      selectedAttachment: user,
       showMemberForm: true,
       isEditView: true
     });
@@ -106,19 +107,19 @@ class Members extends Component {
     this.setState({ showMemberForm: true });
   };
 
-  handleAddMember = member => {
-    let members = [...this.state.users];
+  handleAddMember = attachment => {
+    let attachments = [...this.state.users];
     if (this.state.isEditView) {
-      let index = members.findIndex(m => m._id === member._id);
-      members[index] = member;
+      let index = attachments.findIndex(a => a._id === attachment._id);
+      attachments[index] = attachment;
     } else {
-      members.unshift(member);
+      attachments.unshift(attachment);
     }
     this.setState({
-      users: members,
+      users: attachments,
       showMemberForm: false,
       isEditView: false,
-      selectedMember: null
+      selectedAttachment: null
     });
     return;
   };
@@ -140,13 +141,18 @@ class Members extends Component {
         {!this.state.isLoading ? (
           count < 1 ? (
             <p className="alert alert-info p-4">
-              There are no Members in the database.
-              <Link to="/admin/users/register">Create an Account</Link>
+              There are no allowed attachments in the database.
+              <button
+                className="btn btn-sm btn-info rounded-pill mb-1"
+                onClick={this.handleShowForm}
+              >
+                Add New...
+              </button>
             </p>
           ) : (
             <div className="d-flex flex-wrap flex-column mx-1 ">
               <div className="align-self-end mr-4 ">
-                <p>Showing {totalCount} Users.</p>
+                <p>Showing {totalCount} atttachments.</p>
                 <SearchBox value={searchQuery} onChange={this.handleSearch} />
               </div>
               {totalCount > 0 ? (
@@ -159,19 +165,19 @@ class Members extends Component {
                       >
                         Add New...
                       </button>
-                      <HigherAuthoritiesTable
-                        members={users}
+                      <AttachmentsTable
+                        attachments={users}
                         onDelete={this.handleDelete}
                         onEdit={this.handleEdit}
                         onSort={this.handleSort}
                         sortColumn={this.state.sortColumn}
                       />
                       {this.state.showMemberForm && (
-                        <MemberForm
+                        <AttachmentForm
                           isOpen={this.state.showMemberForm}
                           onClose={this.handleClose}
                           isEditView={this.state.isEditView}
-                          selectedMember={this.state.selectedMember}
+                          selectedAttachment={this.state.selectedAttachment}
                           onSuccess={this.handleAddMember}
                         />
                       )}
@@ -198,4 +204,4 @@ class Members extends Component {
   }
 }
 
-export default Members;
+export default Attachments;

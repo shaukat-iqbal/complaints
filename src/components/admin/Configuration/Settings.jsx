@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-// import Attachments from "../Attachments/Attachments";
+import Attachments from "../Attachments/Attachments";
 import Switch from "../../common/switch";
 import Members from "../Higher Authorities/Members";
 class Settings extends Component {
@@ -32,24 +32,16 @@ class Settings extends Component {
           <div>
             <p className="d-inline-block mr-2">Higher Authorities: </p>
             <span>
-              {/* <button className="btn p-0 m-0" onClick={this.handleShowForm}>
-                <i className="fa fa-pencil mr-1 "></i>
-              </button>{" "} */}
               <button className="btn p-0 m-0" onClick={this.handleViewList}>
                 <i className="fa fa-eye "></i>
               </button>
             </span>
-
-            <hr />
 
             {this.state.showHigherAuthoritiesList && <Members />}
           </div>
           <div>
             <p className="d-inline-block mr-2">Allowed Attachments: </p>
             <span>
-              <button className="btn p-0 m-0">
-                <i className="fa fa-pencil mr-1 "></i>
-              </button>{" "}
               <button
                 className="btn p-0 m-0"
                 onClick={this.handleViewAttachmentsList}
@@ -58,7 +50,7 @@ class Settings extends Component {
               </button>
             </span>
 
-            {/* {this.state.showAttachmentsList && <Attachments />} */}
+            {this.state.showAttachmentsList && <Attachments />}
           </div>
           <div>
             <div>
