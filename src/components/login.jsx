@@ -4,14 +4,17 @@ import Joi from "joi-browser";
 import Form from "./common/form";
 import auth from "../services/authService";
 import Spinner from "../components/common/Spinner/Spinner";
-import { getConfiguration } from "../services/configurationService";
+import {
+  getConfiguration,
+  getConfigToken
+} from "../services/configurationService";
+import { toast } from "react-toastify";
 class Login extends Form {
   state = {
     data: { email: "", password: "" },
     errors: {},
     isLoading: false
   };
-
   role = React.createRef();
 
   schema = {
@@ -28,8 +31,13 @@ class Login extends Form {
   async componentDidMount() {
     try {
       const user = await auth.getCurrentUser();
+      let { data: config } = await getConfiguration();
+      localStorage("configuration", JSON.stringify(config));
+      this.setState({ configToken: config });
       this.props.history.replace(`/${user.role}`);
-    } catch (ex) {}
+    } catch (ex) {
+      toast.warn("Authentication Failed");
+    }
   }
 
   doSubmit = async () => {
@@ -60,6 +68,7 @@ class Login extends Form {
   };
 
   render() {
+    let { configToken } = this.state;
     return (
       <React.Fragment>
         <div>
@@ -107,9 +116,11 @@ class Login extends Form {
                     <br />
                     <Link to="/recoverpassword">Forgot Password?</Link>
                     <br />
-                    <Link to="/register">
-                      Not Registered? Register by clicking here.
-                    </Link>
+                    {configToken && configToken.isAccountCreation && (
+                      <Link to="/register">
+                        Not Registered? Register by clicking here.
+                      </Link>
+                    )}
                     <br />
                   </form>
                 </div>
