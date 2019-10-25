@@ -16,11 +16,9 @@ import RegisterForm from "./components/admin/usersManagement/Register";
 import PasswordManagement from "./components/common/passwordManagement";
 import ResetPassword from "./components/common/resetPassword";
 import CategoriesList from "./categories/categoriesList";
-import Test from "./test";
 
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import Wizard from "./components/Startup/wizard";
 import AdminForm from "./components/common/adminForm";
 import CustomizedSteppers from "./components/Startup/stepper";
 // const Complainer = lazy(() => import("./components/complainer/Complainer"));
