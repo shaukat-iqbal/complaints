@@ -9,7 +9,6 @@ import Check from "@material-ui/icons/Check";
 import SettingsIcon from "@material-ui/icons/Settings";
 import StepConnector from "@material-ui/core/StepConnector";
 import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
 import CategoriesList from "../../categories/categoriesList";
 import Members from "../admin/Higher Authorities/Members";
 import AdminForm from "../common/adminForm";
@@ -245,18 +244,18 @@ export default function CustomizedSteppers() {
       <div>
         {activeStep === steps.length ? (
           <div>
-            <Typography className={classes.instructions}>
+            <div className={classes.instructions}>
               All steps completed - you&apos;re finished
-            </Typography>
+            </div>
             <Button onClick={handleReset} className={classes.button}>
               Reset
             </Button>
           </div>
         ) : (
           <div>
-            <Typography className={classes.instructions}>
+            <div className={classes.instructions}>
               {getStepContent(activeStep)}
-            </Typography>
+            </div>
             <div className="mt-3">
               <Button
                 disabled={activeStep === 0}
