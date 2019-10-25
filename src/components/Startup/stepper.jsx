@@ -21,9 +21,9 @@ import {
   Details,
   PersonAdd,
   FormatListBulleted,
-  ListAlt,
   Work,
-  SupervisedUserCircleRounded
+  SupervisedUserCircleRounded,
+  Attachment
 } from "@material-ui/icons";
 
 const useQontoStepIconStyles = makeStyles({
@@ -129,7 +129,7 @@ function ColorlibStepIcon(props) {
     2: <PersonAdd />,
     3: <SettingsIcon />,
     4: <FormatListBulleted />,
-    5: <ListAlt />,
+    5: <Attachment />,
     6: <Work />,
     7: <SupervisedUserCircleRounded />
   };
@@ -173,7 +173,7 @@ function getSteps() {
     "Categories",
     "Allowed Attachments",
     "Higher Authority Members",
-    "Users registeration"
+    "Users registration"
   ];
 }
 
