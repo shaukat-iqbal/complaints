@@ -16,7 +16,6 @@ const CategoriesList = ({
   onTick,
   isCrud
 }) => {
-  let pair = [];
   return (
     <React.Fragment>
       <Dialog
@@ -41,57 +40,36 @@ const CategoriesList = ({
             </DialogTitle>
             <DialogContent dividers={true}>
               <div>
-                <div className="container" style={{ height: "450px" }}>
-                  {categories.map((category, index) => {
-                    let cat = (
-                      <div className="category col p-3 d-flex m-1">
-                        <option
-                          key={category._id}
-                          className="w-100"
-                          onClick={onClick}
-                          value={category._id}
-                        >
-                          {category.name}
-                        </option>
-                        {isCrud && (
-                          <button
-                            className="badge badge-light"
-                            onClick={() => onTick(category._id)}
+                <div className="d-flex flex-wrap ">
+                  {categories.map(category => {
+                    return (
+                      <div className="mr-1 mb-2" style={{ width: "49%" }}>
+                        <div className="category ">
+                          <option
+                            key={category._id}
+                            onClick={onClick}
+                            value={category._id}
                           >
-                            <i className="fa fa-check"></i>
-                          </button>
-                        )}
+                            {category.name}
+                          </option>
+                          {isCrud && (
+                            <button
+                              className="btn btn-light justify-content-end align-self-end"
+                              onClick={() => onTick(category._id)}
+                            >
+                              <i className="fa fa-check"></i>
+                            </button>
+                          )}
+                        </div>
                       </div>
                     );
-
-                    if (pair.length < 2) {
-                      pair.push(cat);
-                    }
-                    if (pair.length === 2) {
-                      const categoriesRow = (
-                        <div key={category._id + "1"} className="row">
-                          {pair[0]}
-                          {pair[1]}
-                        </div>
-                      );
-                      pair.length = 0;
-
-                      return categoriesRow;
-                    }
-                    if (categories.length - 1 === index) {
-                      return (
-                        <div key={category._id + "2"} className="row">
-                          {pair[0]}
-                        </div>
-                      );
-                    }
                   })}
                 </div>
               </div>
             </DialogContent>
             <DialogActions>
               <button className="btn btn-primary" onClick={onClose}>
-                close
+                Close
               </button>
 
               {categories[0] && categories[0].parentCategory && (

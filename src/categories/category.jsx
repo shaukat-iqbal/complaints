@@ -12,7 +12,7 @@ const Category = ({
 }) => {
   return (
     <div
-      className="card border-danger p-0 bg-danger m-1"
+      className=" p-0 bg-danger m-1"
       onDragStart={e => onDragStart(e, category._id)}
       draggable
       onDragOver={onDragOver}
@@ -44,12 +44,32 @@ const Category = ({
         </div>
       </div>
     */}
-      <div key={uuid()} style={{ position: "relative" }}>
+      <div key={uuid()}>
         <div key={uuid()}>
           {/* <Accordion defaultActiveKey=""> */}
           <Card>
-            <Accordion.Toggle as={Card.Header} eventKey={category._id}>
-              <div className="btn btn-info">{category.name}</div>
+            <Accordion.Toggle as={Card.text} eventKey={category._id}>
+              <div style={{ position: "relative" }}>
+                <div className="d-flex align-self-start p-2">
+                  {category.name}
+                </div>
+                <div
+                  onDragStart={e => onDragStart(e, category._id)}
+                  onDragOver={onDragOver}
+                  key={uuid()}
+                  id={category._id}
+                  data-toggle="collapse"
+                  data-target={category._id}
+                  style={{
+                    position: "absolute",
+                    top: "0",
+                    right: "0",
+                    left: "0",
+                    height: "100%",
+                    width: "100%"
+                  }}
+                ></div>
+              </div>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={category._id}>
               <Card.Body>
@@ -78,22 +98,6 @@ const Category = ({
           </Card>
           {/* </Accordion> */}
         </div>
-        <div
-          onDragStart={e => onDragStart(e, category._id)}
-          onDragOver={onDragOver}
-          key={uuid()}
-          id={category._id}
-          data-toggle="collapse"
-          data-target={category._id}
-          style={{
-            height: "60px",
-            width: "80%",
-            position: "absolute",
-            top: "0",
-            right: "0",
-            left: "20%"
-          }}
-        ></div>
       </div>
     </div>
   );

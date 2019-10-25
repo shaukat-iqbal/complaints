@@ -108,11 +108,18 @@ class CategoriesList extends Component {
     return false;
   };
 
-  handleCLoseCategoryForm = category => {
-    let { allCategories } = this.state;
-    allCategories.push(category);
-    this.setState({ allCategories, categoryFormEnabled: false });
+  handleSubmitCategoryForm = category => {
+    if (category) {
+      let { allCategories } = this.state;
+      allCategories.push(category);
+      this.setState({ allCategories, categoryFormEnabled: false });
+    } else {
+      this.setState({ categoryFormEnabled: false });
+    }
     // window.location.reload();
+  };
+  handleCloseCategoryForm = () => {
+    this.setState({ categoryFormEnabled: false });
   };
   handleNewCategory = () => {
     this.setState({ requestType: "new", categoryFormEnabled: true });
@@ -211,7 +218,6 @@ class CategoriesList extends Component {
                     </div>
                   ) : (
                     <div
-                      className="border border-success"
                       onDragOver={this.onDragOver}
                       id={category._id}
                       onDrop={this.onDrop}
@@ -237,8 +243,9 @@ class CategoriesList extends Component {
             requestType={this.state.requestType}
             category={this.state.selectedCategory}
             isOpen={this.state.categoryFormEnabled}
-            onClose={this.handleCLoseCategoryForm}
+            onSubmitForm={this.handleSubmitCategoryForm}
             allCategories={allCategories}
+            onClose={this.handleCloseCategoryForm}
           />
         )}
       </div>

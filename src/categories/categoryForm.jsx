@@ -89,7 +89,7 @@ class CategoryForm extends Form {
         let { data } = await createCategory(this.state.data);
         category = data;
       }
-      this.props.onClose(category);
+      this.props.onSubmitForm(category);
     } catch (error) {
       console.log(error);
     }
