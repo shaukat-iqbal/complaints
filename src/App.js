@@ -22,6 +22,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import Wizard from "./components/Startup/wizard";
 import AdminForm from "./components/common/adminForm";
+import CustomizedSteppers from "./components/Startup/stepper";
 // const Complainer = lazy(() => import("./components/complainer/Complainer"));
 
 class App extends Component {
@@ -29,11 +30,18 @@ class App extends Component {
     return (
       <div className="App ">
         <ToastContainer />
-
         <Switch>
-          <Route path="/welcome" component={Wizard} />
           <Route path="/categories" component={CategoriesList} />
-          <Route path="/test" component={Test} />
+          <Route
+            path="/welcome"
+            render={props => (
+              <>
+                <div className="container">
+                  <CustomizedSteppers {...props} />
+                </div>
+              </>
+            )}
+          />
 
           <Route
             path="/complainer/new-complaint"

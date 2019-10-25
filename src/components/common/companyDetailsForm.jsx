@@ -65,8 +65,11 @@ class CompanyDetailsForm extends Form {
   };
 
   doSubmit = async () => {
-    const { id: companyId } = this.props.match.params;
-
+    let companyId;
+    if (this.props.match) {
+      const { id } = this.props.match.params;
+      companyId = id;
+    }
     const fd = createDetailsFormData(this.state);
     try {
       if (companyId) {
@@ -95,7 +98,11 @@ class CompanyDetailsForm extends Form {
   };
 
   render() {
-    const { id: companyId } = this.props.match.params;
+    let companyId;
+    if (this.props.match) {
+      const { id } = this.props.match.params;
+      companyId = id;
+    }
     // let companyId = "helo";
     const { isEditView, isProfileView, profile, isLoading } = this.state;
     const { onNext } = this.props;
@@ -131,14 +138,6 @@ class CompanyDetailsForm extends Form {
                 : companyId
                 ? this.renderButton("Update")
                 : this.renderButton("Register")}
-
-              <button
-                type="button"
-                className="btn button-outline-primary"
-                onClick={onNext}
-              >
-                Next
-              </button>
             </div>
           </form>
         </div>

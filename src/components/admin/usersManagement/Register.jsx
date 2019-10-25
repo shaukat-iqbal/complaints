@@ -85,9 +85,11 @@ class RegisterForm extends Form {
     //   // alert(confirm("fbmsdbnc"));\
     //   alert("you are leaving");
     // });
-    const { id, role } = this.props.match.params;
-    if (id && role) {
-      this.populateUserDetails(id, role.substring(0, role.length - 1));
+    if (this.props.match) {
+      const { id, role } = this.props.match.params;
+      if (id && role) {
+        this.populateUserDetails(id, role.substring(0, role.length - 1));
+      }
     } else {
       this.setState({ isLoading: false });
     }
@@ -180,7 +182,11 @@ class RegisterForm extends Form {
 
   doSubmit = async () => {
     //only compare passwrods when complainer or assignee is creating account by themselves
-    const { id: userId } = this.props.match.params;
+    let userId;
+    if (this.props.match) {
+      const { id } = this.props.match.params;
+      userId = id;
+    }
     const { role } = this.state.currentUser;
     if (role !== "admin") {
       const error = this.validatePassword();
@@ -218,7 +224,11 @@ class RegisterForm extends Form {
     }
   };
   render() {
-    const { id: userId } = this.props.match.params;
+    let userId;
+    if (this.props.match) {
+      const { id } = this.props.match.params;
+      userId = id;
+    }
     const {
       isEditView,
       isProfileView,
