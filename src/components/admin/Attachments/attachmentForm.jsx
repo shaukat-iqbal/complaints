@@ -1,6 +1,5 @@
 import React from "react";
 import Joi from "joi-browser";
-import Loading from "../../common/loading";
 import Form from "../../common/form";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";

@@ -17,6 +17,7 @@ function setJwt(jwt) {
   // calling protected endpoints
   axios.defaults.headers.common["x-auth-token"] = jwt;
   axios.defaults.headers.common["crossdomain"] = true;
+  axios.defaults.headers.common["count"] = 2;
 }
 
 export default {

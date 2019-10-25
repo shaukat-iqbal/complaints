@@ -4,11 +4,7 @@ import Joi from "joi-browser";
 import Form from "./common/form";
 import auth from "../services/authService";
 import Spinner from "../components/common/Spinner/Spinner";
-import {
-  getConfiguration,
-  getConfigToken
-} from "../services/configurationService";
-import { toast } from "react-toastify";
+import { getConfiguration } from "../services/configurationService";
 class Login extends Form {
   state = {
     data: { email: "", password: "" },
@@ -32,11 +28,12 @@ class Login extends Form {
     try {
       const user = await auth.getCurrentUser();
       let { data: config } = await getConfiguration();
-      localStorage("configuration", JSON.stringify(config));
+      localStorage.setItem("configuration", JSON.stringify(config));
       this.setState({ configToken: config });
       this.props.history.replace(`/${user.role}`);
     } catch (ex) {
-      toast.warn("Authentication Failed");
+      // toast.warn("Authentication Failed");
+      // console.log(ex);
     }
   }
 
@@ -79,51 +76,54 @@ class Login extends Form {
           )}
         </div>
         {!this.state.isLoading && (
-          <div>
-            <div className="mt-5 d-flex justify-content-center align-items-center">
-              <div
-                className="card mt-5 card-form"
-                style={{ boxShadow: "5px 5px 25px 5px #e5e5e5" }}
-              >
-                <div className="card-header h3">Please Login to Continue</div>
-                <div className="card-body">
-                  <br />
-                  <form onSubmit={this.handleSubmit}>
-                    {this.renderInput("email", "Email", "email")}
-                    {this.renderInput("password", "Password", "password")}
+          <div className="vh-100 d-flex justify-content-center align-items-center">
+            <div
+              className="card mt-5 card-form"
+              style={{
+                boxShadow: "5px 5px 25px 5px #e5e5e5",
+                minWidth: "400px"
+              }}
+            >
+              <div className="card-header h3 text-center">
+                <u>Login</u>
+              </div>
+              <div className="card-body">
+                <br />
+                <form onSubmit={this.handleSubmit}>
+                  {this.renderInput("email", "Email", "email")}
+                  {this.renderInput("password", "Password", "password")}
 
-                    <label htmlFor="role">Choose Role</label>
-                    <select
-                      ref={this.role}
-                      name="role"
-                      className="form-control mb-4"
-                    >
-                      <option value="assignee">Assignee</option>
-                      <option value="complainer">Complainer</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                    <div className="form-check ">
-                      <input
-                        type="checkbox"
-                        defaultChecked
-                        className="form-check-input"
-                      />
-                      Remember Me
-                    </div>
-                    <div className="text-center mt-4">
-                      {this.renderButton("Login")}
-                    </div>
-                    <br />
-                    <Link to="/recoverpassword">Forgot Password?</Link>
-                    <br />
-                    {configToken && configToken.isAccountCreation && (
-                      <Link to="/register">
-                        Not Registered? Register by clicking here.
-                      </Link>
-                    )}
-                    <br />
-                  </form>
-                </div>
+                  <label htmlFor="role">Choose Role</label>
+                  <select
+                    ref={this.role}
+                    name="role"
+                    className="form-control mb-4"
+                  >
+                    <option value="assignee">Assignee</option>
+                    <option value="complainer">Complainer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <div className="form-check ">
+                    <input
+                      type="checkbox"
+                      defaultChecked
+                      className="form-check-input"
+                    />
+                    Remember Me
+                  </div>
+                  <div className="text-center mt-4">
+                    {this.renderButton("Login")}
+                  </div>
+                  <br />
+                  <Link to="/recoverpassword">Forgot Password?</Link>
+                  <br />
+                  {configToken && configToken.isAccountCreation && (
+                    <Link to="/register">
+                      Not Registered? Register by clicking here.
+                    </Link>
+                  )}
+                  <br />
+                </form>
               </div>
             </div>
           </div>

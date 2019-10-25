@@ -4,7 +4,6 @@ import { paginate } from "../../../utils/paginate";
 import Pagination from "../../common/pagination";
 import SearchBox from "../../common/searchBox";
 import HigherAuthoritiesTable from "./membersTable";
-import { Link } from "react-router-dom";
 import Loading from "../../common/loading";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css

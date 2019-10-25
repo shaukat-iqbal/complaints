@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import uuid from "uuid/v1";
+import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -21,8 +20,6 @@ export default function ComplaintDetail(props) {
   const [assignees, setAssignees] = useState([]);
   const [error, setError] = useState("");
   // const [categories, setCategories] = useState([]);
-
-  const selectedAssignee = useRef();
 
   useEffect(() => {
     const id = props.match.params.id;
@@ -162,7 +159,7 @@ export default function ComplaintDetail(props) {
           </div>
           <DialogContent>
             <Users
-              role="assignees"
+              type="assignees"
               isAssigning={true}
               onUserSelected={handleUserSelected}
             />

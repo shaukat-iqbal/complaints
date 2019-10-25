@@ -20,6 +20,8 @@ import Test from "./test";
 
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+import Wizard from "./components/Startup/wizard";
+import AdminForm from "./components/common/adminForm";
 // const Complainer = lazy(() => import("./components/complainer/Complainer"));
 
 class App extends Component {
@@ -29,6 +31,7 @@ class App extends Component {
         <ToastContainer />
 
         <Switch>
+          <Route path="/welcome" component={Wizard} />
           <Route path="/categories" component={CategoriesList} />
           <Route path="/test" component={Test} />
 
@@ -45,7 +48,11 @@ class App extends Component {
             path="/profile/:id/:role"
             render={props => (
               <div className="d-flex justify-content-center py-5 ">
-                <RegisterForm isProfileView={true} {...props} />
+                {props.match.params.role !== "admins" ? (
+                  <RegisterForm isProfileView={true} {...props} />
+                ) : (
+                  <AdminForm isProfileView={true} {...props} />
+                )}
               </div>
             )}
           />

@@ -4,7 +4,7 @@ import { getCategories, deleteCategory } from "../services/categoryService";
 import Category from "./category";
 import CategoryForm from "./categoryForm";
 import { Accordion } from "react-bootstrap";
-
+import uuid from "uuid";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 class CategoriesList extends Component {
@@ -190,6 +190,7 @@ class CategoriesList extends Component {
                   category.hasChild ? (
                     <div key={category._id + "parent"}>
                       <Category
+                        key={uuid()}
                         category={category}
                         onEdit={this.handleEditCategory}
                         onAddChild={this.handleAddChild}
@@ -197,6 +198,7 @@ class CategoriesList extends Component {
                         onDragStart={this.onDragStart}
                       />
                       <Childs
+                        key={uuid()}
                         category={category}
                         onEdit={this.handleEditCategory}
                         onAddChild={this.handleAddChild}
@@ -216,6 +218,7 @@ class CategoriesList extends Component {
                       key={category._id + "single"}
                     >
                       <Category
+                        key={uuid()}
                         category={category}
                         onEdit={this.handleEditCategory}
                         onAddChild={this.handleAddChild}

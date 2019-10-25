@@ -18,6 +18,10 @@ export function registerUser(userData, isAssignee) {
   return http.post(apiUrl + "/complainers/", userData);
 }
 
+export function registerAdmin(userData) {
+  return http.post(apiUrl + "/admins/", userData);
+}
+
 export function createFormData({
   data,
   currentUser,
@@ -51,6 +55,13 @@ export function updateUser(userId, userData, isAssignee) {
   return http.put(apiUrl + "/complainers/" + userId, userData);
 }
 
+export function updateAdmin(userId, userData) {
+  return http.put(apiUrl + "/admins/" + userId, userData);
+}
+
+// export function getPaginatedUsers(role, pageSize) {
+//   return http.get(`${apiUrl}/${role}/allUsers/` + pageSize);
+// }
 export function createUsers(role, FormData) {
   return http.post(`${apiUrl}/${role}s/uploadCsv`, FormData);
 }

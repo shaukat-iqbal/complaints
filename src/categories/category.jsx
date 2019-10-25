@@ -1,7 +1,7 @@
 import React from "react";
 import "./category.css";
 import { Accordion, Card } from "react-bootstrap";
-
+import uuid from "uuid";
 const Category = ({
   category,
   onEdit,
@@ -16,7 +16,7 @@ const Category = ({
       onDragStart={e => onDragStart(e, category._id)}
       draggable
       onDragOver={onDragOver}
-      key={category._id + " " + category.name}
+      key={uuid()}
       id={category._id}
     >
       {/* <div className="card-header category " key={category.name}>
@@ -44,8 +44,8 @@ const Category = ({
         </div>
       </div>
     */}
-      <div style={{ position: "relative" }}>
-        <div>
+      <div key={uuid()} style={{ position: "relative" }}>
+        <div key={uuid()}>
           {/* <Accordion defaultActiveKey=""> */}
           <Card>
             <Accordion.Toggle as={Card.Header} eventKey={category._id}>
@@ -81,7 +81,7 @@ const Category = ({
         <div
           onDragStart={e => onDragStart(e, category._id)}
           onDragOver={onDragOver}
-          key={category._id + "64t " + category.name}
+          key={uuid()}
           id={category._id}
           data-toggle="collapse"
           data-target={category._id}

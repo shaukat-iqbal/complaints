@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Link, Redirect } from "react-router-dom";
+import { Route, Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -11,14 +11,10 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import MenuIcon from "@material-ui/icons/Menu";
-import Icon from "@material-ui/core/Icon";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import RegisterForm from "../Register";
 import Users from "../users";
 import FileUpload from "../fileUpload";
-
 import { getCurrentUser } from "../../../../services/authService";
 import UserLogo from "../../../common/logo";
 import CategoriesList from "../../../../categories/categoriesList";
@@ -224,11 +220,11 @@ function UserManagement(props) {
 
         <Route
           path="/admin/users/assignees"
-          render={props => <Users role="assignees" {...props} />}
+          render={props => <Users type="assignees" {...props} />}
         />
         <Route
           path="/admin/users/complainers"
-          render={props => <Users role="complainers" {...props} />}
+          render={props => <Users type="complainers" {...props} />}
         />
         <Route path="/admin/users/categories" component={CategoriesList} />
         <Route path="/admin/users/configuration" component={Settings} />

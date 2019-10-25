@@ -7,7 +7,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import { toast } from "react-toastify";
 
 import Form from "../../common/form";
-import Category from "../../common/category";
 import {
   getCategories,
   getSentimentCategory

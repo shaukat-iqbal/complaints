@@ -135,7 +135,7 @@ class Assignee extends React.Component {
     try {
       await markSpam(complaint._id, true);
     } catch (ex) {
-      if (ex.response && ex.response.status == "400") {
+      if (ex.response && ex.response.status === "400") {
         return toast.warn("Something went wrong");
       }
     }

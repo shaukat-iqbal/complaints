@@ -4,7 +4,6 @@ import _ from "lodash";
 import { paginate } from "./../../../utils/paginate";
 import Pagination from "./../../common/pagination";
 import SearchBox from "./../../common/searchBox";
-import UsersTable from "./usersTable";
 import { getAllUsers } from "../../../services/userService";
 import { deleteComplainer } from "../../../services/complainerService";
 import { Link } from "react-router-dom";
@@ -12,22 +11,20 @@ import Loading from "../../common/loading";
 import User from "./user";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
-
+import uuid from "uuid";
 class Users extends Component {
   state = {
     users: [],
     currentPage: 1,
     pageSize: 4,
     searchQuery: "",
-    selectedGenre: null,
     sortColumn: { path: "name", order: "asc" },
     isLoading: true
   };
 
   async componentDidMount() {
-    const { data: users } = await getAllUsers(this.props.role);
-
-    this.setState({ users, isLoading: false });
+    const response = await getAllUsers(this.props.type);
+    this.setState({ users: response.data, isLoading: false });
   }
 
   handleDelete = async user => {
@@ -53,7 +50,7 @@ class Users extends Component {
 
     try {
       //call function based on user type
-      if (this.props.role === "assignees") await deleteAssignee(user._id);
+      if (this.props.type === "assignees") await deleteAssignee(user._id);
       else await deleteComplainer(user._id);
     } catch (ex) {
       if (ex.response && ex.response.status === 404) {
@@ -62,11 +59,11 @@ class Users extends Component {
     }
   };
   handleProfile = user => {
-    this.props.history.push(`/profile/${user._id}/${this.props.role}`);
+    this.props.history.push(`/profile/${user._id}/${this.props.type}`);
   };
   handleEdit = user => {
     this.props.history.replace(
-      "/admin/users/edit/" + user._id + "/" + this.props.role
+      "/admin/users/edit/" + user._id + "/" + this.props.type
     );
   };
   handlePageChange = page => {
@@ -131,6 +128,7 @@ class Users extends Component {
                     <div className="card-body">
                       {users.map(user => (
                         <User
+                          key={uuid()}
                           showCrudBtns={!this.props.isAssigning}
                           user={user}
                           onProfileView={this.handleProfile}

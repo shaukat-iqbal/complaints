@@ -114,7 +114,7 @@ class AssigneeDashboard extends Component {
     try {
       await dropResponsibility(complaint._id);
     } catch (ex) {
-      if (ex.response && ex.response.status == "400") {
+      if (ex.response && ex.response.status === "400") {
         return toast.warn("Something went wrong");
       }
     }

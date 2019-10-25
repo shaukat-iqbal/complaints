@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 // import { getChildsOf } from "../services/categoryService";
+import uuid from "uuid";
 import Category from "./category";
 class Childs extends Component {
   state = { childs: [] };
@@ -41,13 +42,14 @@ class Childs extends Component {
         className="ml-5"
         onDragOver={onDragOver}
         onDrop={onDrop}
-        key={category.id + "parentInChilds"}
+        key={uuid()}
       >
         {childs.length &&
           childs.map(childCategory =>
             childCategory.hasChild ? (
               <React.Fragment>
                 <Category
+                  key={uuid()}
                   category={childCategory}
                   onEdit={this.props.onEdit}
                   onAddChild={this.props.onAddChild}
@@ -56,6 +58,7 @@ class Childs extends Component {
                   onDragStart={onDragStart}
                 />
                 <Childs
+                  key={uuid()}
                   allCategories={this.props.allCategories}
                   category={childCategory}
                   onEdit={this.props.onEdit}
@@ -71,9 +74,10 @@ class Childs extends Component {
                 onDragOver={this.onDragOver}
                 id={childCategory._id}
                 onDrop={this.onDrop}
-                key={category._id + "singleInChilds"}
+                key={uuid()}
               >
                 <Category
+                  key={uuid()}
                   category={childCategory}
                   onEdit={this.props.onEdit}
                   onAddChild={this.props.onAddChild}
