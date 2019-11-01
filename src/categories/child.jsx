@@ -28,7 +28,7 @@ class Childs extends Component {
   }
 
   getChildsOf = (category, allCategories) => {
-    const childs = allCategories.filter(c => category._id === c.parentCategory);
+    const childs = allCategories.filter(c => category._id == c.parentCategory);
     return childs;
   };
 

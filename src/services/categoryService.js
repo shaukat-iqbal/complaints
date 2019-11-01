@@ -27,7 +27,6 @@ export function getCategoriesWithParent(categoryId) {
 export function getSentimentCategory(details) {
   return http.post(config.apiUrl + `/categories/sentiment/selection`, details);
 }
-
 // getting categories for selection with no parent
 export function getParentCategory(categoryId) {
   return http.get(
@@ -55,4 +54,10 @@ export function createCategory(body) {
 }
 export function deleteCategory(id) {
   return http.delete(config.apiUrl + "/categories/" + id);
+}
+// getting categories for selection with no parent
+export function insertMultipleCategories(categories) {
+  return http.post(config.apiUrl + `/categories/bulk`, {
+    categories: categories
+  });
 }

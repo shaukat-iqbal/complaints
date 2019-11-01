@@ -1,14 +1,13 @@
 import React, { Component } from "react";
 import Childs from "./child";
-import { getCategories, deleteCategory } from "../services/categoryService";
 import Category from "./category";
-import CategoryForm from "./categoryForm";
 import { Accordion } from "react-bootstrap";
 import uuid from "uuid";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
+import PlainCategoryForm from "./PlainCategoryForm";
 import { toast } from "react-toastify";
-class CategoriesList extends Component {
+class TemporaryCategoriesList extends Component {
   state = {
     allCategories: [],
     categoryFormEnabled: false,
@@ -16,16 +15,16 @@ class CategoriesList extends Component {
   };
   constructor(props) {
     super(props);
-    if (props.categories) this.state.allCategories = props.categories;
+    this.state.allCategories = props.categories;
   }
 
   async componentDidMount() {
-    if (this.state.allCategories.length < 1) {
-      const { data: allCategories } = await getCategories();
-      // const { data: categories } = await getCategoriesWithNoParent();
-      let categories = allCategories.filter(c => c.name !== "Root");
-      this.setState({ allCategories: categories });
-    }
+    // if (this.state.allCategories.length < 1) {
+    //   const { data: allCategories } = await getCategories();
+    //   // const { data: categories } = await getCategoriesWithNoParent();
+    //   let categories = allCategories.filter(c => c.name !== "Root");
+    //   this.setState({ allCategories: categories });
+    // }
   }
 
   onDragStart = (ev, categoryId) => {
@@ -118,9 +117,25 @@ class CategoriesList extends Component {
   };
 
   handleSubmitCategoryForm = category => {
+    let { allCategories } = this.state;
+
     if (category) {
-      let { allCategories } = this.state;
-      allCategories.push(category);
+      if (category.parentCategory === "0") {
+        delete category.parentCategory;
+      }
+      if (this.state.requestType === "edit") {
+        let cIndex = allCategories.findIndex(c => c._id == category._id);
+        allCategories[cIndex] = category;
+      } else if (this.state.requestType === "addChild") {
+        allCategories.push(category);
+        let cIndex = allCategories.findIndex(
+          c => c._id == category.parentCategory
+        );
+        console.log(cIndex);
+        if (cIndex >= 0) allCategories[cIndex].hasChild = true;
+      } else {
+        allCategories.push(category);
+      }
       this.setState({ allCategories, categoryFormEnabled: false });
     } else {
       this.setState({ categoryFormEnabled: false });
@@ -159,7 +174,7 @@ class CategoriesList extends Component {
           onClick: async () => {
             try {
               if (!category.hasChild) {
-                await deleteCategory(category._id);
+                // await deleteCategory(category._id);
                 let { allCategories } = this.state;
                 let updated = allCategories.filter(c => c._id !== category._id);
                 if (category.parentCategory) {
@@ -212,7 +227,7 @@ class CategoriesList extends Component {
               onDrop={this.onDrop}
               id={null}
             >
-              {length &&
+              {length > 0 &&
                 rootCategories.map(category =>
                   category.hasChild ? (
                     <div key={category._id + "parent"}>
@@ -259,7 +274,7 @@ class CategoriesList extends Component {
           </Accordion>
         </div>
         {this.state.categoryFormEnabled && (
-          <CategoryForm
+          <PlainCategoryForm
             requestType={this.state.requestType}
             category={this.state.selectedCategory}
             isOpen={this.state.categoryFormEnabled}
@@ -273,4 +288,4 @@ class CategoriesList extends Component {
   }
 }
 
-export default CategoriesList;
+export default TemporaryCategoriesList;

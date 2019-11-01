@@ -21,6 +21,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import AdminForm from "./components/common/adminForm";
 import CustomizedSteppers from "./components/Startup/stepper";
+import CategoriesRenderer from "./CategoriesRenderer";
 // const Complainer = lazy(() => import("./components/complainer/Complainer"));
 
 class App extends Component {
@@ -30,6 +31,7 @@ class App extends Component {
         <ToastContainer />
         <Switch>
           <Route path="/categories" component={CategoriesList} />
+          <Route path="/test" component={CategoriesRenderer} />
           <Route
             path="/welcome"
             render={props => (
