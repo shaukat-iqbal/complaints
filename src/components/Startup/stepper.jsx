@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
@@ -26,6 +26,7 @@ import {
   Attachment
 } from "@material-ui/icons";
 import CategoriesRenderer from "../../categories/CategoriesRenderer";
+import { getConfiguration } from "../../services/configurationService";
 
 const useQontoStepIconStyles = makeStyles({
   root: {
@@ -228,7 +229,12 @@ export default function CustomizedSteppers({ match }) {
   function handleReset() {
     setActiveStep(0);
   }
-
+  useEffect(async () => {
+    try {
+      await getConfiguration();
+      window.location = "/login";
+    } catch (error) {}
+  }, []);
   return (
     <div className={classes.root}>
       <Stepper
