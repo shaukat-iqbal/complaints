@@ -64,7 +64,8 @@ class RegisterForm extends Form {
     if (
       !(props.isProfileView || props.isEditView) &&
       user &&
-      user.role !== "admin"
+      user.role !== "admin" &&
+      !props.stepper
     ) {
       this.schema.password = Joi.string()
         .required()
@@ -90,9 +91,8 @@ class RegisterForm extends Form {
       if (id && role) {
         this.populateUserDetails(id, role.substring(0, role.length - 1));
       }
-    } else {
-      this.setState({ isLoading: false });
     }
+    this.setState({ isLoading: false });
   }
 
   populateUserDetails = async (userId, role) => {
@@ -270,13 +270,16 @@ class RegisterForm extends Form {
                 "Is Assignee?",
                 this.handleUserType,
                 isAssignee,
-                isProfileView || isEditView || currentUser.role === "guest"
+                !this.props.stepper &&
+                  (isProfileView || isEditView || currentUser.role === "guest")
               )}
               {this.renderInput("name", "Name", "text", isProfileView)}
               {this.renderInput("email", "Email", "text", isProfileView)}
 
               {/* create new component and put passwords input into that */}
-              {!(isProfileView || isEditView) && role !== "admin"
+              {!(isProfileView || isEditView) &&
+              role !== "admin" &&
+              !this.props.stepper
                 ? this.renderPasswords()
                 : null}
 

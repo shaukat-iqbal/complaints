@@ -75,7 +75,7 @@ class AdminForm extends Form {
     //   alert("you are leaving");
     // });
     if (this.props.match) {
-      const { id, role } = this.props.match;
+      const { id, role } = this.props.match.params;
       if (id && role) {
         this.populateUserDetails(id, role.substring(0, role.length - 1));
       }

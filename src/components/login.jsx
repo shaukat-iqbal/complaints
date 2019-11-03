@@ -27,9 +27,15 @@ class Login extends Form {
   async componentDidMount() {
     try {
       const user = await auth.getCurrentUser();
-      let { data: config } = await getConfiguration();
-      localStorage.setItem("configuration", JSON.stringify(config));
-      this.setState({ configToken: config });
+      try {
+        let { data: config } = await getConfiguration();
+        localStorage.setItem("configuration", JSON.stringify(config));
+        this.setState({ configToken: config });
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          window.location = "/welcome";
+        }
+      }
       this.props.history.replace(`/${user.role}`);
     } catch (ex) {
       // toast.warn("Authentication Failed");

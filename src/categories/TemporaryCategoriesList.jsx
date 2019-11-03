@@ -7,6 +7,7 @@ import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import PlainCategoryForm from "./PlainCategoryForm";
 import { toast } from "react-toastify";
+import { insertMultipleCategories } from "../services/categoryService";
 class TemporaryCategoriesList extends Component {
   state = {
     allCategories: [],
@@ -18,6 +19,12 @@ class TemporaryCategoriesList extends Component {
     this.state.allCategories = props.categories;
   }
 
+  //intializing the thereExists with props coming from parent
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    this.setState({
+      thereExistsError: nextProps.thereExistsError
+    });
+  }
   async componentDidMount() {
     // if (this.state.allCategories.length < 1) {
     //   const { data: allCategories } = await getCategories();
@@ -203,6 +210,34 @@ class TemporaryCategoriesList extends Component {
       ]
     });
   };
+
+  checkErrors = () => {
+    const { allCategories } = this.state;
+    let thereExistsError = allCategories.filter(c => c.error);
+    if (thereExistsError.length > 0)
+      alert("There exists " + thereExistsError.length + " error(s)");
+    else alert("There are no errors.Now Click SAVE button");
+    this.setState({
+      thereExistsError: thereExistsError.length > 0 ? true : false
+    });
+  };
+
+  handleSave = async () => {
+    if (this.state.thereExistsError) {
+      alert(
+        "Kindly solve errors of yellow categories first then hit save. To see errors CLICK on category. If there is no yellow category but still seeing this then CLICK Check for Errors button."
+      );
+      return;
+    }
+    try {
+      await insertMultipleCategories(this.state.allCategories);
+      toast.success("Categories successfully created.");
+      if (!this.props.isStepper) window.location = "/admin/users/categories";
+    } catch (error) {
+      toast.error("Something wrong occured. Please try again.");
+    }
+  };
+
   render() {
     const { allCategories } = this.state;
     const rootCategories = allCategories.filter(c => !c.parentCategory);
@@ -214,64 +249,93 @@ class TemporaryCategoriesList extends Component {
           <p className="h5">All categories</p>
         </div>
         <div className="card-body">
-          <button
-            className="btn button-secondary rounded-pill mb-3"
-            onClick={this.handleNewCategory}
-          >
-            Create Category...
-          </button>
-          <Accordion defaultActiveKey="">
-            <div
-              className="p-3 shadow-lg"
-              onDragOver={this.onDragOver}
-              onDrop={this.onDrop}
-              id={null}
+          <div className="d-flex">
+            <button
+              className="btn button-secondary rounded-pill mb-3 mr-auto"
+              onClick={this.handleNewCategory}
             >
-              {length > 0 &&
-                rootCategories.map(category =>
-                  category.hasChild ? (
-                    <div key={category._id + "parent"}>
-                      <Category
-                        key={uuid()}
-                        category={category}
-                        onEdit={this.handleEditCategory}
-                        onAddChild={this.handleAddChild}
-                        onDelete={this.handleDeleteCategory}
-                        onDragStart={this.onDragStart}
-                      />
-                      <Childs
-                        key={uuid()}
-                        category={category}
-                        onEdit={this.handleEditCategory}
-                        onAddChild={this.handleAddChild}
-                        onDelete={this.handleDeleteCategory}
-                        allCategories={allCategories}
+              Create Category...
+            </button>
+
+            {this.state.allCategories.length > 0 && (
+              <div>
+                <button
+                  className="btn button-secondary rounded-pill  mb-3 mr-auto"
+                  onClick={this.checkErrors}
+                >
+                  Check for Errors
+                </button>
+                <button
+                  className="btn btn-primary btn-round mb-3 ml-1"
+                  onClick={this.handleSave}
+                >
+                  Save
+                </button>
+              </div>
+            )}
+          </div>
+          {this.state.allCategories.length > 0 ? (
+            <Accordion defaultActiveKey="">
+              <div
+                className="p-3 shadow-lg"
+                onDragOver={this.onDragOver}
+                onDrop={this.onDrop}
+                id={null}
+              >
+                {length > 0 &&
+                  rootCategories.map(category =>
+                    category.hasChild ? (
+                      <div key={category._id + "parent"}>
+                        <Category
+                          key={uuid()}
+                          category={category}
+                          onEdit={this.handleEditCategory}
+                          onAddChild={this.handleAddChild}
+                          onDelete={this.handleDeleteCategory}
+                          onDragStart={this.onDragStart}
+                        />
+                        <Childs
+                          key={uuid()}
+                          category={category}
+                          onEdit={this.handleEditCategory}
+                          onAddChild={this.handleAddChild}
+                          onDelete={this.handleDeleteCategory}
+                          allCategories={allCategories}
+                          onDragOver={this.onDragOver}
+                          onDrop={this.onDrop}
+                          onDragStart={this.onDragStart}
+                        />
+                      </div>
+                    ) : (
+                      <div
                         onDragOver={this.onDragOver}
+                        id={category._id}
                         onDrop={this.onDrop}
-                        onDragStart={this.onDragStart}
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      onDragOver={this.onDragOver}
-                      id={category._id}
-                      onDrop={this.onDrop}
-                      key={category._id + "single"}
-                    >
-                      <Category
-                        key={uuid()}
-                        category={category}
-                        onEdit={this.handleEditCategory}
-                        onAddChild={this.handleAddChild}
-                        onDelete={this.handleDeleteCategory}
-                        onDragOver={this.onDragOver}
-                        onDragStart={this.onDragStart}
-                      />
-                    </div>
-                  )
-                )}
-            </div>
-          </Accordion>
+                        key={category._id + "single"}
+                      >
+                        <Category
+                          key={uuid()}
+                          category={category}
+                          onEdit={this.handleEditCategory}
+                          onAddChild={this.handleAddChild}
+                          onDelete={this.handleDeleteCategory}
+                          onDragOver={this.onDragOver}
+                          onDragStart={this.onDragStart}
+                        />
+                      </div>
+                    )
+                  )}
+              </div>
+            </Accordion>
+          ) : (
+            <p>
+              Select one of two methods i.e{" "}
+              <u>
+                <strong>CSV or Create Category</strong>
+              </u>{" "}
+              button to create categories.
+            </p>
+          )}
         </div>
         {this.state.categoryFormEnabled && (
           <PlainCategoryForm

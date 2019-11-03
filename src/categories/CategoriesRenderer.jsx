@@ -1,7 +1,7 @@
 import React from "react";
 import Papa from "papaparse";
-import { insertMultipleCategories } from "./services/categoryService";
-import TemporaryCategoriesList from "./categories/TemporaryCategoriesList";
+import TemporaryCategoriesList from "./TemporaryCategoriesList";
+import Joi from "joi-browser";
 import { toast } from "react-toastify";
 
 class CategoriesRenderer extends React.Component {
@@ -10,7 +10,13 @@ class CategoriesRenderer extends React.Component {
     csvFile: null,
     allCategories: []
   };
-
+  schema = {
+    name: Joi.string()
+      .min(4)
+      .required(),
+    parentCategory: Joi.string(),
+    hasChild: Joi.boolean()
+  };
   childsOf = id => {
     return this.state.allCategories.filter(c => c.parentCategory === id);
   };
@@ -28,40 +34,64 @@ class CategoriesRenderer extends React.Component {
     this.done();
     console.log(this.state.allCategories);
   };
+  validate = category => {
+    const { error } = Joi.validate(category, this.schema, {
+      abortEarly: false
+    });
+
+    if (!error) return null;
+
+    const errors = {};
+
+    for (let item of error.details) errors[item.path[0]] = item.message;
+
+    return errors;
+  };
 
   done = () => {
-    const { allCategories, data } = this.state;
+    let { allCategories, data, thereExistsError } = this.state;
+
     data.shift();
     data.forEach(path => {
       const rootCategories = this.getRootCategories();
+      //As first name on will be consider root category so check if already exists in root categories?
       let root = this.findCategoryByName(path[0], rootCategories);
       let childs = [];
       if (!root) {
-        root = { _id: allCategories.length + 1, name: path[0] };
+        root = { name: path[0] };
         if (path.length > 1) {
           root.hasChild = true;
         }
+        const error = this.validate(root);
+        if (error) {
+          root.error = error;
+          thereExistsError = true;
+        }
+        root._id = allCategories.length + 1 + "";
         allCategories.push(root);
       }
       childs = this.childsOf(root._id);
       let parentId = root._id;
       for (let i = 0; i < path.length; i++) {
-        if (i == 0) continue;
+        if (i === 0) continue;
         const name = path[i];
         let category = this.findCategoryByName(name, childs);
         if (!category) {
           let obj = {
-            _id: allCategories.length + 1,
             name: name,
             parentCategory: parentId,
             hasChild: false
           };
           if (i < path.length - 1) {
             obj.hasChild = true;
-            if (name == "Food") {
-              console.log(path);
-            }
           }
+
+          const error = this.validate(obj);
+          if (error) {
+            obj.error = error;
+            thereExistsError = true;
+          }
+          obj._id = allCategories.length + 1 + "";
           allCategories.push(obj);
           parentId = obj._id;
           childs = [];
@@ -73,7 +103,7 @@ class CategoriesRenderer extends React.Component {
         }
       }
     });
-    this.setState({ allCategories });
+    this.setState({ allCategories, thereExistsError });
   };
 
   renderCategories = () => {
@@ -86,10 +116,6 @@ class CategoriesRenderer extends React.Component {
     });
   };
 
-  handleSave = async () => {
-    await insertMultipleCategories(this.state.allCategories);
-  };
-
   handleFileInput = event => {
     if (event.target.files[0]) {
       const file = event.target.files[0];
@@ -100,33 +126,38 @@ class CategoriesRenderer extends React.Component {
   render() {
     return (
       <div className="container">
-        <div className="d-flex jumbotron bg-white flex-column shadow-lg ">
-          <p className="display-5">
-            Upload <strong>Csv File</strong> to create categories
-          </p>
-          <input
-            type="file"
-            name="categories"
-            accept=".csv"
-            onChange={this.handleFileInput}
-            style={{ cursor: "pointer" }}
-          />
-          <button
-            className="mt-5 btn btn-sm button-primary align-self-center"
-            onClick={this.renderCategories}
-            name="categories"
-          >
-            Render categories
-          </button>
-        </div>
-        {
-          <div>
-            <TemporaryCategoriesList categories={this.state.allCategories} />
-            {this.state.allCategories.length > 0 && (
-              <button onClick={this.handleSave}>Save</button>
-            )}
+        <div className="row ">
+          <div className="col-md-9 col-sm-12">
+            <TemporaryCategoriesList
+              {...this.props}
+              categories={this.state.allCategories}
+              thereExistsError={this.state.thereExistsError}
+            />
           </div>
-        }
+
+          <div
+            className="col-md-3 col-sm-12 d-flex jumbotron bg-white flex-column shadow-sm"
+            style={{ width: "300px", height: "300px" }}
+          >
+            <p className="display-5">
+              Upload <strong>Csv File</strong> to create categories
+            </p>
+            <input
+              type="file"
+              name="categories"
+              accept=".csv"
+              onChange={this.handleFileInput}
+              style={{ cursor: "pointer" }}
+            />
+            <button
+              className="mt-5 btn btn-sm button-primary align-self-center"
+              onClick={this.renderCategories}
+              name="categories"
+            >
+              Render categories
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

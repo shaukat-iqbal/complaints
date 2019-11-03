@@ -9,7 +9,6 @@ import Check from "@material-ui/icons/Check";
 import SettingsIcon from "@material-ui/icons/Settings";
 import StepConnector from "@material-ui/core/StepConnector";
 import Button from "@material-ui/core/Button";
-import CategoriesList from "../../categories/categoriesList";
 import Members from "../admin/Higher Authorities/Members";
 import AdminForm from "../common/adminForm";
 import Features from "../admin/Configuration/Features";
@@ -17,6 +16,7 @@ import Attachments from "../admin/Attachments/Attachments";
 import RegisterForm from "../admin/usersManagement/Register";
 import FileUpload from "../admin/usersManagement/fileUpload";
 import CompanyDetailsForm from "../common/companyDetailsForm";
+import { Link } from "react-router-dom";
 import {
   Details,
   PersonAdd,
@@ -25,6 +25,7 @@ import {
   SupervisedUserCircleRounded,
   Attachment
 } from "@material-ui/icons";
+import CategoriesRenderer from "../../categories/CategoriesRenderer";
 
 const useQontoStepIconStyles = makeStyles({
   root: {
@@ -177,7 +178,7 @@ function getSteps() {
   ];
 }
 
-function getStepContent(step) {
+function getStepContent(step, match) {
   switch (step) {
     case 0:
       return (
@@ -194,7 +195,7 @@ function getStepContent(step) {
     case 2:
       return <Features />;
     case 3:
-      return <CategoriesList />;
+      return <CategoriesRenderer />;
     case 4:
       return <Attachments />;
     case 5:
@@ -202,7 +203,7 @@ function getStepContent(step) {
     case 6:
       return (
         <div className="d-flex justify-content-around flex-wrap">
-          <RegisterForm />
+          <RegisterForm stepper={true} />
           <FileUpload />
         </div>
       );
@@ -211,9 +212,9 @@ function getStepContent(step) {
   }
 }
 
-export default function CustomizedSteppers() {
+export default function CustomizedSteppers({ match }) {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = React.useState(6);
   const steps = getSteps();
 
   function handleNext() {
@@ -245,16 +246,18 @@ export default function CustomizedSteppers() {
         {activeStep === steps.length ? (
           <div>
             <div className={classes.instructions}>
-              All steps completed - you&apos;re finished
+              <h4>Congratulations</h4>
+              <p>
+                You are good to go. Now you may login to your account and use
+                our product.{" "}
+              </p>
             </div>
-            <Button onClick={handleReset} className={classes.button}>
-              Reset
-            </Button>
+            <Link to={"/login"}>Go to Login</Link>
           </div>
         ) : (
           <div>
             <div className={classes.instructions}>
-              {getStepContent(activeStep)}
+              {getStepContent(activeStep, match)}
             </div>
             <div className="mt-3">
               <Button

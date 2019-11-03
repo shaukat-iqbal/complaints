@@ -75,6 +75,8 @@ export function convertToPicture(buffer) {
 }
 
 export function getUser(userId, role) {
+  // alert(userId + " " + role);
+
   return http.get(`${apiUrl}/${role}s/${userId}`);
 }
 

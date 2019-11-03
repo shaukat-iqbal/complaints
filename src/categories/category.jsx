@@ -10,6 +10,8 @@ const Category = ({
   onDragStart,
   onDragOver
 }) => {
+  let classes = "d-flex align-self-start p-2";
+  if (category.error) classes += " bg-warning";
   return (
     <div
       className=" p-0 bg-danger m-1"
@@ -50,9 +52,7 @@ const Category = ({
           <Card>
             <Accordion.Toggle as={Card.text} eventKey={category._id}>
               <div style={{ position: "relative" }}>
-                <div className="d-flex align-self-start p-2">
-                  {category.name}
-                </div>
+                <div className={classes}>{category.name}</div>
                 <div
                   onDragStart={e => onDragStart(e, category._id)}
                   onDragOver={onDragOver}
@@ -73,15 +73,20 @@ const Category = ({
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={category._id}>
               <Card.Body>
-                <div className="d-flex ">
+                {category.error && (
+                  <div className="alert alert-danger">
+                    {JSON.stringify(category.error)}
+                  </div>
+                )}
+                <div className="d-flex flex-wrap ">
                   <button
-                    className="btn btn-primary btn-sm mr-1"
+                    className="btn btn-primary btn-sm mr-1 mb-1"
                     onClick={() => onEdit(category)}
                   >
                     Edit
                   </button>
                   <button
-                    className="btn btn-secondary btn-sm mr-1"
+                    className="btn btn-secondary btn-sm mr-1 mb-1"
                     onClick={() => onAddChild(category)}
                   >
                     Add Child

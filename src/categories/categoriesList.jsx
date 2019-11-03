@@ -1,8 +1,13 @@
 import React, { Component } from "react";
 import Childs from "./child";
-import { getCategories, deleteCategory } from "../services/categoryService";
+import {
+  getCategories,
+  deleteCategory,
+  updateMultipleCategories
+} from "../services/categoryService";
 import Category from "./category";
 import CategoryForm from "./categoryForm";
+import CategoriesRenderer from "./CategoriesRenderer";
 import { Accordion } from "react-bootstrap";
 import uuid from "uuid";
 import { confirmAlert } from "react-confirm-alert"; // Import
@@ -12,7 +17,8 @@ class CategoriesList extends Component {
   state = {
     allCategories: [],
     categoryFormEnabled: false,
-    selectedCategory: ""
+    selectedCategory: "",
+    csvUploadComponent: false
   };
   constructor(props) {
     super(props);
@@ -65,13 +71,15 @@ class CategoriesList extends Component {
         });
     }
 
-    //agar null har matlab category ko root category bna do by deleting parent category id
+    //agar null ha matlab category ko root category bna do by deleting parent category id
     if (!parentCategoryId) {
       allCategories.map(c => {
         if (c._id == categoryId) delete c.parentCategory;
         return c;
       });
-      this.setState({ allCategories });
+      let orderChanged = this.state.orderChanged;
+      if (!orderChanged) orderChanged = true;
+      this.setState({ allCategories, orderChanged });
       return;
     }
     //agar null ni hai tou check karo khud ko khud pay drop kar raha h? do nothing
@@ -101,7 +109,10 @@ class CategoriesList extends Component {
     console.log("Categories updated ", allCategories);
     console.log("Category dropped is", categoryId);
 
-    this.setState({ allCategories });
+    // Make sure some changes occured in hirarchi of categories
+    let orderChanged = this.state.orderChanged;
+    if (!orderChanged) orderChanged = true;
+    this.setState({ allCategories, orderChanged });
   };
 
   doesHaveSiblings = category => {
@@ -120,7 +131,16 @@ class CategoriesList extends Component {
   handleSubmitCategoryForm = category => {
     if (category) {
       let { allCategories } = this.state;
-      allCategories.push(category);
+
+      if (this.state.requestType === "addChild") {
+        let parentCategoryIndex = allCategories.findIndex(
+          c => c._id === category.parentCategory
+        );
+        if (parentCategoryIndex >= 0)
+          allCategories[parentCategoryIndex].hasChild = true;
+        console.log(parentCategoryIndex, allCategories[parentCategoryIndex]);
+      }
+      allCategories.unshift(category);
       this.setState({ allCategories, categoryFormEnabled: false });
     } else {
       this.setState({ categoryFormEnabled: false });
@@ -141,6 +161,7 @@ class CategoriesList extends Component {
       requestType: "edit"
     });
   };
+
   handleAddChild = category => {
     this.setState({
       selectedCategory: category,
@@ -188,85 +209,123 @@ class CategoriesList extends Component {
       ]
     });
   };
+
+  handleSave = async () => {
+    try {
+      await updateMultipleCategories(this.state.allCategories);
+      toast.success("Categories successfully updated.");
+    } catch (error) {
+      toast.error("Something wrong occured. Please try again.");
+    }
+  };
+
+  handleCSVUpload = () => {
+    this.setState({ csvUploadComponent: true });
+  };
   render() {
     const { allCategories } = this.state;
     const rootCategories = allCategories.filter(c => !c.parentCategory);
     const length = rootCategories.length;
 
     return (
-      <div className="container card p-1  ">
-        <div className="card-header">
-          <p className="h5">All categories</p>
-        </div>
-        <div className="card-body">
-          <button
-            className="btn button-secondary rounded-pill mb-3"
-            onClick={this.handleNewCategory}
-          >
-            Create Category...
-          </button>
-          <Accordion defaultActiveKey="">
-            <div
-              className="p-3 shadow-lg"
-              onDragOver={this.onDragOver}
-              onDrop={this.onDrop}
-              id={null}
-            >
-              {length &&
-                rootCategories.map(category =>
-                  category.hasChild ? (
-                    <div key={category._id + "parent"}>
-                      <Category
-                        key={uuid()}
-                        category={category}
-                        onEdit={this.handleEditCategory}
-                        onAddChild={this.handleAddChild}
-                        onDelete={this.handleDeleteCategory}
-                        onDragStart={this.onDragStart}
-                      />
-                      <Childs
-                        key={uuid()}
-                        category={category}
-                        onEdit={this.handleEditCategory}
-                        onAddChild={this.handleAddChild}
-                        onDelete={this.handleDeleteCategory}
-                        allCategories={allCategories}
-                        onDragOver={this.onDragOver}
-                        onDrop={this.onDrop}
-                        onDragStart={this.onDragStart}
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      onDragOver={this.onDragOver}
-                      id={category._id}
-                      onDrop={this.onDrop}
-                      key={category._id + "single"}
-                    >
-                      <Category
-                        key={uuid()}
-                        category={category}
-                        onEdit={this.handleEditCategory}
-                        onAddChild={this.handleAddChild}
-                        onDelete={this.handleDeleteCategory}
-                        onDragOver={this.onDragOver}
-                        onDragStart={this.onDragStart}
-                      />
-                    </div>
-                  )
-                )}
+      <div>
+        {!this.state.csvUploadComponent ? (
+          <div className="container card p-1  ">
+            <div className="card-header">
+              <p className="h5">All categories</p>
             </div>
-          </Accordion>
-        </div>
-        {this.state.categoryFormEnabled && (
-          <CategoryForm
-            requestType={this.state.requestType}
-            category={this.state.selectedCategory}
-            isOpen={this.state.categoryFormEnabled}
-            onSubmitForm={this.handleSubmitCategoryForm}
-            allCategories={allCategories}
-            onClose={this.handleCloseCategoryForm}
-          />
+            <div className="card-body">
+              <div className="d-flex mb-3">
+                <div className="d-flex mr-auto">
+                  <button
+                    className="btn btn-secondary rounded-pill "
+                    onClick={this.handleNewCategory}
+                  >
+                    Create Category...
+                  </button>
+
+                  <button
+                    className="btn btn-primary rounded-pill ml-1"
+                    onClick={this.handleCSVUpload}
+                  >
+                    Upload Csv
+                  </button>
+                </div>
+                {this.state.orderChanged && (
+                  <button
+                    className="btn btn-primary btn-round mb-3"
+                    onClick={this.handleSave}
+                  >
+                    Save
+                  </button>
+                )}
+              </div>
+              <Accordion defaultActiveKey="">
+                <div
+                  className="p-3 shadow-lg"
+                  onDragOver={this.onDragOver}
+                  onDrop={this.onDrop}
+                  id={null}
+                >
+                  {length &&
+                    rootCategories.map(category =>
+                      category.hasChild ? (
+                        <div key={category._id + "parent"}>
+                          <Category
+                            key={uuid()}
+                            category={category}
+                            onEdit={this.handleEditCategory}
+                            onAddChild={this.handleAddChild}
+                            onDelete={this.handleDeleteCategory}
+                            onDragStart={this.onDragStart}
+                          />
+                          <Childs
+                            key={uuid()}
+                            category={category}
+                            onEdit={this.handleEditCategory}
+                            onAddChild={this.handleAddChild}
+                            onDelete={this.handleDeleteCategory}
+                            allCategories={allCategories}
+                            onDragOver={this.onDragOver}
+                            onDrop={this.onDrop}
+                            onDragStart={this.onDragStart}
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          onDragOver={this.onDragOver}
+                          id={category._id}
+                          onDrop={this.onDrop}
+                          key={category._id + "single"}
+                        >
+                          <Category
+                            key={uuid()}
+                            category={category}
+                            onEdit={this.handleEditCategory}
+                            onAddChild={this.handleAddChild}
+                            onDelete={this.handleDeleteCategory}
+                            onDragOver={this.onDragOver}
+                            onDragStart={this.onDragStart}
+                          />
+                        </div>
+                      )
+                    )}
+                </div>
+              </Accordion>
+            </div>
+            {this.state.categoryFormEnabled && (
+              <CategoryForm
+                requestType={this.state.requestType}
+                category={this.state.selectedCategory}
+                isOpen={this.state.categoryFormEnabled}
+                onSubmitForm={this.handleSubmitCategoryForm}
+                allCategories={allCategories}
+                onClose={this.handleCloseCategoryForm}
+              />
+            )}
+          </div>
+        ) : (
+          <CategoriesRenderer isStepper={false} />
         )}
       </div>
     );

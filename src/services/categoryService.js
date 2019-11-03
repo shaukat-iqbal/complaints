@@ -61,3 +61,9 @@ export function insertMultipleCategories(categories) {
     categories: categories
   });
 }
+
+export function updateMultipleCategories(categories) {
+  return http.put(config.apiUrl + `/categories/updatebulk`, {
+    categories: categories
+  });
+}
