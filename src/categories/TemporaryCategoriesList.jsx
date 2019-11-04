@@ -73,10 +73,8 @@ class TemporaryCategoriesList extends Component {
 
     //agar null har matlab category ko root category bna do by deleting parent category id
     if (!parentCategoryId) {
-      allCategories.map(c => {
-        if (c._id == categoryId) delete c.parentCategory;
-        return c;
-      });
+      let index = allCategories.findIndex(c => c._id == categoryId);
+      if (index >= 0) allCategories[index].parentCategory = null;
       this.setState({ allCategories });
       return;
     }
@@ -100,10 +98,9 @@ class TemporaryCategoriesList extends Component {
 
     console.log("Sending body", categoryToUpdate);
 
-    allCategories.map(c => {
-      if (c._id == categoryToUpdate._id) c = categoryToUpdate;
-      return c;
-    });
+    let index = allCategories.findIndex(c => c._id == categoryId);
+    if (index >= 0) allCategories[index] = categoryToUpdate;
+
     console.log("Categories updated ", allCategories);
     console.log("Category dropped is", categoryId);
 

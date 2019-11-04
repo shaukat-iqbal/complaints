@@ -153,6 +153,7 @@ class AdminForm extends Form {
     try {
       if (userId) {
         await updateAdmin(userId, fd);
+        this.setState({ isProfileView: true, isEditView: false });
         toast.info("Account Updated");
       } else {
         await registerAdmin(fd);

@@ -73,10 +73,9 @@ class CategoriesList extends Component {
 
     //agar null ha matlab category ko root category bna do by deleting parent category id
     if (!parentCategoryId) {
-      allCategories.map(c => {
-        if (c._id == categoryId) delete c.parentCategory;
-        return c;
-      });
+      let index = allCategories.findIndex(c => c._id == categoryId);
+      if (index >= 0) allCategories[index].parentCategory = null;
+
       let orderChanged = this.state.orderChanged;
       if (!orderChanged) orderChanged = true;
       this.setState({ allCategories, orderChanged });
@@ -97,15 +96,13 @@ class CategoriesList extends Component {
       categoryToUpdate.parentCategory = parentCategoryId;
       categoryTobeParent.hasChild = true;
     } else {
-      delete categoryToUpdate.parentCategory;
+      categoryToUpdate.parentCategory = null;
     }
 
     console.log("Sending body", categoryToUpdate);
+    let index = allCategories.findIndex(c => c._id == categoryId);
+    if (index >= 0) allCategories[index] = categoryToUpdate;
 
-    allCategories.map(c => {
-      if (c._id == categoryToUpdate._id) c = categoryToUpdate;
-      return c;
-    });
     console.log("Categories updated ", allCategories);
     console.log("Category dropped is", categoryId);
 
@@ -215,6 +212,8 @@ class CategoriesList extends Component {
       await updateMultipleCategories(this.state.allCategories);
       toast.success("Categories successfully updated.");
     } catch (error) {
+      console.log(error);
+
       toast.error("Something wrong occured. Please try again.");
     }
   };

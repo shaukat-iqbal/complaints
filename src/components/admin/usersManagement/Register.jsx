@@ -201,6 +201,8 @@ class RegisterForm extends Form {
     try {
       if (userId) {
         await updateUser(userId, fd, this.state.isAssignee);
+        this.setState({ isEditView: false, isProfileView: true });
+        return;
       } else {
         await registerUser(fd, this.state.isAssignee);
       }
