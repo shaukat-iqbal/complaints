@@ -229,12 +229,12 @@ export default function CustomizedSteppers({ match }) {
   function handleReset() {
     setActiveStep(0);
   }
-  useEffect(async () => {
-    try {
-      await getConfiguration();
-      window.location = "/login";
-    } catch (error) {}
-  }, []);
+  // useEffect(async () => {
+  //   try {
+  //     await getConfiguration();
+  //     window.location = "/login";
+  //   } catch (error) {}
+  // }, []);
   return (
     <div className={classes.root}>
       <Stepper

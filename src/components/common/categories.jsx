@@ -27,7 +27,7 @@ class Categories extends Component {
   handleClick = async event => {
     const id = event.target.value;
     const { data: categories } = await getChildsOf(id);
-    if (categories[0]) {
+    if (categories.length > 0) {
       this.setState({ categories });
       return;
     }
@@ -39,11 +39,13 @@ class Categories extends Component {
   };
 
   handleBack = async () => {
-    const { data: siblingCategories } = await getSiblingsOf(
-      this.state.categories[0].parentCategory
-    );
-    if (siblingCategories && siblingCategories[0])
-      this.setState({ categories: siblingCategories });
+    try {
+      const { data: siblingCategories } = await getSiblingsOf(
+        this.state.categories[0].parentCategory
+      );
+      if (siblingCategories.length > 0)
+        this.setState({ categories: siblingCategories });
+    } catch (error) {}
   };
 
   render() {

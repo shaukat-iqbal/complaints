@@ -234,17 +234,17 @@ class CategoriesList extends Component {
               <p className="h5">All categories</p>
             </div>
             <div className="card-body">
-              <div className="d-flex mb-3">
+              <div className="d-flex ">
                 <div className="d-flex mr-auto">
                   <button
-                    className="btn btn-secondary rounded-pill "
+                    className="btn btn-secondary rounded-pill mb-3 "
                     onClick={this.handleNewCategory}
                   >
                     Create Category...
                   </button>
 
                   <button
-                    className="btn btn-primary rounded-pill ml-1"
+                    className="btn btn-primary rounded-pill ml-1 mb-3"
                     onClick={this.handleCSVUpload}
                   >
                     Upload Csv

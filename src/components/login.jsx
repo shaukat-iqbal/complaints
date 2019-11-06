@@ -33,7 +33,7 @@ class Login extends Form {
         this.setState({ configToken: config });
       } catch (error) {
         if (error.response && error.response.status === 404) {
-          window.location = "/welcome";
+          // window.location = "/welcome";
         }
       }
       this.props.history.replace(`/${user.role}`);
