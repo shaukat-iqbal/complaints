@@ -221,6 +221,9 @@ class CategoriesList extends Component {
   handleCSVUpload = () => {
     this.setState({ csvUploadComponent: true });
   };
+  handleHideCsvComponent = () => {
+    this.setState({ csvUploadComponent: false });
+  };
   render() {
     const { allCategories } = this.state;
     const rootCategories = allCategories.filter(c => !c.parentCategory);
@@ -324,7 +327,10 @@ class CategoriesList extends Component {
             )}
           </div>
         ) : (
-          <CategoriesRenderer isStepper={false} />
+          <CategoriesRenderer
+            isStepper={false}
+            hideComponent={this.handleHideCsvComponent}
+          />
         )}
       </div>
     );

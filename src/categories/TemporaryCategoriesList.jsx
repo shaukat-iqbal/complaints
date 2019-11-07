@@ -22,7 +22,8 @@ class TemporaryCategoriesList extends Component {
   //intializing the thereExists with props coming from parent
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
-      thereExistsError: nextProps.thereExistsError
+      thereExistsError: nextProps.thereExistsError,
+      allCategories: nextProps.categories
     });
   }
   async componentDidMount() {
@@ -208,22 +209,26 @@ class TemporaryCategoriesList extends Component {
     });
   };
 
+  // checkErrors = () => {
+  //   const { allCategories } = this.state;
+  //   let thereExistsError = allCategories.filter(c => c.error);
+  //   if (thereExistsError.length > 0)
+  //     alert("There exists " + thereExistsError.length + " error(s)");
+  //   else alert("There are no errors.Now Click SAVE button");
+  //   this.setState({
+  //     thereExistsError: thereExistsError.length > 0 ? true : false
+  //   });
+  // };
+
   checkErrors = () => {
     const { allCategories } = this.state;
-    let thereExistsError = allCategories.filter(c => c.error);
-    if (thereExistsError.length > 0)
-      alert("There exists " + thereExistsError.length + " error(s)");
-    else alert("There are no errors.Now Click SAVE button");
-    this.setState({
-      thereExistsError: thereExistsError.length > 0 ? true : false
-    });
+    let errors = allCategories.filter(c => c.error);
+    return errors.length > 0 ? true : false;
   };
 
   handleSave = async () => {
-    if (this.state.thereExistsError) {
-      alert(
-        "Kindly solve errors of yellow categories first then hit save. To see errors CLICK on category. If there is no yellow category but still seeing this then CLICK Check for Errors button."
-      );
+    if (this.checkErrors()) {
+      alert("Kindly solve errors of yellow categories first then hit save. ");
       return;
     }
     try {
@@ -235,20 +240,28 @@ class TemporaryCategoriesList extends Component {
     }
   };
 
+  clearAll = () => {
+    this.setState({ allCategories: [] });
+    this.props.clearAll();
+  };
+
   render() {
     const { allCategories } = this.state;
     const rootCategories = allCategories.filter(c => !c.parentCategory);
     const length = rootCategories.length;
 
     return (
-      <div className="container card p-1  ">
-        <div className="card-header">
-          <p className="h5">All categories</p>
-        </div>
+      <div className="container card p-1">
         <div className="card-body">
           <div className="d-flex">
             <button
-              className="btn button-secondary rounded-pill mb-3 mr-auto"
+              className="btn button-outline-primary mb-3 mr-1"
+              onClick={this.props.hideComponent}
+            >
+              <i className="fa fa-arrow-left"></i>
+            </button>
+            <button
+              className="btn button-secondary rounded-pill mb-3 mr-auto "
               onClick={this.handleNewCategory}
             >
               Create Category...
@@ -257,10 +270,10 @@ class TemporaryCategoriesList extends Component {
             {this.state.allCategories.length > 0 && (
               <div>
                 <button
-                  className="btn button-secondary rounded-pill  mb-3 mr-auto"
-                  onClick={this.checkErrors}
+                  className="btn btn-danger btn-round mb-3 ml-1"
+                  onClick={this.clearAll}
                 >
-                  Check for Errors
+                  <i className="fa fa-refresh"></i>Clear All
                 </button>
                 <button
                   className="btn btn-primary btn-round mb-3 ml-1"

@@ -12,6 +12,7 @@ import User from "./user";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import uuid from "uuid";
+import { capitalizeFirstLetter } from "../../../services/helper";
 class Users extends Component {
   state = {
     users: [],
@@ -115,6 +116,9 @@ class Users extends Component {
             </p>
           ) : (
             <div className="d-flex flex-wrap flex-column mx-5 ">
+              <div className="p-3 border rounded-sm d-flex justify-content-center mb-1">
+                <h3>{capitalizeFirstLetter(this.props.type)}</h3>
+              </div>
               <div className="align-self-end mr-4 ">
                 <p>Showing {totalCount} Users.</p>
                 <SearchBox value={searchQuery} onChange={this.handleSearch} />

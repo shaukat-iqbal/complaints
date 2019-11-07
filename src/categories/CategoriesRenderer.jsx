@@ -29,11 +29,6 @@ class CategoriesRenderer extends React.Component {
     return this.state.allCategories.filter(c => !c.parentCategory);
   };
 
-  saveData = result => {
-    this.setState({ data: result.data });
-    this.done();
-    console.log(this.state.allCategories);
-  };
   validate = category => {
     const { error } = Joi.validate(category, this.schema, {
       abortEarly: false
@@ -48,8 +43,9 @@ class CategoriesRenderer extends React.Component {
     return errors;
   };
 
-  done = () => {
-    let { allCategories, data, thereExistsError } = this.state;
+  done = result => {
+    let { allCategories, thereExistsError } = this.state;
+    let { data } = result;
 
     data.shift();
     data.forEach(path => {
@@ -112,7 +108,7 @@ class CategoriesRenderer extends React.Component {
       return;
     }
     Papa.parse(this.state.csvFile, {
-      complete: this.saveData
+      complete: this.done
     });
   };
 
@@ -123,6 +119,9 @@ class CategoriesRenderer extends React.Component {
     }
   };
 
+  hanndleClearAll = () => {
+    this.setState({ allCategories: [] });
+  };
   render() {
     return (
       <div className="container">
@@ -130,6 +129,7 @@ class CategoriesRenderer extends React.Component {
           <div className="col-md-9 col-sm-12">
             <TemporaryCategoriesList
               {...this.props}
+              clearAll={this.hanndleClearAll}
               categories={this.state.allCategories}
               thereExistsError={this.state.thereExistsError}
             />
