@@ -23,36 +23,40 @@ class Settings extends Component {
 
   render() {
     return (
-      <div className="container">
-        <h3 className="text-center">Configuration</h3>
+      <>
+        <div className="p-3 mt-0 border rounded-sm d-flex justify-content-center mb-1 gradiantHeading">
+          <h3 style={{ color: "white" }}>Configuration</h3>
+        </div>
+        <div className="container">
+          <Features />
 
-        <div className="p-5 ">
-          <div>
-            <p className="d-inline-block mr-2">Higher Authorities: </p>
-            <span>
-              <button className="btn p-0 m-0" onClick={this.handleViewList}>
-                <i className="fa fa-eye "></i>
-              </button>
-            </span>
+          <div className="px-1 py-3">
+            <div>
+              <p className="d-inline-block mr-2">Higher Authorities: </p>
+              <span>
+                <button className="btn p-0 m-0" onClick={this.handleViewList}>
+                  <i className="fa fa-eye "></i>
+                </button>
+              </span>
 
-            {this.state.showHigherAuthoritiesList && <Members />}
-          </div>
-          <div>
-            <p className="d-inline-block mr-2">Allowed Attachments: </p>
-            <span>
-              <button
-                className="btn p-0 m-0"
-                onClick={this.handleViewAttachmentsList}
-              >
-                <i className="fa fa-eye "></i>
-              </button>
-            </span>
+              {this.state.showHigherAuthoritiesList && <Members />}
+            </div>
+            <div>
+              <p className="d-inline-block mr-2">Allowed Attachments: </p>
+              <span>
+                <button
+                  className="btn p-0 m-0"
+                  onClick={this.handleViewAttachmentsList}
+                >
+                  <i className="fa fa-eye "></i>
+                </button>
+              </span>
 
-            {this.state.showAttachmentsList && <Attachments />}
+              {this.state.showAttachmentsList && <Attachments />}
+            </div>
           </div>
         </div>
-        <Features />
-      </div>
+      </>
     );
   }
 }

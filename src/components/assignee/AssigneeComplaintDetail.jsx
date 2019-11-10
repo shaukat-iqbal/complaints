@@ -39,7 +39,7 @@ export default function ComplaintDetail(props) {
 
   // handle Edit
   const handleEdit = () => {
-    setEdit(true);
+    edit ? setEdit(false) : setEdit(true);
   };
 
   // handle save
@@ -49,7 +49,6 @@ export default function ComplaintDetail(props) {
     if (remarks.length < 5) {
       return setError("Remarks length should be atleast 5 charaters long.");
     }
-
     const { data: complaint } = await changeStatus(id, value, remarks);
     setEdit(false);
     setComplaint(complaint);
@@ -92,7 +91,7 @@ export default function ComplaintDetail(props) {
       </button>
       <div className="card shadow-lg">
         <div className="card-header">
-          <h3>Complaint Details</h3>
+          <h3 className="stylishHeading">Complaint Details</h3>
         </div>
 
         <div className="card-body">
@@ -104,7 +103,6 @@ export default function ComplaintDetail(props) {
                   <strong> Title:</strong>
                 </div>
                 <div className="col-md-3">{complaint.title} </div>
-
                 <div className="col-md-3">
                   <strong> Details:</strong>
                 </div>
@@ -120,17 +118,15 @@ export default function ComplaintDetail(props) {
                   <strong> Remarks:</strong>
                 </div>
                 <div className="col-md-3">
-                  {" "}
                   {complaint.remarks === "" ? (
                     <>
-                      {" "}
                       <span>No Remarks yet</span> <br />
                     </>
                   ) : (
                     <span>
                       {complaint.remarks} <br />
                     </span>
-                  )}{" "}
+                  )}
                 </div>
               </div>
 

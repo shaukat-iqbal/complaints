@@ -16,6 +16,7 @@ import Attachments from "../admin/Attachments/Attachments";
 import RegisterForm from "../admin/usersManagement/Register";
 import FileUpload from "../admin/usersManagement/fileUpload";
 import CompanyDetailsForm from "../common/companyDetailsForm";
+import "./stepper.css";
 import { Link } from "react-router-dom";
 import {
   Details,
@@ -179,28 +180,28 @@ function getSteps() {
   ];
 }
 
-function getStepContent(step, match) {
+function getStepContent(step, enableNext) {
   switch (step) {
     case 0:
       return (
         <div className=" d-flex justify-content-center align-items-center">
-          <CompanyDetailsForm />
+          <CompanyDetailsForm enableNext={enableNext} />
         </div>
       );
     case 1:
       return (
         <div className=" d-flex justify-content-center align-items-center">
-          <AdminForm />
+          <AdminForm enableNext={enableNext} />
         </div>
       );
     case 2:
-      return <Features />;
+      return <Features isStepper={true} />;
     case 3:
-      return <CategoriesRenderer />;
+      return <CategoriesRenderer enableNext={enableNext} isStepper={true} />;
     case 4:
-      return <Attachments />;
+      return <Attachments enableNext={enableNext} />;
     case 5:
-      return <Members />;
+      return <Members enableNext={enableNext} />;
     case 6:
       return (
         <div className="d-flex justify-content-around flex-wrap">
@@ -213,28 +214,33 @@ function getStepContent(step, match) {
   }
 }
 
-export default function CustomizedSteppers({ match }) {
+export default function CustomizedSteppers() {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(6);
+  const [isNextEnabled, setIsNextEnabled] = React.useState(false);
   const steps = getSteps();
 
   function handleNext() {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
+    activeStep !== 2 || activeStep !== 6
+      ? setIsNextEnabled(false)
+      : setIsNextEnabled(true);
   }
 
+  function enableNext() {
+    setIsNextEnabled(true);
+  }
   function handleBack() {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
   }
 
-  function handleReset() {
-    setActiveStep(0);
-  }
   useEffect(async () => {
     try {
       await getConfiguration();
       window.location = "/login";
     } catch (error) {}
   }, []);
+
   return (
     <div className={classes.root}>
       <Stepper
@@ -263,7 +269,7 @@ export default function CustomizedSteppers({ match }) {
         ) : (
           <div>
             <div className={classes.instructions}>
-              {getStepContent(activeStep, match)}
+              {getStepContent(activeStep, enableNext)}
             </div>
             <div className="mt-3">
               <Button
@@ -273,14 +279,27 @@ export default function CustomizedSteppers({ match }) {
               >
                 Back
               </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNext}
-                className={classes.button}
-              >
-                {activeStep === steps.length - 1 ? "Finish" : "Next"}
-              </Button>
+
+              {activeStep === steps.length - 1 ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNext}
+                  className={classes.button}
+                >
+                  Finish
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNext}
+                  className={classes.button}
+                  disabled={!isNextEnabled}
+                >
+                  Next
+                </Button>
+              )}
             </div>
           </div>
         )}

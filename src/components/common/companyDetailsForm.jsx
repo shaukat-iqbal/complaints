@@ -77,12 +77,9 @@ class CompanyDetailsForm extends Form {
         // this.props.history.push("/login");
         return;
       } else {
-        let { data: form } = await insertCompanyDetails(
-          fd,
-          this.state.isAssignee
-        );
-        console.log(form);
+        await insertCompanyDetails(fd);
       }
+      if (this.props.enableNext) this.props.enableNext();
     } catch (error) {
       if (error.response && error.response.status === 400) {
         let errors = { ...this.state.errors };

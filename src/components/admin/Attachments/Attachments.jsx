@@ -106,6 +106,7 @@ class Attachments extends Component {
 
     return { totalCount: filtered.length, data: attachments };
   };
+
   handleShowForm = () => {
     this.setState({ showMemberForm: true });
   };
@@ -124,7 +125,7 @@ class Attachments extends Component {
       isEditView: false,
       selectedAttachment: null
     });
-    return;
+    if (this.props.enableNext) this.props.enableNext();
   };
   handleClose = () => {
     this.setState({
@@ -175,15 +176,6 @@ class Attachments extends Component {
                         onSort={this.handleSort}
                         sortColumn={this.state.sortColumn}
                       />
-                      {this.state.showMemberForm && (
-                        <AttachmentForm
-                          isOpen={this.state.showMemberForm}
-                          onClose={this.handleClose}
-                          isEditView={this.state.isEditView}
-                          selectedAttachment={this.state.selectedAttachment}
-                          onSuccess={this.handleAddMember}
-                        />
-                      )}
                     </div>
                   </div>
 
@@ -201,6 +193,15 @@ class Attachments extends Component {
           )
         ) : (
           <Loading />
+        )}
+        {this.state.showMemberForm && (
+          <AttachmentForm
+            isOpen={this.state.showMemberForm}
+            onClose={this.handleClose}
+            isEditView={this.state.isEditView}
+            selectedAttachment={this.state.selectedAttachment}
+            onSuccess={this.handleAddMember}
+          />
         )}
       </div>
     );

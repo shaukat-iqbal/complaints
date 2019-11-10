@@ -235,6 +235,7 @@ class TemporaryCategoriesList extends Component {
       await insertMultipleCategories(this.state.allCategories);
       toast.success("Categories successfully created.");
       if (!this.props.isStepper) window.location = "/admin/users/categories";
+      if (this.props.enableNext) this.props.enableNext();
     } catch (error) {
       toast.error("Something wrong occured. Please try again.");
     }
@@ -254,12 +255,14 @@ class TemporaryCategoriesList extends Component {
       <div className="container card p-1">
         <div className="card-body">
           <div className="d-flex">
-            <button
-              className="btn button-outline-primary mb-3 mr-1"
-              onClick={this.props.hideComponent}
-            >
-              <i className="fa fa-arrow-left"></i>
-            </button>
+            {!this.props.isStepper && (
+              <button
+                className="btn button-outline-primary mb-3 mr-1"
+                onClick={this.props.hideComponent}
+              >
+                <i className="fa fa-arrow-left"></i>
+              </button>
+            )}
             <button
               className="btn button-secondary rounded-pill mb-3 mr-auto "
               onClick={this.handleNewCategory}

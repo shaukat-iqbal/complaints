@@ -198,7 +198,7 @@ export default function ComplaintDetail(props) {
         </button>
         <div className="card shadow-lg">
           <div className="card-header">
-            <h3>Complaint Details</h3>
+            <h3 className="stylishHeading">Complaint Details</h3>
           </div>
           <div className="card-body m-2">
             {!complaint && <h3>No Complaint found with this ID.</h3>}

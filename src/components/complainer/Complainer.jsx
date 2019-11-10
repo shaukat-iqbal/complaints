@@ -14,6 +14,7 @@ import SearchBox from "./searchBox";
 import Showcase from "./showcase";
 import openSocket from "socket.io-client";
 import Spinner from "../common/Spinner/Spinner";
+import GraphBanner from "../common/GraphsBanner";
 
 class Complainer extends Component {
   state = {
@@ -31,12 +32,12 @@ class Complainer extends Component {
   async componentDidMount() {
     try {
       const user = auth.getCurrentUser();
-      this.setState({ user });
 
       if (!user || user.role !== "complainer") {
         toast.error("Access denied to this Route!");
         this.props.history.replace("/");
       }
+      this.setState({ user });
     } catch (ex) {
       window.location = "/login";
     }
@@ -63,8 +64,8 @@ class Complainer extends Component {
     const { data: allcategories } = await getCategories();
 
     let temp = [];
+    // To render side bar of only those categories of which complainer has made a complaint
     complaints.forEach(complaint => {
-      console.log(complaint);
       let cat = allcategories.find(c => c._id === complaint.category._id);
       let available = temp.find(ca => ca._id === cat._id);
       if (!available) temp.push(cat);
@@ -199,11 +200,14 @@ class Complainer extends Component {
         <div className="container">
           {/* {this.state.user && <h3>Hello {this.state.user.name} !</h3>}
           <hr /> */}
-          <Showcase
+          {/* <Showcase
             resolved={resolved}
             inprogress={inprogress}
             closed={closed}
-          />
+          /> */}
+          {this.state.complaints.length > 0 && (
+            <GraphBanner complaints={this.state.complaints} />
+          )}
           {count !== 0 && (
             <div className="row">
               <div className="col-md-2 mb-2">

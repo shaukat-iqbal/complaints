@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import Switch from "../../common/switch";
 import {
   updateConfiguration,
-  getConfigToken
+  getConfigToken,
+  addConfiguration
 } from "../../../services/configurationService";
 import { toast } from "react-toastify";
 class Features extends Component {
@@ -22,7 +23,8 @@ class Features extends Component {
     } else {
       this.state.updatedConfigObj = {
         isAccountCreation: false,
-        isMessaging: false
+        isMessaging: false,
+        isSeverity: false
       };
     }
   }
@@ -35,10 +37,18 @@ class Features extends Component {
 
   handleSaveSettings = async () => {
     try {
-      let { data: configuration } = await updateConfiguration(
-        this.state.updatedConfigObj,
-        this.state.configToken._id
-      );
+      let configuration;
+      if (this.props.isStepper) {
+        let { data } = await addConfiguration(this.state.updatedConfigObj);
+        configuration = data;
+      } else {
+        let { data } = await updateConfiguration(
+          this.state.updatedConfigObj,
+          this.state.configToken._id
+        );
+        configuration = data;
+      }
+
       localStorage.setItem("configuration", JSON.stringify(configuration));
       toast.info("Settings Updated");
     } catch (error) {
@@ -77,7 +87,7 @@ class Features extends Component {
           />
         </div>
         <div
-          className="p-3"
+          className="p-3 mb-4"
           style={{ border: "1px solid #dadce0", borderRadius: "8px" }}
         >
           <p>
@@ -91,6 +101,23 @@ class Features extends Component {
               this.handleSwitch("isMessaging");
             }}
             checked={this.state.updatedConfigObj.isMessaging}
+          />
+        </div>
+        <div
+          className="p-3 "
+          style={{ border: "1px solid #dadce0", borderRadius: "8px" }}
+        >
+          <p>
+            This feature will enable complainer to set the severity of complaint
+            by themselves.
+          </p>
+          <Switch
+            label="Severity Feature"
+            name="isSeverity"
+            onClick={() => {
+              this.handleSwitch("isSeverity");
+            }}
+            checked={this.state.updatedConfigObj.isSeverity}
           />
         </div>
       </div>

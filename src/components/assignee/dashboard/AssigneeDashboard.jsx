@@ -20,6 +20,7 @@ import { paginate } from "../../../utils/paginate";
 import { toast } from "react-toastify";
 import { getAssigneeCategories } from "../../../services/categoryService";
 import SpamList from "../spamlist";
+import GraphBanner from "../../common/GraphsBanner";
 
 class AssigneeDashboard extends Component {
   state = {
@@ -37,6 +38,10 @@ class AssigneeDashboard extends Component {
     confirmSpam: false,
     confirmDrop: false
   };
+  constructor(props) {
+    super(props);
+    this.state.complaints = props.complaints;
+  }
 
   async componentDidMount() {
     this.getAllCategories();
@@ -273,12 +278,15 @@ class AssigneeDashboard extends Component {
               </DialogActions>
             </Dialog>
           )}
-          <Showcase
+          {/* <Showcase
             resolved={resolved}
             inprogress={inprogress}
             closed={closed}
-          />
+          /> */}
           <div className="container">
+            {this.props.complaints.length > 0 && (
+              <GraphBanner complaints={[...this.props.complaints]} />
+            )}
             {checkedComplaint && (
               <div
                 className="alert alert-info dismissible fade show"

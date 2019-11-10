@@ -29,7 +29,6 @@ class Assignee extends React.Component {
     this.isActive = true;
     this.checkSocketConnection();
     const user = auth.getCurrentUser();
-    this.setState({ user: user });
 
     if (!user || user.role !== "assignee") {
       toast.error("Access denied to this route!");
@@ -37,16 +36,10 @@ class Assignee extends React.Component {
         ? this.props.history.replace("/login")
         : window.location("/login");
     }
+
     if (this.isActive) {
       this.setState({ isLoading: true });
       const { data } = await getAssigneeComplaints();
-
-      this.setState(pre => {
-        return {
-          complaints: data
-        };
-      });
-      this.setState({ isLoading: false });
 
       let arr = [];
 
@@ -62,7 +55,10 @@ class Assignee extends React.Component {
 
       this.setState(prevState => {
         return {
-          complainers: uniquecomplainer
+          complaints: data,
+          isLoading: false,
+          complainers: uniquecomplainer,
+          user
         };
       });
     }
@@ -78,7 +74,7 @@ class Assignee extends React.Component {
       const socket = openSocket("http://localhost:5000", {
         reconnection: true
       });
-      socket.once("complaints", data => {
+      socket.on("complaints", data => {
         if (data.action === "new complaint") {
           this.setState({ isLoading: true });
           this.createNewComplaint(data.complaint);
@@ -140,13 +136,11 @@ class Assignee extends React.Component {
       }
     }
 
+    const { data: complaints } = await getAssigneeComplaints();
+    this.setState({ complaints, displaySpamList: false });
     this.setState({ checkedComplaint: null });
     // this.props.history.replace("/assignee");
     toast.success("You have successfully Marked this as spam");
-
-    const { data: complaints } = await getAssigneeComplaints();
-    this.setState({ complaints });
-    this.setState({ displaySpamList: false });
   };
 
   render() {

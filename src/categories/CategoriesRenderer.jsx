@@ -132,6 +132,7 @@ class CategoriesRenderer extends React.Component {
               clearAll={this.hanndleClearAll}
               categories={this.state.allCategories}
               thereExistsError={this.state.thereExistsError}
+              {...this.props}
             />
           </div>
 

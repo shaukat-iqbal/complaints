@@ -115,46 +115,50 @@ class Users extends Component {
               <Link to="/admin/users/register">Create an Account</Link>
             </p>
           ) : (
-            <div className="d-flex flex-wrap flex-column mx-5 ">
-              <div className="p-3 border rounded-sm d-flex justify-content-center mb-1">
-                <h3>{capitalizeFirstLetter(this.props.type)}</h3>
+            <>
+              <div className="p-3 border rounded-sm d-flex justify-content-center mb-1 gradiantHeading">
+                <h3 style={{ color: "white" }}>
+                  {capitalizeFirstLetter(this.props.type)}
+                </h3>
               </div>
-              <div className="align-self-end mr-4 ">
-                <p>Showing {totalCount} Users.</p>
-                <SearchBox value={searchQuery} onChange={this.handleSearch} />
-              </div>
-              {totalCount > 0 ? (
-                <div
-                  style={{ minHeight: "500px" }}
-                  className="d-flex flex-column align-content-between justify-content-between "
-                >
-                  <div className="card container shadow-lg mb-3">
-                    <div className="card-body">
-                      {users.map(user => (
-                        <User
-                          key={uuid()}
-                          showCrudBtns={!this.props.isAssigning}
-                          user={user}
-                          onProfileView={this.handleProfile}
-                          onDelete={this.handleDelete}
-                          onEdit={this.handleEdit}
-                          onUserSelected={this.props.onUserSelected}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  <Pagination
-                    itemsCount={totalCount}
-                    pageSize={pageSize}
-                    currentPage={currentPage}
-                    onPageChange={this.handlePageChange}
-                  />
+              <div className="d-flex flex-wrap flex-column mx-5 ">
+                <div className="align-self-end mr-4 ">
+                  <p>Showing {totalCount} Users.</p>
+                  <SearchBox value={searchQuery} onChange={this.handleSearch} />
                 </div>
-              ) : (
-                <div>No User Found</div>
-              )}
-            </div>
+                {totalCount > 0 ? (
+                  <div
+                    style={{ minHeight: "500px" }}
+                    className="d-flex flex-column align-content-between justify-content-between "
+                  >
+                    <div className="card container shadow-lg mb-3">
+                      <div className="card-body">
+                        {users.map(user => (
+                          <User
+                            key={uuid()}
+                            showCrudBtns={!this.props.isAssigning}
+                            user={user}
+                            onProfileView={this.handleProfile}
+                            onDelete={this.handleDelete}
+                            onEdit={this.handleEdit}
+                            onUserSelected={this.props.onUserSelected}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <Pagination
+                      itemsCount={totalCount}
+                      pageSize={pageSize}
+                      currentPage={currentPage}
+                      onPageChange={this.handlePageChange}
+                    />
+                  </div>
+                ) : (
+                  <div>No User Found</div>
+                )}
+              </div>
+            </>
           )
         ) : (
           <Loading />

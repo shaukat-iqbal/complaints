@@ -7,10 +7,11 @@ import { getCategories } from "../../../services/categoryService";
 import AdminTable from "../AdminTable";
 import _ from "lodash";
 import SearchBox from "../../complainer/searchBox";
-import Showcase from "../../complainer/showcase";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
 import Spinner from "../../common/Spinner/Spinner";
+import GraphBanner from "../../common/GraphsBanner";
+import { countComplainers } from "../../../services/complainerService";
 
 class Dashboard extends Component {
   state = {
@@ -23,11 +24,36 @@ class Dashboard extends Component {
     selectedCategory: null,
     isLoading: false
   };
+  async componentDidUpdate(prevProps, prevState) {
+    if (prevState.complaints.length < this.state.complaints) {
+      let { data: months } = await countComplainers();
+      this.setState({ countUsers: months });
+    }
+  }
+
+  // aggregateMonthWiseComplaints = complaints => {
+  //   let months = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  //   for (let i = 0; i < complaints.length; i++) {
+  //     const complaint = complaints[i];
+  //     var date = new Date(complaint.timeStamp);
+  //     let now = new Date();
+  //     let year = date.getFullYear();
+  //     if (now.getFullYear() !== year) continue;
+  //     let index = date.getMonth();
+  //     months[index]++;
+  //   }
+  //   let chartData = {};
+  //   chartData.data = months;
+  //   chartData.label = "Monthly Complaints";
+  //   this.setState({ chartData, complaints });
+  // };
 
   async componentDidMount() {
     this.getComplaints();
     this.checkingSocketConnection();
+    let { data: months } = await countComplainers();
 
+    this.setState({ countUsers: months });
     // const { data: allcategories } = await getCategories();
     // const categories = [{ _id: "", name: "All Categories" }, ...allcategories];
 
@@ -37,7 +63,7 @@ class Dashboard extends Component {
 
   checkingSocketConnection = () => {
     const socket = openSocket("http://localhost:5000", { reconnection: true });
-    socket.once("complaints", data => {
+    socket.on("complaints", data => {
       if (data.action === "new complaint") {
         this.setState({ isLoading: true });
         this.createNewComplaint(data.complaint);
@@ -102,14 +128,13 @@ class Dashboard extends Component {
 
     let temp = [];
     complaints.forEach(complaint => {
-      console.log(complaint);
       let cat = allcategories.find(c => c._id === complaint.category._id);
       let available = temp.find(ca => ca._id === cat._id);
       if (!available) temp.push(cat);
     });
     const categories = [{ _id: "", name: "All Categories" }, ...temp];
-    this.setState({ complaints, categories });
-    this.setState({ isLoading: false });
+    this.setState({ isLoading: false, complaints, categories });
+    // this.aggregateMonthWiseComplaints(complaints);
   };
 
   // handle detail
@@ -205,8 +230,15 @@ class Dashboard extends Component {
             <Spinner />
           </div>
         )}
-        <Showcase resolved={resolved} inprogress={inprogress} closed={closed} />
+
+        {/* <Showcase resolved={resolved} inprogress={inprogress} closed={closed} /> */}
         <div className="container">
+          {this.state.complaints.length > 0 && (
+            <GraphBanner
+              complaints={this.state.complaints}
+              usersCount={this.state.countUsers}
+            />
+          )}
           {count !== 0 && (
             <>
               <div className="row">

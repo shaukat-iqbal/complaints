@@ -231,101 +231,103 @@ class CategoriesList extends Component {
 
     return (
       <div>
+        <div className="p-3 border rounded-sm d-flex justify-content-center mb-1 gradiantHeading">
+          <h3 style={{ color: "white" }}>Categories</h3>
+        </div>
         {!this.state.csvUploadComponent ? (
-          <div className="container card p-1  ">
-            <div className="card-header">
-              <p className="h5">All categories</p>
-            </div>
-            <div className="card-body">
-              <div className="d-flex ">
-                <div className="d-flex mr-auto">
-                  <button
-                    className="btn btn-secondary rounded-pill mb-3 "
-                    onClick={this.handleNewCategory}
-                  >
-                    Create Category...
-                  </button>
+          <>
+            <div className="container card p-1  ">
+              <div className="card-body">
+                <div className="d-flex ">
+                  <div className="d-flex mr-auto">
+                    <button
+                      className="btn btn-secondary rounded-pill mb-3 "
+                      onClick={this.handleNewCategory}
+                    >
+                      Create Category...
+                    </button>
 
-                  <button
-                    className="btn btn-primary rounded-pill ml-1 mb-3"
-                    onClick={this.handleCSVUpload}
-                  >
-                    Upload Csv
-                  </button>
+                    <button
+                      className="btn btn-primary rounded-pill ml-1 mb-3"
+                      onClick={this.handleCSVUpload}
+                    >
+                      Upload Csv
+                    </button>
+                  </div>
+                  {this.state.orderChanged && (
+                    <button
+                      className="btn btn-primary btn-round mb-3"
+                      onClick={this.handleSave}
+                    >
+                      Save
+                    </button>
+                  )}
                 </div>
-                {this.state.orderChanged && (
-                  <button
-                    className="btn btn-primary btn-round mb-3"
-                    onClick={this.handleSave}
+                <Accordion defaultActiveKey="">
+                  <div
+                    className="p-3 shadow-lg"
+                    onDragOver={this.onDragOver}
+                    onDrop={this.onDrop}
+                    id={null}
                   >
-                    Save
-                  </button>
-                )}
-              </div>
-              <Accordion defaultActiveKey="">
-                <div
-                  className="p-3 shadow-lg"
-                  onDragOver={this.onDragOver}
-                  onDrop={this.onDrop}
-                  id={null}
-                >
-                  {length &&
-                    rootCategories.map(category =>
-                      category.hasChild ? (
-                        <div key={category._id + "parent"}>
-                          <Category
-                            key={uuid()}
-                            category={category}
-                            onEdit={this.handleEditCategory}
-                            onAddChild={this.handleAddChild}
-                            onDelete={this.handleDeleteCategory}
-                            onDragStart={this.onDragStart}
-                          />
-                          <Childs
-                            key={uuid()}
-                            category={category}
-                            onEdit={this.handleEditCategory}
-                            onAddChild={this.handleAddChild}
-                            onDelete={this.handleDeleteCategory}
-                            allCategories={allCategories}
+                    {length &&
+                      rootCategories.map(category =>
+                        category.hasChild ? (
+                          <div key={category._id + "parent"}>
+                            <Category
+                              key={uuid()}
+                              category={category}
+                              onEdit={this.handleEditCategory}
+                              onAddChild={this.handleAddChild}
+                              onDelete={this.handleDeleteCategory}
+                              onDragStart={this.onDragStart}
+                            />
+                            <Childs
+                              key={uuid()}
+                              category={category}
+                              onEdit={this.handleEditCategory}
+                              onAddChild={this.handleAddChild}
+                              onDelete={this.handleDeleteCategory}
+                              allCategories={allCategories}
+                              onDragOver={this.onDragOver}
+                              onDrop={this.onDrop}
+                              onDragStart={this.onDragStart}
+                            />
+                          </div>
+                        ) : (
+                          <div
                             onDragOver={this.onDragOver}
+                            id={category._id}
                             onDrop={this.onDrop}
-                            onDragStart={this.onDragStart}
-                          />
-                        </div>
-                      ) : (
-                        <div
-                          onDragOver={this.onDragOver}
-                          id={category._id}
-                          onDrop={this.onDrop}
-                          key={category._id + "single"}
-                        >
-                          <Category
-                            key={uuid()}
-                            category={category}
-                            onEdit={this.handleEditCategory}
-                            onAddChild={this.handleAddChild}
-                            onDelete={this.handleDeleteCategory}
-                            onDragOver={this.onDragOver}
-                            onDragStart={this.onDragStart}
-                          />
-                        </div>
-                      )
-                    )}
-                </div>
-              </Accordion>
+                            key={category._id + "single"}
+                          >
+                            <Category
+                              key={uuid()}
+                              category={category}
+                              onEdit={this.handleEditCategory}
+                              onAddChild={this.handleAddChild}
+                              onDelete={this.handleDeleteCategory}
+                              onDragOver={this.onDragOver}
+                              onDragStart={this.onDragStart}
+                            />
+                          </div>
+                        )
+                      )}
+                  </div>
+                </Accordion>
+              </div>
+              {this.state.categoryFormEnabled && (
+                <CategoryForm
+                  requestType={this.state.requestType}
+                  category={this.state.selectedCategory}
+                  isOpen={this.state.categoryFormEnabled}
+                  onSubmitForm={this.handleSubmitCategoryForm}
+                  allCategories={allCategories}
+                  onClose={this.handleCloseCategoryForm}
+                />
+              )}
             </div>
-            {this.state.categoryFormEnabled && (
-              <CategoryForm
-                requestType={this.state.requestType}
-                category={this.state.selectedCategory}
-                isOpen={this.state.categoryFormEnabled}
-                onSubmitForm={this.handleSubmitCategoryForm}
-                allCategories={allCategories}
-                onClose={this.handleCloseCategoryForm}
-              />
-            )}
-          </div>
+          </>
         ) : (
           <CategoriesRenderer
             isStepper={false}

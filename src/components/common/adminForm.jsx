@@ -160,6 +160,7 @@ class AdminForm extends Form {
         toast.info("Account Created");
         if (this.props.onNext) this.props.onNext();
       }
+      if (this.props.enableNext) this.props.enableNext();
     } catch (error) {
       let errors = { ...this.state.errors };
       if (error.response && error.response.status === 400) {

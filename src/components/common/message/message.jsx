@@ -24,7 +24,7 @@ class Message extends React.Component {
   async componentDidMount() {
     this.scroll.current.scrollIntoView();
     this.getAllMessages();
-    socket.once("msg", data => {
+    socket.on("msg", data => {
       console.log(data);
     });
 

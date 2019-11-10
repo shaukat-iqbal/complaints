@@ -1,11 +1,11 @@
 import React from "react";
 import Joi from "joi-browser";
-
+import { DialogActions } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { toast } from "react-toastify";
-
+import { compressImage } from "../../../services/imageService";
 import Form from "../../common/form";
 import {
   getCategories,
@@ -15,7 +15,10 @@ import { saveComplaint } from "../../../services/complaintService";
 import Modal from "../../common/Modal/Modal";
 import Spinner from "../../common/Spinner/Spinner";
 import Categories from "../../common/categories";
-
+import { getAllowedAttachments } from "../../../services/attachmentsService";
+import "./complaintForm.css";
+import { MyLocation } from "@material-ui/icons";
+import { getConfigToken } from "../../../services/configurationService";
 class ComplaintForm extends Form {
   state = {
     data: {
@@ -29,7 +32,7 @@ class ComplaintForm extends Form {
     detailsError: "",
     errors: {},
     categories: [],
-    isLoading: false,
+    isLoading: true,
     isDialogOpen: false,
     selectedFile: null,
     open: true,
@@ -48,14 +51,27 @@ class ComplaintForm extends Form {
       .max(255)
       .label("Location")
   };
-
+  constructor(props) {
+    super(props);
+    let token = getConfigToken();
+    if (token) {
+      this.state.configToken = token;
+      this.schema.severity = Joi.string()
+        .min(1)
+        .label("Severity");
+    }
+  }
   // componentDidMount
   async componentDidMount() {
-    this.setState({ isLoading: true });
     await this.populateCategories();
     this.setState({ isLoading: false });
   }
 
+  getLocation = () => {
+    window.navigator.geolocation.getCurrentPosition(position => {
+      this.setState({ coords: position.coords });
+    });
+  };
   async populateCategories() {
     const { data: categories } = await getCategories();
     this.setState({ categories });
@@ -89,9 +105,40 @@ class ComplaintForm extends Form {
     this.setState({ isDialogOpen: false });
   };
 
-  handleFileChange = e => {
+  handleFileChange = async e => {
+    let { attachments } = this.state;
     // if (this.checkMimeType(e)) {
-    this.setState({ selectedFile: e.target.files[0] });
+    if (!e.target.files[0]) return;
+    let file = e.target.files[0];
+    if (!attachments) {
+      let { data } = await getAllowedAttachments();
+      this.setState({ allowedAttachments: data });
+      attachments = data;
+    }
+    let type = attachments.find(
+      a =>
+        a.extentionName.toLowerCase() === file.name.split(".")[1].toLowerCase()
+    );
+    if (!type) {
+      toast.error(
+        "You cannot attach '." +
+          file.name.split(".")[1].toLowerCase() +
+          "' type file."
+      );
+      return;
+    }
+    this.setState({ selectedFile: file });
+
+    let compressedImg = await compressImage(file);
+    console.log("Un KBs", file.size / 1024);
+    console.log("compressed KBs", compressedImg.size / 1024);
+    if (compressedImg.size / 1024 > +type.maxSize) {
+      toast.error("The file size is larger than allowed size.");
+      this.setState({ selectedFile: null });
+
+      return;
+    }
+    this.setState({ selectedFile: compressedImg });
   };
 
   doSubmit = async () => {
@@ -104,12 +151,20 @@ class ComplaintForm extends Form {
     data.append("location", this.state.data.location);
     data.append("categoryId", this.state.categoryId);
     data.append("complaint", this.state.selectedFile);
-
-    await saveComplaint(data);
-
+    if (this.state.data.longitude && this.state.data.latitude) {
+      data.append("longitude", this.state.coords.longitude);
+      data.append("latitude", this.state.coords.latitude);
+    }
+    if (this.state.data.severity)
+      data.append("severity", this.state.data.severity);
+    try {
+      await saveComplaint(data);
+      toast.success("Complaint is successfully registered.");
+      this.props.history.replace("/complainer");
+    } catch (error) {
+      toast.error("Could not lodge a complaint");
+    }
     this.setState({ isLoading: false });
-    toast.success("Complaint is successfully registered.");
-    this.props.history.replace("/complainer");
   };
 
   // for file
@@ -190,151 +245,228 @@ class ComplaintForm extends Form {
           // onClose={this.handleClose}
           aria-labelledby="form-dialog-title"
           fullWidth={true}
+          scroll={"paper"}
         >
-          <div className="container">
-            <Modal show={this.state.isDialogOpen}>
-              <p>You can't edit complaint after registering</p>
+          <Modal show={this.state.isDialogOpen}>
+            <p>You can't edit complaint after registering</p>
+            <div className="float-right">
+              <button className="btn btn-danger" onClick={this.cancelDialog}>
+                Cancel
+              </button>
+              <button
+                className="btn ml-3  btn-success"
+                onClick={this.handleSubmit}
+              >
+                Ok
+              </button>
+            </div>
+          </Modal>
 
-              <div className="float-right">
-                <button className="btn btn-danger" onClick={this.cancelDialog}>
-                  Cancel
-                </button>
-                <button
-                  className="btn ml-3  btn-success"
-                  onClick={this.handleSubmit}
-                >
-                  Ok
-                </button>
-              </div>
-            </Modal>
-            {this.state.isLoading && (
-              <div className="d-flex justify-content-center">
-                <Spinner />
-              </div>
-            )}
+          {this.state.isLoading && (
+            <div className="d-flex justify-content-center">
+              <Spinner />
+            </div>
+          )}
 
-            {!this.state.isLoading && (
-              <div>
-                {/* <h3 className="pb-2">Please Fill this Form Carefully</h3> */}
-                <DialogTitle id="form-dialog-title">
-                  Please Fill this Form Carefully
-                </DialogTitle>
-                <hr />
-                <DialogContent>
-                  <form onSubmit={this.ToggleConfirmation}>
-                    <div className="form-group">
-                      <label htmlFor="details">Details</label>
-
-                      <textarea
-                        name="details"
-                        id="details"
-                        className="form-control"
-                        value={this.state.details}
-                        onChange={this.handleDetailsChange}
-                        onBlur={this.handleDetailsBlur}
-                        cols="70"
-                        rows="4"
-                      />
+          {!this.state.isLoading && (
+            <>
+              {/* <h3 className="pb-2">Please Fill this Form Carefully</h3> */}
+              <DialogTitle id="form-dialog-title">
+                <div>
+                  <h5 className="stylishHeading">Complaint</h5>
+                </div>
+              </DialogTitle>
+              <DialogContent>
+                <form onSubmit={this.ToggleConfirmation}>
+                  <div className="form-group">
+                    <label htmlFor="details">Complaint Description</label>
+                    <textarea
+                      name="details"
+                      id="details"
+                      className="form-control"
+                      value={this.state.details}
+                      onChange={this.handleDetailsChange}
+                      onBlur={this.handleDetailsBlur}
+                      cols="70"
+                      rows="4"
+                    />
+                  </div>
+                  {this.state.detailsError && (
+                    <div className="alert alert-danger">
+                      {this.state.detailsError}
                     </div>
-                    {this.state.detailsError && (
-                      <div className="alert alert-danger">
-                        {this.state.detailsError}
-                      </div>
-                    )}
-                    <p
-                      className="text-muted text-sm-left"
-                      style={{ fontSize: "10px" }}
-                    >
-                      Write your Complaint's detail elaborative because your
-                      Complaint's "severity" will be automatically set based on
-                      your Complaint's detail.
-                      <br />
-                      In order to get category automatically selected, You have
-                      to leave "details" input after writing
-                    </p>
+                  )}
+                  <p
+                    className="text-muted text-sm-left"
+                    style={{ fontSize: "10px" }}
+                  >
+                    Write your Complaint's detail elaborative because your
+                    Complaint's "severity" will be automatically set based on
+                    your Complaint's detail.
+                    <br />
+                    In order to get category automatically selected, You have to
+                    leave "details" input after writing
+                  </p>
 
-                    {/* category  */}
+                  {/* category  */}
 
-                    {this.state.sentimentCategory && (
-                      <>
-                        <label>Selected Category</label>
-                        <button
-                          className="btn button-primary"
-                          onClick={this.handleCategoryButton}
-                        >
-                          {this.state.sentimentCategory.name}
-                          <i className="fa fa-edit pl-3"></i>
-                        </button>
-                        <p
-                          className="text-muted text-sm-left mt-2"
-                          style={{ fontSize: "10px" }}
-                        >
-                          You may change the category by clicking the category
-                          name
-                        </p>
+                  {this.state.sentimentCategory && (
+                    <>
+                      <label>Selected Category</label>
+                      <button
+                        className="btn button-primary"
+                        onClick={this.handleCategoryButton}
+                        type="button"
+                      >
+                        {this.state.sentimentCategory.name}
+                        <i className="fa fa-edit pl-3"></i>
+                      </button>
+                      <p
+                        className="text-muted text-sm-left mt-2"
+                        style={{ fontSize: "10px" }}
+                      >
+                        You may change the category by clicking the category
+                        name
+                      </p>
 
-                        <Categories
-                          isLoading={true}
-                          onCategorySeletion={this.handleOnCategorySeletion}
-                          isOpen={this.state.showCategoriesDialog}
-                          onClose={this.handleDialogClose}
-                          categories={this.state.categories}
-                        />
+                      <Categories
+                        isLoading={true}
+                        onCategorySeletion={this.handleOnCategorySeletion}
+                        isOpen={this.state.showCategoriesDialog}
+                        onClose={this.handleDialogClose}
+                        categories={this.state.categories}
+                      />
 
-                        {/* <Category
+                      {/* <Category
                           onCategoryId={this.handleCategorySelect}
                           category={this.state.sentimentCategory}
                         /> */}
-                      </>
-                    )}
-                    {/* category end  */}
+                    </>
+                  )}
+                  {/* category end  */}
 
-                    {this.state.categoryError && (
-                      <div className="alert alert-danger">
-                        {this.state.categoryError}
-                      </div>
-                    )}
-                    {/* {this.renderSelect(
+                  {this.state.categoryError && (
+                    <div className="alert alert-danger">
+                      {this.state.categoryError}
+                    </div>
+                  )}
+                  {/* {this.renderSelect(
                       "categoryId",
                       "Choose category",
                       this.state.categories
                     )} */}
-                    {this.renderInput("title", "Title")}
+                  {this.renderInput("title", "Title")}
+                  {this.state.configToken &&
+                    this.state.configToken.isSeverity &&
+                    this.renderSelect("severity", "Severity", [
+                      { _id: "1", name: "Low" },
+                      { _id: "2", name: "Medium" },
+                      { _id: "3", name: "High" }
+                    ])}
+                  {this.renderInput("location", "Enter Location")}
 
-                    {this.renderInput("location", "Enter Location")}
+                  <div className="custom-file my-3">
+                    <input
+                      name="complaint"
+                      id="complaint"
+                      type="file"
+                      className="custom-file-input"
+                      onChange={this.handleFileChange}
+                      ref={this.file}
+                    />
+                    <label className="custom-file-label" htmlFor="customFile">
+                      Choose file
+                    </label>
+                  </div>
+                  {this.state.selectedFile && (
+                    <p>{this.state.selectedFile.name}</p>
+                  )}
 
-                    <div className="custom-file my-3">
-                      <input
-                        name="complaint"
-                        id="complaint"
-                        type="file"
-                        className="custom-file-input"
-                        onChange={this.handleFileChange}
-                        ref={this.file}
-                      />
-                      <label className="custom-file-label" htmlFor="customFile">
-                        Choose file
-                      </label>
-                    </div>
-                    {this.state.selectedFile && (
-                      <p>{this.state.selectedFile.name}</p>
-                    )}
-                    {/* <Map /> */}
-
-                    <div className="d-flex justify-content-end">
+                  <div
+                    style={{
+                      position: "relative"
+                    }}
+                  >
+                    <div
+                      className="background overlayed "
+                      style={{
+                        border: "2px solid black",
+                        borderLeft: "none",
+                        borderRight: "none"
+                      }}
+                    ></div>
+                    <div className="overlayed">
                       <button
-                        className="btn button-secondary mr-3"
-                        onClick={this.handleClose}
+                        className="centered-button rounded-circle btn btn-light shadow-sm "
+                        type="button"
+                        onClick={this.getLocation}
                       >
-                        Close
+                        <MyLocation />
                       </button>
-                      {this.renderButton("Register")}
+                      <div className="row mx-1" style={{ height: "100%" }}>
+                        <div
+                          className="col-6"
+                          style={{ borderRight: "2px solid #999999" }}
+                        >
+                          Get your current location
+                        </div>
+                        <div className="col-6 d-flex flex-column p-0 m-0">
+                          <div
+                            className="mb-1 pr-2 pt-2 mr-0 d-flex flex-column justify-content-start
+                             align-items-end"
+                            style={{
+                              borderBottom: "2px solid #999999",
+                              height: "50%",
+                              marginRight: "15px"
+                            }}
+                          >
+                            {this.state.coords && (
+                              <>
+                                <p className="mb-0">
+                                  <strong>Longitude</strong>
+                                </p>
+                                <p>{this.state.coords.longitude}</p>
+                              </>
+                            )}
+                          </div>
+                          <div
+                            className="mb-1 pr-2 pt-2 mr-0 d-flex flex-column justify-content-start
+                             align-items-end"
+                          >
+                            {this.state.coords && (
+                              <>
+                                <p className="mb-0">
+                                  <strong>Latitude</strong>
+                                </p>
+                                <p>{this.state.coords.latitude}</p>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </form>
-                </DialogContent>
-              </div>
-            )}
-          </div>
+                  </div>
+                  {/* <Map /> */}
+                </form>
+              </DialogContent>
+              <DialogActions>
+                <div className="d-flex justify-content-end">
+                  <button
+                    className="btn button-secondary mr-3"
+                    onClick={this.handleClose}
+                  >
+                    Close
+                  </button>
+                  <button
+                    className="btn button-secondary mr-3"
+                    onClick={this.ToggleConfirmation}
+                  >
+                    Register
+                  </button>
+                </div>
+              </DialogActions>
+            </>
+          )}
         </Dialog>
       </React.Fragment>
     );

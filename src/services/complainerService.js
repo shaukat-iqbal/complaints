@@ -12,3 +12,7 @@ export function getComplainer(complainerId) {
 export function deleteComplainer(complainerId) {
   return http.delete(config.apiUrl + "/complainers/" + complainerId);
 }
+
+export function countComplainers() {
+  return http.get(config.apiUrl + "/complainers/count/complainers");
+}

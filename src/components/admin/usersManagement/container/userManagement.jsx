@@ -28,8 +28,10 @@ const useStyles = makeStyles(theme => ({
   drawer: {
     [theme.breakpoints.up("sm")]: {
       width: drawerWidth,
-      flexShrink: 0
-    }
+      flexShrink: 0,
+      background: "blue"
+    },
+    background: "blue"
   },
   appBar: {
     marginLeft: drawerWidth,
@@ -76,7 +78,9 @@ function UserManagement(props) {
           }}
         >
           <UserLogo width="70px" height="70px" />
-          <p className="text-white m-0 mt-1">{getCurrentUser().name}</p>
+          <p className="text-white m-0 mt-1">
+            {getCurrentUser().name.split(" ")[0]}
+          </p>
           <p className="text-white text-center m-0">Admin</p>
         </div>
       </div>
@@ -201,17 +205,37 @@ function UserManagement(props) {
           </Drawer>
         </Hidden>
       </nav>
-      <main className={`${classes.content} container-fluid pt-3`}>
-        <div className="d-flex justify-content-around flex-wrap">
-          <Route path="/admin/users/register" exact component={RegisterForm} />
-          <Route path="/admin/users/register" exact component={FileUpload} />
-        </div>
-        <div className="d-flex justify-content-around">
+      <main className={`${classes.content} container-fluid pt-0`}>
+        <div>
           <Route
-            path="/admin/users/edit/:id/:role"
-            render={props => <RegisterForm isEditView={true} {...props} />}
+            path="/admin/users/register"
+            exact
+            render={props => (
+              <div>
+                <div className="p-3 border rounded-lg d-flex justify-content-center mb-1 gradiantHeading">
+                  <h3 style={{ color: "white" }}>Accounts</h3>
+                </div>
+                <div className="d-flex justify-content-around flex-wrap">
+                  <RegisterForm /> <FileUpload {...props} />
+                </div>
+              </div>
+            )}
           />
         </div>
+
+        <Route
+          path="/admin/users/edit/:id/:role"
+          render={props => (
+            <div>
+              <div className="p-3 border rounded-lg d-flex justify-content-center mb-1 gradiantHeading">
+                <h3 style={{ color: "white" }}>User</h3>
+              </div>
+              <div className="d-flex justify-content-around flex-wrap">
+                <RegisterForm isEditView={true} {...props} />
+              </div>
+            </div>
+          )}
+        />
 
         {/* <Route
           path="/user/profile/:id/:role"

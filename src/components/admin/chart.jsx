@@ -1,50 +1,81 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import SpamChart from "./charts/spamCharts";
-import ProgressChart from "./charts/progressChart";
-import ResolvedChart from "./charts/resolvedChart";
 // import httpService from "../../services/httpService";
 import config from "../../config.json";
-import { getReport } from "../../services/complaintService";
+import {
+  getReportOfMonth,
+  getAdminComplaints
+} from "../../services/complaintService";
 import { sendEmailToAuthorities } from "../../services/emailService";
 import { toast } from "react-toastify";
+
+import DatePickerModal from "./DatePickerModal";
+import MembersModal from "./MembersModal";
+import PieChart from "./charts/pie";
+import BarChart from "./charts/bar";
+import LineChart from "./charts/LineChart";
 
 const Chart = props => {
   const [reportname, setReportname] = useState("");
   const [reportPath, setReportPath] = useState("");
-
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
+  const [complaints, setComplaints] = useState([]);
   // handleGenerateReport
-  const handleGenerateReport = async () => {
+  const handleGenerateReport = async body => {
     // window.open(
     //   "http://localhost:5000/api/admin-complaints//generate/pdf/v1",
     //   "_blank"
     // );
 
-    const { headers } = await getReport();
-    console.log(headers);
-    setReportname(headers.filename.split("\\")[3]);
-    setReportPath(headers.filename);
+    // const { headers } = await getReport();
+    window.open(
+      `${config.apiUrl}/admin-complaints/generateReport/pdf/${body.from}/${body.to}`
+    );
+    try {
+      const { headers } = await getReportOfMonth(body);
+      console.log(headers);
+      setReportname(headers.filename.split("\\")[3]);
+      setReportPath(headers.filename);
+      setIsOpen(false);
+    } catch (error) {
+      toast.error("Some error occured");
+    }
+  };
+  useEffect(async () => {
+    let { data: complaints } = await getAdminComplaints();
+    setComplaints(complaints);
+  }, []);
+
+  const onClose = () => {
+    setIsOpen(false);
+    setIsMembersDialogOpen(false);
   };
 
-  const handleEmailSend = async () => {
-    const data = {
-      reportName: reportname
-    };
-    const { data: response } = await sendEmailToAuthorities(data);
-    toast.success(response);
+  const showMembersDialog = () => {
+    setIsMembersDialogOpen(true);
   };
-
+  const handleEmailSend = async recievers => {
+    setIsMembersDialogOpen(false);
+    try {
+      const data = {
+        recievers: JSON.stringify(recievers),
+        reportName: reportname
+      };
+      const { data: response } = await sendEmailToAuthorities(data);
+      toast.success(response);
+    } catch (error) {
+      toast.error("Some error ocuured while sending email");
+    }
+  };
+  const showModal = () => {
+    setIsOpen(true);
+  };
   return (
     <div className="container">
-      <a
-        className="btn button-outline-secondary mb-3"
-        href={`${config.apiUrl}/admin-complaints/generate/pdf/v1`}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={handleGenerateReport}
-      >
+      <button className="btn button-outline-secondary mb-3" onClick={showModal}>
         Generate Report
-      </a>
+      </button>
       {reportname && (
         <div>
           You report has been generated with name "{" "}
@@ -52,26 +83,40 @@ const Chart = props => {
           {reportname} "{/* #fc4364 */}
           <button
             className="btn button-outline-primary btn-sm my-3 ml-4"
-            onClick={handleEmailSend}
+            onClick={showMembersDialog}
           >
-            Send to Authorities?
+            Send Report
           </button>
         </div>
       )}
 
-      <div className="">
-        <div className="text-center mb-3">
-          <SpamChart />
-        </div>
+      <DatePickerModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={handleGenerateReport}
+      />
 
-        <div className="text-center my-3">
-          <ProgressChart />
+      <MembersModal
+        isOpen={isMembersDialogOpen}
+        onClose={onClose}
+        onSubmit={handleEmailSend}
+      />
+
+      <div className="row">
+        <div className="col-4 ">
+          <BarChart complaints={complaints} />
         </div>
-      </div>
-      <div className="text-center">
-        {/* <div className="card"> */}
-        <ResolvedChart />
-        {/* </div> */}
+        <div className="col-4  ">
+          <LineChart
+            chartData={{
+              data: [1, 2, 3, 3],
+              label: "showing from chart compo"
+            }}
+          />
+        </div>
+        <div className="col-4  ">
+          <PieChart complaints={complaints} />
+        </div>
       </div>
     </div>
   );

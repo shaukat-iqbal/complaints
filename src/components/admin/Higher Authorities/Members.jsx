@@ -113,13 +113,14 @@ class Members extends Component {
     } else {
       members.unshift(member);
     }
+
     this.setState({
       members: members,
       showMemberForm: false,
       isEditView: false,
       selectedMember: null
     });
-    return;
+    if (this.props.enableNext) this.props.enableNext();
   };
   handleClose = () => {
     this.setState({
@@ -158,7 +159,7 @@ class Members extends Component {
                   <div className="card container shadow-lg mb-3">
                     <div className="card-body ">
                       <button
-                        className="btn btn-sm btn-info rounded-pill mb-1"
+                        className="btn btn-sm btn-info rounded-pill mb-2"
                         onClick={this.handleShowForm}
                       >
                         Add New...
@@ -170,15 +171,6 @@ class Members extends Component {
                         onSort={this.handleSort}
                         sortColumn={this.state.sortColumn}
                       />
-                      {this.state.showMemberForm && (
-                        <MemberForm
-                          isOpen={this.state.showMemberForm}
-                          onClose={this.handleClose}
-                          isEditView={this.state.isEditView}
-                          selectedMember={this.state.selectedMember}
-                          onSuccess={this.handleAddMember}
-                        />
-                      )}
                     </div>
                   </div>
 
@@ -196,6 +188,15 @@ class Members extends Component {
           )
         ) : (
           <Loading />
+        )}
+        {this.state.showMemberForm && (
+          <MemberForm
+            isOpen={this.state.showMemberForm}
+            onClose={this.handleClose}
+            isEditView={this.state.isEditView}
+            selectedMember={this.state.selectedMember}
+            onSuccess={this.handleAddMember}
+          />
         )}
       </div>
     );

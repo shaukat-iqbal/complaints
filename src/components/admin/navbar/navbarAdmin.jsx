@@ -57,16 +57,12 @@ class Navbar extends Component {
                 >
                   More
                 </NavLink>
-
                 <div className="dropdown-menu" aria-labelledby="navbarDropdown">
                   <NavLink className="dropdown-item" to="/admin/dashboard">
                     Dashboard
                   </NavLink>
                   <NavLink className="dropdown-item" to="/admin/users">
                     Users Management
-                  </NavLink>
-                  <NavLink className="dropdown-item" to="/admin/configuration">
-                    Configuration
                   </NavLink>
                   <NavLink className="dropdown-item" to="/admin/reports">
                     Reports & Graphs

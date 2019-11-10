@@ -15,6 +15,22 @@ body {
   margin-bottom: 30px;
 } */
 
+.stylishHeading {
+  display: inline-block;
+  font-size: 30px;
+  /* line-height: 0.9; */
+  padding: 10px;
+  font-family: "Syncopate", sans-serif;
+  text-transform: uppercase;
+  background: radial-gradient(
+      ellipse farthest-corner at center center,
+      rgb(216, 185, 185),
+      #111
+    )
+    no-repeat;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 .nav-button {
   background: none !important ;
   border: none;
@@ -62,6 +78,11 @@ body {
 
 .dropdown:hover > .dropdown-menu {
   display: block;
+}
+.gradiantHeading {
+  background: -webkit-linear-gradient(left, #25c481, #25b7c4);
+  background: linear-gradient(to right, #25c481, #25b7c4);
+  font-family: "Roboto", sans-serif;
 }
 
 .button-outline-primary {

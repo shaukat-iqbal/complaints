@@ -9,16 +9,21 @@ import { getSpamList, removeSpam } from "../../services/complaintService";
 
 class SpamList extends Component {
   state = {
-    complaints: [],
     categories: [],
     sortColumn: { path: "title", order: "asc" },
     display: false
   };
-
+  constructor(props) {
+    super(props);
+    if (props.spamList && props.spamList.length > 0)
+      this.state.complaints = props.spamList;
+    else this.state.complaints = [];
+  }
   async componentDidMount() {
+    this.setState({ display: this.props.displaySpamList });
+    if (!this.state.complaints || this.state.complaints.length > 0) return;
     const { data } = await getSpamList();
     this.setState({ complaints: data });
-    this.setState({ display: this.props.displaySpamList });
   }
 
   handleSort = sortColumn => {

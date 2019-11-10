@@ -72,7 +72,7 @@ const CategoriesList = ({
                 Close
               </button>
 
-              {categories[0] && categories[0].parentCategory && (
+              {categories.length > 0 && categories[0].parentCategory && (
                 <button className="btn btn-primary" onClick={onBack}>
                   Back
                 </button>

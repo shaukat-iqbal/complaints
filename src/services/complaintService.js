@@ -111,3 +111,11 @@ export function getAllResolvedComplaints() {
 export function getReport() {
   return http.get(config.apiUrl + `/admin-complaints/generate/pdf/v1`);
 }
+
+// Generating report of specified month
+export function getReportOfMonth(body) {
+  return http.get(
+    config.apiUrl +
+      `/admin-complaints/generateReport/pdf/${body.from}/${body.to}`
+  );
+}
