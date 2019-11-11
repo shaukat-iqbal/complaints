@@ -2,9 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Joi from "joi-browser";
 import Form from "./common/form";
+import Loading from "./common/loading";
 import auth from "../services/authService";
-import Spinner from "../components/common/Spinner/Spinner";
 import { getConfiguration } from "../services/configurationService";
+import "./login.css";
 class Login extends Form {
   state = {
     data: { email: "", password: "" },
@@ -73,26 +74,20 @@ class Login extends Form {
   render() {
     let { configToken } = this.state;
     return (
-      <React.Fragment>
+      <div className="form_page">
         <div>
           {this.state.isLoading && (
             <div className="d-flex justify-content-center mt-5">
-              <Spinner />
+              <Loading />
             </div>
           )}
         </div>
         {!this.state.isLoading && (
           <div className="vh-100 d-flex justify-content-center align-items-center">
-            <div
-              className="card mt-5 card-form"
-              style={{
-                boxShadow: "5px 5px 25px 5px #e5e5e5",
-                minWidth: "400px"
-              }}
-            >
-              <div className="card-header h3 text-center">
-                <u>Login</u>
-              </div>
+            <div className="card mt-5 card-form loginCard">
+              <p class="sign" align="center">
+                Sign in
+              </p>
               <div className="card-body">
                 <br />
                 <form onSubmit={this.handleSubmit}>
@@ -106,7 +101,9 @@ class Login extends Form {
                     className="form-control mb-4"
                   >
                     <option value="assignee">Assignee</option>
-                    <option value="complainer">Complainer</option>
+                    <option value="complainer" selected>
+                      Complainer
+                    </option>
                     <option value="admin">Admin</option>
                   </select>
                   <div className="form-check ">
@@ -117,8 +114,10 @@ class Login extends Form {
                     />
                     Remember Me
                   </div>
-                  <div className="text-center mt-4">
-                    {this.renderButton("Login")}
+                  <div className="">
+                    <button className="submit" onClick={this.handleSubmit}>
+                      Login
+                    </button>
                   </div>
                   <br />
                   <Link to="/recoverpassword">Forgot Password?</Link>
@@ -134,7 +133,7 @@ class Login extends Form {
             </div>
           </div>
         )}
-      </React.Fragment>
+      </div>
     );
   }
 }

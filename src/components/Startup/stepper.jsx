@@ -220,11 +220,14 @@ export default function CustomizedSteppers() {
   const [isNextEnabled, setIsNextEnabled] = React.useState(false);
   const steps = getSteps();
 
+  function handleSkip() {
+    setActiveStep(prevActiveStep => prevActiveStep + 1);
+  }
+
   function handleNext() {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
-    activeStep !== 2 || activeStep !== 6
-      ? setIsNextEnabled(false)
-      : setIsNextEnabled(true);
+
+    setIsNextEnabled(false);
   }
 
   function enableNext() {
@@ -290,15 +293,30 @@ export default function CustomizedSteppers() {
                   Finish
                 </Button>
               ) : (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleNext}
-                  className={classes.button}
-                  disabled={!isNextEnabled}
-                >
-                  Next
-                </Button>
+                <>
+                  {" "}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleNext}
+                    className={classes.button}
+                    disabled={!isNextEnabled}
+                  >
+                    Next
+                  </Button>
+                  {activeStep === 2 ||
+                    (activeStep === 6 && (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleSkip}
+                        className={classes.button}
+                        disabled={!isNextEnabled}
+                      >
+                        Skip
+                      </Button>
+                    ))}
+                </>
               )}
             </div>
           </div>

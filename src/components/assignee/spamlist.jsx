@@ -9,6 +9,7 @@ import { getSpamList, removeSpam } from "../../services/complaintService";
 
 class SpamList extends Component {
   state = {
+    complaints: [],
     categories: [],
     sortColumn: { path: "title", order: "asc" },
     display: false
@@ -31,11 +32,17 @@ class SpamList extends Component {
   };
 
   handleRemove = async complaint => {
-    await removeSpam(complaint._id);
+    const originalComplaints = this.state.complaints;
+    const complaints = originalComplaints.filter(c => c._id !== complaint._id);
+    this.setState({ complaints });
 
-    const { data } = await getSpamList();
-    this.setState({ complaints: data });
-    console.log(data);
+    try {
+      await removeSpam(complaint._id);
+
+      // console.log(data);
+    } catch (error) {
+      this.setState({ complaints: originalComplaints });
+    }
   };
 
   // handle display

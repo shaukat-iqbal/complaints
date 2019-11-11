@@ -4,8 +4,10 @@
   content: "";
   display: block;
   position: fixed;
-  left: 48%;
-  top: 40%;
+  left: 50%;
+  top: 50%;
+  margin-left: -40px;
+  margin-top: -40px;
   width: 80px;
   height: 80px;
   border-style: solid;
