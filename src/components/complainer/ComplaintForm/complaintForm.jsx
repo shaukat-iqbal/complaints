@@ -116,30 +116,33 @@ class ComplaintForm extends Form {
       this.setState({ allowedAttachments: data });
       attachments = data;
     }
-    let type = attachments.find(
-      a =>
-        a.extentionName.toLowerCase() === file.name.split(".")[1].toLowerCase()
-    );
+    let exe = file.type.split("/")[1].toLowerCase();
+
+    let type = attachments.find(a => a.extentionName.toLowerCase() === exe);
+
     if (!type) {
-      toast.error(
-        "You cannot attach '." +
-          file.name.split(".")[1].toLowerCase() +
-          "' type file."
-      );
+      toast.error("You cannot attach '." + exe + "' type file.");
       return;
     }
+
     this.setState({ selectedFile: file });
-
-    let compressedImg = await compressImage(file);
-    console.log("Un KBs", file.size / 1024);
-    console.log("compressed KBs", compressedImg.size / 1024);
-    if (compressedImg.size / 1024 > +type.maxSize) {
-      toast.error("The file size is larger than allowed size.");
-      this.setState({ selectedFile: null });
-
-      return;
+    if (file.type.split("/")[0] === "image") {
+      let compressedImg = await compressImage(file);
+      console.log("Un KBs", file.size / 1024);
+      console.log("compressed KBs", compressedImg.size / 1024);
+      if (compressedImg.size / 1024 > +type.maxSize) {
+        toast.error("The file size is larger than allowed size.");
+        this.setState({ selectedFile: null });
+        return;
+      }
+      this.setState({ selectedFile: compressedImg });
+    } else {
+      if (file.size / 1024 > +type.maxSize) {
+        toast.error("The file size is larger than allowed size.");
+        this.setState({ selectedFile: null });
+        return;
+      }
     }
-    this.setState({ selectedFile: compressedImg });
   };
 
   doSubmit = async () => {
