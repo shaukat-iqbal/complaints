@@ -7,11 +7,12 @@ const tokenKey = "token";
 
 http.setJwt(getJwt());
 
-export function login(email, password, apiEndpoint) {
+export function login(email, password, companyId, apiEndpoint) {
   const Endpoint = apiUrl + apiEndpoint;
   return http.post(Endpoint, {
     email,
-    password
+    password,
+    companyId
   });
   // console.log(response);
   // let profilePicture = "";

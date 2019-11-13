@@ -14,6 +14,7 @@ import MembersModal from "./MembersModal";
 import PieChart from "./charts/pie";
 import BarChart from "./charts/bar";
 import LineChart from "./charts/LineChart";
+import { getConfigToken } from "../../services/configurationService.js";
 
 const Chart = props => {
   const [reportname, setReportname] = useState("");
@@ -27,11 +28,12 @@ const Chart = props => {
     //   "http://localhost:5000/api/admin-complaints//generate/pdf/v1",
     //   "_blank"
     // );
-
+    let companyId = getConfigToken().companyId;
     // const { headers } = await getReport();
     window.open(
-      `${config.apiUrl}/admin-complaints/generateReport/pdf/${body.from}/${body.to}`
+      `${config.apiUrl}/admin-complaints/generateReport/${companyId}/${body.from}/${body.to}`
     );
+    body.companyId = companyId;
     try {
       const { headers } = await getReportOfMonth(body);
       console.log(headers);
@@ -55,6 +57,7 @@ const Chart = props => {
   const showMembersDialog = () => {
     setIsMembersDialogOpen(true);
   };
+
   const handleEmailSend = async recievers => {
     setIsMembersDialogOpen(false);
     try {
@@ -78,7 +81,7 @@ const Chart = props => {
       </button>
       {reportname && (
         <div>
-          You report has been generated with name "{" "}
+          Your report has been generated with name "{" "}
           <i className="fa fa-file-pdf-o" style={{ color: "#b65599" }}></i>{" "}
           {reportname} "{/* #fc4364 */}
           <button

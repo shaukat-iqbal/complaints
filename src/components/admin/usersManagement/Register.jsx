@@ -17,6 +17,8 @@ import AssignedCategoriesList from "./responsibilities";
 import { getCurrentUser } from "../../../services/authService";
 import Loading from "../../common/loading";
 import { compressImage } from "../../../services/imageService";
+import { toast } from "react-toastify";
+import { getConfigToken } from "../../../services/configurationService";
 
 class RegisterForm extends Form {
   state = {
@@ -44,7 +46,6 @@ class RegisterForm extends Form {
       .required()
       .email()
       .label("Email"),
-
     phone: Joi.string()
       .required()
       .min(9)
@@ -56,8 +57,11 @@ class RegisterForm extends Form {
     let user = getCurrentUser();
     if (!user) {
       user = { role: "guest" };
+      let configToken = getConfigToken();
+      if (configToken) this.state.companyId = configToken.companyId;
     }
     this.state.currentUser = user;
+    this.state.companyId = user.companyId;
     //siProfile determines wheter to view the form as profile i.e view details
     this.state.isProfileView = props.isProfileView;
     this.state.isEditView = props.isEditView;
@@ -133,6 +137,10 @@ class RegisterForm extends Form {
   handleProfilePicture = async event => {
     let { profile, profilePath } = this.state;
     if (event.target.files[0]) {
+      if (event.target.files[0].type.split("/")[0] !== "image") {
+        toast.warn("Please attach image file");
+        return;
+      }
       profile = URL.createObjectURL(event.target.files[0]);
       this.setState({ profile });
       profilePath = await compressImage(event.target.files[0]);
@@ -187,6 +195,7 @@ class RegisterForm extends Form {
       const { id } = this.props.match.params;
       userId = id;
     }
+
     const { role } = this.state.currentUser;
     if (role !== "admin") {
       const error = this.validatePassword();
@@ -197,14 +206,17 @@ class RegisterForm extends Form {
         return;
       }
     }
+
     const fd = createFormData(this.state);
     try {
       if (userId) {
         await updateUser(userId, fd, this.state.isAssignee);
         this.setState({ isEditView: false, isProfileView: true });
+        toast.success("User Successfully updated");
         return;
       } else {
         await registerUser(fd, this.state.isAssignee);
+        toast.success("User create successfully.");
       }
       if (role !== "admin") {
         this.props.history.push("/login");

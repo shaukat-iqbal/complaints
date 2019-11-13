@@ -5,7 +5,7 @@ import {
   updateAdmin
 } from "../../services/userService";
 import Joi from "joi-browser";
-import { getCurrentUser } from "../../services/authService";
+import { getCurrentUser, login } from "../../services/authService";
 import Loading from "./loading";
 import { compressImage } from "../../services/imageService";
 import { toast } from "react-toastify";
@@ -18,7 +18,8 @@ class AdminForm extends Form {
     data: {
       name: "",
       email: "",
-      phone: ""
+      phone: "",
+      companyId: ""
     },
     profile: "",
     profilePath: null,
@@ -43,7 +44,8 @@ class AdminForm extends Form {
     phone: Joi.string()
       .required()
       .min(9)
-      .label("Phone number")
+      .label("Phone number"),
+    companyId: Joi.string().required()
   };
 
   constructor(props) {
@@ -74,6 +76,11 @@ class AdminForm extends Form {
     //   // alert(confirm("fbmsdbnc"));\
     //   alert("you are leaving");
     // });
+    if (this.props.companyId) {
+      let { data } = this.state;
+      data.companyId = this.props.companyId;
+      this.setState({ data });
+    }
     if (this.props.match) {
       const { id, role } = this.props.match.params;
       if (id && role) {
@@ -87,10 +94,12 @@ class AdminForm extends Form {
   populateUserDetails = async (userId, role) => {
     try {
       const { data: user } = await getUser(userId, role);
+      // if(!user)return;
       const data = {};
       data.name = user.name;
       data.email = user.email;
       data.phone = user.phone;
+      data.companyId = user.companyId;
       if (user.profilePicture) {
         var profilePicture = convertToPicture(user.profilePicture.data);
       }
@@ -114,6 +123,10 @@ class AdminForm extends Form {
   handleProfilePicture = async event => {
     let { profile, profilePath } = this.state;
     if (event.target.files[0]) {
+      if (event.target.files[0].type.split("/")[0] !== "image") {
+        toast.warn("Please attach image file");
+        return;
+      }
       profile = URL.createObjectURL(event.target.files[0]);
       this.setState({ profile });
       profilePath = await compressImage(event.target.files[0]);
@@ -134,7 +147,7 @@ class AdminForm extends Form {
       userId = id;
     }
     const { isProfileView, isEditView } = this.props;
-    if (isProfileView || isEditView) {
+    if (!isProfileView && !isEditView) {
       const error = this.validatePassword();
       const errors = { ...this.state.errors };
       if (error) {
@@ -150,6 +163,7 @@ class AdminForm extends Form {
     };
 
     const fd = createDetailsFormData(body);
+    this.setState({ isLoading: true });
     try {
       if (userId) {
         await updateAdmin(userId, fd);
@@ -157,8 +171,17 @@ class AdminForm extends Form {
         toast.info("Account Updated");
       } else {
         await registerAdmin(fd);
+        //because next steps depend on company id that can be accessed by backend easily
+        if (this.props.isStepper) {
+          let response = await login(
+            this.state.data.email,
+            this.state.data.password,
+            this.state.data.companyId,
+            "/auth-admin"
+          );
+          localStorage.setItem("token", response.headers["x-auth-token"]);
+        }
         toast.info("Account Created");
-        if (this.props.onNext) this.props.onNext();
       }
       if (this.props.enableNext) this.props.enableNext();
     } catch (error) {
@@ -173,6 +196,7 @@ class AdminForm extends Form {
       }
       this.setState({ errors });
     }
+    this.setState({ isLoading: false });
   };
   render() {
     let userId;

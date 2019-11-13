@@ -12,7 +12,8 @@ import {
 import { getAllAssignees } from "../../services/assigneeService.js";
 import { toast } from "react-toastify";
 import Users from "./usersManagement/users";
-
+import { Modal, DialogTitle } from "@material-ui/core";
+import "./complaintDetail.css";
 export default function ComplaintDetail(props) {
   const [openAssigneeDialog, setopenAssigneeDialog] = useState(true);
   const [complaint, setComplaint] = useState([]);
@@ -130,181 +131,276 @@ export default function ComplaintDetail(props) {
   };
 
   return (
-    <div className="container">
-      <button
-        className="btn button-outline-secondary mb-2"
-        onClick={handleClose}
+    <Dialog
+      open={true}
+      onClose={true}
+      aria-labelledby="form-dialog-title"
+      maxWidth="md"
+      fullWidth={true}
+      scroll={"paper"}
+    >
+      <div
+        className="p-0 m-0"
+        style={{
+          height: "600px",
+          position: "relative",
+          backgroundColor: "aliceblue"
+        }}
       >
-        &larr; Back to Dashboard
-      </button>
-      {!complaint.assignedTo && (
-        <button
-          onClick={() => handleAssign(complaint)}
-          className="btn button-outline-primary mb-2 ml-2"
-        >
-          Assign
-        </button>
-      )}
-
-      {/* display assignee list */}
-      {displayAssignees && (
-        <Dialog
-          open={openAssigneeDialog}
-          onClose={handleCloseAssigneeDialog}
-          aria-labelledby="form-dialog-title"
-          fullWidth={true}
-        >
-          <div className="card-header mb-2">
-            <h5>Assignees List</h5>
+        <div className=" complaint-header">
+          <div className="complaintControls rounded-pill d-flex  justify-content-end">
+            <i className="fa fa-envelope controlIcon"></i>
+            <i className="fa fa-user controlIcon"></i>
+            <i className="fa fa-paperclip controlIcon"></i>
+            <i className="fa fa-map-marker controlIcon"></i>
           </div>
-          <DialogContent>
-            <Users
-              type="assignees"
-              isAssigning={true}
-              onUserSelected={handleUserSelected}
-            />
-          </DialogContent>
-          {/* <DialogContent>
-            <div className="row">
-              <div className="form-group d-inline">
-                <strong className="mb-4">Name</strong> &nbsp; &nbsp;
-                <select className="form-control-sm" ref={selectedAssignee}>
-                  {assignees &&
-                    assignees.map(a => (
-                      <option key={uuid()} value={a._id}>
-                        {a.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-
-              {/* <div className="col-md-6">
-                 Categories will go here
-                </div> 
-           </div>
-          </DialogContent> 
-          */}
-          <DialogActions>
-            <Button onClick={handleCloseAssigneeDialog} color="secondary">
-              Cancel
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
-      {/* display assignee list end */}
-
-      {!error ? (
-        <>
-          <div className="card shadow-lg">
-            <div className="card-header">
-              <h3>Complaint Details</h3>
-            </div>
-            <div className="card-body m-2">
-              {!complaint && <h3>No Complaint found with this ID.</h3>}
-
-              <div className="row">
-                <div className="col-md-3">
-                  <strong> Title:</strong>
-                </div>
-                <div className="col-md-3">{complaint.title} </div>
-
-                <div className="col-md-3">
-                  <strong> Details:</strong>
-                </div>
-                <div className="col-md-3">{complaint.details} </div>
-              </div>
-              <div className="row">
-                <div className="col-md-3">
-                  <strong> Location:</strong>
-                </div>
-                <div className="col-md-3">{complaint.location} </div>
-
-                <div className="col-md-3">
-                  <strong> Complainer:</strong>
-                </div>
-                <div className="col-md-3">
-                  {complaint.complainer && (
-                    <>
-                      <span> {complaint.complainer.name}</span> <br />
-                    </>
-                  )}
-                </div>
-              </div>
-              {complaint.assignedTo && complaint.category && (
-                <>
-                  <div className="row">
-                    <div className="col-md-3">
-                      <strong> Assigned to:</strong>
-                    </div>
-                    <div className="col-md-3">{complaint.assignedTo.name}</div>
-
-                    <div className="col-md-3">
-                      <strong> Category:</strong>
-                    </div>
-                    <div className="col-md-3">{complaint.category.name}</div>
-                  </div>
-                </>
-              )}
-
-              <div className="row">
-                <div className="col-md-3">
-                  {" "}
-                  <strong> Remarks:</strong>
-                </div>
-                <div className="col-md-3">
-                  {complaint.remarks === "" ? (
-                    <>
-                      {" "}
-                      <span>No Remarks yet</span> <br /> <br />{" "}
-                    </>
-                  ) : (
-                    <span>{complaint.remarks}</span>
-                  )}
-                </div>
-                <div className="col-md-3">
-                  <strong>Status</strong>
-                </div>
-                <div className="col-md-3"> {complaint.status} </div>
-              </div>
-
-              <div className="row">
-                <div className="col-md-3 ">
-                  {" "}
-                  <strong>Feedback:</strong>
-                </div>
-                <div className="col-md-6">
-                  {" "}
-                  {complaint.feedbackRemarks || "No Feedback Yet"}
-                </div>
-              </div>
-
-              {complaint.files !== "" && (
-                <>
-                  <button
-                    className="btn button-outline-secondary my-2 mr-2"
-                    onClick={() => handleFileDownload(complaint)}
-                  >
-                    Download File(s)
-                  </button>
-                  <button
-                    to="/"
-                    className="btn button-outline-secondary my-2"
-                    onClick={() => handleFileView(complaint)}
-                  >
-                    View File
-                  </button>{" "}
-                  <br />
-                </>
-              )}
-            </div>
-            <div className="card-footer text-muted text-center">
-              {calculateDays()}
-            </div>
+          <h3 className="">Our Fan is not working properly.</h3>
+          <div className="d-flex justify-content-between">
+            <label className="userLabel">
+              Complainer:
+              <span className="userName">Shaukat Iqbal</span>
+            </label>
+            <label className="userLabel">
+              Assigned To: <span className="userName">Makki Anjum</span>
+            </label>
           </div>
-        </>
-      ) : (
-        <div className="text-center alert alert-danger">{error}</div>
-      )}
-    </div>
+          <div className="d-flex justify-content-between">
+            <span className="status">Status: In-Progress</span>
+            <span className="complaintCategory">Category: Electrical</span>
+          </div>
+        </div>
+        <div className=" complaint-body ">
+          <table>
+            <tbody>
+              <tr>
+                <td>
+                  <label className="userLabel">Location</label>
+                </td>
+                <td>Room 215</td>
+              </tr>
+              <tr>
+                <td>
+                  <label className="userLabel">Description</label>
+                </td>{" "}
+                <td>
+                  <p name="" id="" cols="60" rows="7">
+                    It is a long established fact that a reader will be
+                    distracted by the readable content of a page when looking at
+                    its layout. The point of using Lorem Ipsum is that it has a
+                    more-or-less normal distribution of letters, as opposed to
+                    using 'Content here, content here', making it look like
+                    readable English. Many desktop publishing packages and web
+                    page editors now use Lorem Ipsum as their default model
+                    text, and a search for 'lorem ipsum' will uncover many web
+                    sites still in their infancy. Various versions have evolved
+                    over the years, sometimes by accident, sometimes on purpose
+                    (injected humour and the like).
+                  </p>
+                </td>{" "}
+              </tr>
+
+              <tr>
+                <td>
+                  <label className="userLabel">Remarks</label>
+                </td>
+                <p>
+                  It is a long established fact that a reader will be distracted
+                  by the readable content of a page when looking at its layout.
+                  The point of using Lorem Ipsum is that it has a more-or-less
+                  normal distribution of letters, as opposed to using 'Content
+                  here, content here', making it look like readable English.
+                </p>
+              </tr>
+              <tr>
+                <td>
+                  <label className="userLabel">Feedback</label>
+                </td>
+                <p>
+                  It is a long established fact that a reader will be distracted
+                  by the readable content of a page when looking at its layout.
+                </p>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </Dialog>
   );
 }
+
+// <div className="container">
+// <button
+//   className="btn button-outline-secondary mb-2"
+//   onClick={handleClose}
+// >
+//   &larr; Back to Dashboard
+// </button>
+// {!complaint.assignedTo && (
+//   <button
+//     onClick={() => handleAssign(complaint)}
+//     className="btn button-outline-primary mb-2 ml-2"
+//   >
+//     Assign
+//   </button>
+// )}
+
+// {/* display assignee list */}
+// {displayAssignees && (
+//   <Dialog
+//     open={openAssigneeDialog}
+//     onClose={handleCloseAssigneeDialog}
+//     aria-labelledby="form-dialog-title"
+//     fullWidth={true}
+//   >
+//     <div className="card-header mb-2">
+//       <h5>Assignees List</h5>
+//     </div>
+//     <DialogContent>
+//       <Users
+//         type="assignees"
+//         isAssigning={true}
+//         onUserSelected={handleUserSelected}
+//       />
+//     </DialogContent>
+//     {/* <DialogContent>
+//       <div className="row">
+//         <div className="form-group d-inline">
+//           <strong className="mb-4">Name</strong> &nbsp; &nbsp;
+//           <select className="form-control-sm" ref={selectedAssignee}>
+//             {assignees &&
+//               assignees.map(a => (
+//                 <option key={uuid()} value={a._id}>
+//                   {a.name}
+//                 </option>
+//               ))}
+//           </select>
+//         </div>
+
+//         {/* <div className="col-md-6">
+//            Categories will go here
+//           </div>
+//      </div>
+//     </DialogContent>
+//     */}
+//     <DialogActions>
+//       <Button onClick={handleCloseAssigneeDialog} color="secondary">
+//         Cancel
+//       </Button>
+//     </DialogActions>
+//   </Dialog>
+// )}
+// {/* display assignee list end */}
+
+// {!error ? (
+//   <>
+//     <div className="card shadow-lg">
+//       <div className="card-header">
+//         <h3>Complaint Details</h3>
+//       </div>
+//       <div className="card-body m-2">
+//         {!complaint && <h3>No Complaint found with this ID.</h3>}
+
+//         <div className="row">
+//           <div className="col-md-3">
+//             <strong> Title:</strong>
+//           </div>
+//           <div className="col-md-3">{complaint.title} </div>
+
+//           <div className="col-md-3">
+//             <strong> Details:</strong>
+//           </div>
+//           <div className="col-md-3">{complaint.details} </div>
+//         </div>
+//         <div className="row">
+//           <div className="col-md-3">
+//             <strong> Location:</strong>
+//           </div>
+//           <div className="col-md-3">{complaint.location} </div>
+
+//           <div className="col-md-3">
+//             <strong> Complainer:</strong>
+//           </div>
+//           <div className="col-md-3">
+//             {complaint.complainer && (
+//               <>
+//                 <span> {complaint.complainer.name}</span> <br />
+//               </>
+//             )}
+//           </div>
+//         </div>
+//         {complaint.assignedTo && complaint.category && (
+//           <>
+//             <div className="row">
+//               <div className="col-md-3">
+//                 <strong> Assigned to:</strong>
+//               </div>
+//               <div className="col-md-3">{complaint.assignedTo.name}</div>
+
+//               <div className="col-md-3">
+//                 <strong> Category:</strong>
+//               </div>
+//               <div className="col-md-3">{complaint.category.name}</div>
+//             </div>
+//           </>
+//         )}
+
+//         <div className="row">
+//           <div className="col-md-3">
+//             {" "}
+//             <strong> Remarks:</strong>
+//           </div>
+//           <div className="col-md-3">
+//             {complaint.remarks === "" ? (
+//               <>
+//                 {" "}
+//                 <span>No Remarks yet</span> <br /> <br />{" "}
+//               </>
+//             ) : (
+//               <span>{complaint.remarks}</span>
+//             )}
+//           </div>
+//           <div className="col-md-3">
+//             <strong>Status</strong>
+//           </div>
+//           <div className="col-md-3"> {complaint.status} </div>
+//         </div>
+
+//         <div className="row">
+//           <div className="col-md-3 ">
+//             {" "}
+//             <strong>Feedback:</strong>
+//           </div>
+//           <div className="col-md-6">
+//             {" "}
+//             {complaint.feedbackRemarks || "No Feedback Yet"}
+//           </div>
+//         </div>
+
+//         {complaint.files !== "" && (
+//           <>
+//             <button
+//               className="btn button-outline-secondary my-2 mr-2"
+//               onClick={() => handleFileDownload(complaint)}
+//             >
+//               Download File(s)
+//             </button>
+//             <button
+//               to="/"
+//               className="btn button-outline-secondary my-2"
+//               onClick={() => handleFileView(complaint)}
+//             >
+//               View File
+//             </button>{" "}
+//             <br />
+//           </>
+//         )}
+//       </div>
+//       <div className="card-footer text-muted text-center">
+//         {calculateDays()}
+//       </div>
+//     </div>
+//   </>
+// ) : (
+//   <div className="text-center alert alert-danger">{error}</div>
+// )}
+// </div>

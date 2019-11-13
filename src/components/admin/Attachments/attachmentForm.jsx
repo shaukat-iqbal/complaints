@@ -97,7 +97,7 @@ class AttachmentForm extends Form {
                 </DialogContent>
                 <DialogActions>
                   {isEditView
-                    ? this.renderButton("Edit")
+                    ? this.renderButton("Update")
                     : this.renderButton("Register")}
                 </DialogActions>
               </form>

@@ -67,3 +67,7 @@ export function updateMultipleCategories(categories) {
     categories: categories
   });
 }
+
+export function getRootCategory() {
+  return http.get(config.apiUrl + "/categories/root/category");
+}

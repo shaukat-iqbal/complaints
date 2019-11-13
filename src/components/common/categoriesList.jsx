@@ -5,7 +5,6 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { DialogActions } from "@material-ui/core";
 import "./../admin/usersManagement/categories.css";
-import "./../admin/usersManagement/categories.css";
 const CategoriesList = ({
   categories,
   isLoading,

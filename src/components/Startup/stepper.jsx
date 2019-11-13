@@ -105,8 +105,8 @@ const useColorlibStepIconStyles = makeStyles({
     backgroundColor: "#ccc",
     zIndex: 1,
     color: "#fff",
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     display: "flex",
     borderRadius: "50%",
     justifyContent: "center",
@@ -180,22 +180,30 @@ function getSteps() {
   ];
 }
 
-function getStepContent(step, enableNext) {
+function getStepContent(step, enableNext, props) {
   switch (step) {
     case 0:
       return (
         <div className=" d-flex justify-content-center align-items-center">
-          <CompanyDetailsForm enableNext={enableNext} />
+          <CompanyDetailsForm
+            enableNext={enableNext}
+            {...props}
+            isEditView={true}
+          />
         </div>
       );
     case 1:
       return (
         <div className=" d-flex justify-content-center align-items-center">
-          <AdminForm enableNext={enableNext} />
+          <AdminForm
+            isStepper={true}
+            enableNext={enableNext}
+            companyId={props.match.params.id}
+          />
         </div>
       );
     case 2:
-      return <Features isStepper={true} />;
+      return <Features isStepper={true} companyId={props.match.params.id} />;
     case 3:
       return <CategoriesRenderer enableNext={enableNext} isStepper={true} />;
     case 4:
@@ -214,7 +222,7 @@ function getStepContent(step, enableNext) {
   }
 }
 
-export default function CustomizedSteppers() {
+export default function CustomizedSteppers(props) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(6);
   const [isNextEnabled, setIsNextEnabled] = React.useState(false);
@@ -237,12 +245,12 @@ export default function CustomizedSteppers() {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
   }
 
-  useEffect(async () => {
-    try {
-      await getConfiguration();
-      window.location = "/login";
-    } catch (error) {}
-  }, []);
+  // useEffect(async () => {
+  //   try {
+  //     await getConfiguration();
+  //     window.location = "/login";
+  //   } catch (error) {}
+  // }, []);
 
   return (
     <div className={classes.root}>
@@ -272,7 +280,7 @@ export default function CustomizedSteppers() {
         ) : (
           <div>
             <div className={classes.instructions}>
-              {getStepContent(activeStep, enableNext)}
+              {getStepContent(activeStep, enableNext, props)}
             </div>
             <div className="mt-3">
               <Button

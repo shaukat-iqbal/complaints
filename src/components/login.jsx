@@ -3,13 +3,15 @@ import { Link } from "react-router-dom";
 import Joi from "joi-browser";
 import Form from "./common/form";
 import Loading from "./common/loading";
+import Companies from "./common/companies";
 import auth from "../services/authService";
 import { getConfiguration } from "../services/configurationService";
 import "./login.css";
 class Login extends Form {
   state = {
-    data: { email: "", password: "" },
+    data: { email: "", password: "", companyId: null },
     errors: {},
+    showCompaniesDialog: true,
     isLoading: false
   };
   role = React.createRef();
@@ -22,21 +24,18 @@ class Login extends Form {
     password: Joi.string()
       .required()
       .min(5)
-      .label("Password")
+      .label("Password"),
+    companyId: Joi.string().required()
   };
 
   async componentDidMount() {
     try {
       const user = await auth.getCurrentUser();
-      try {
-        let { data: config } = await getConfiguration();
-        localStorage.setItem("configuration", JSON.stringify(config));
-        this.setState({ configToken: config });
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          window.location = "/welcome";
-        }
+      if (!this.state.data.companyId) {
+        this.setState({ showCompaniesDialog: true });
+        return;
       }
+
       this.props.history.replace(`/${user.role}`);
     } catch (ex) {
       // toast.warn("Authentication Failed");
@@ -52,10 +51,11 @@ class Login extends Form {
       const response = await auth.login(
         data.email,
         data.password,
+        data.companyId,
         `/auth-${role}`
       );
-      const { data: configuration } = await getConfiguration();
-      localStorage.setItem("configuration", JSON.stringify(configuration));
+      // const { data: configuration } = await getConfiguration();
+      // localStorage.setItem("configuration", JSON.stringify(configuration));
       localStorage.setItem("token", response.headers["x-auth-token"]);
       window.location = `/${role}`;
       this.setState({ isLoading: true });
@@ -70,7 +70,24 @@ class Login extends Form {
 
     // this.props.history.push('/complainer');
   };
+  handleOnCompanySelection = async id => {
+    const data = { ...this.state.data };
+    data.companyId = id;
+    console.log(data);
+    this.setState({ data, showCompaniesDialog: false });
 
+    try {
+      let { data: config } = await getConfiguration(id);
+      localStorage.setItem("configuration", JSON.stringify(config));
+      this.setState({ configToken: config });
+    } catch (error) {
+      console.log(error);
+
+      if (error.response && error.response.status === 404) {
+        window.location = "/welcome/" + id;
+      }
+    }
+  };
   render() {
     let { configToken } = this.state;
     return (
@@ -82,6 +99,7 @@ class Login extends Form {
             </div>
           )}
         </div>
+
         {!this.state.isLoading && (
           <div className="vh-100 d-flex justify-content-center align-items-center">
             <div className="card mt-5 card-form loginCard">
@@ -93,7 +111,24 @@ class Login extends Form {
                 <form onSubmit={this.handleSubmit}>
                   {this.renderInput("email", "Email", "email")}
                   {this.renderInput("password", "Password", "password")}
-
+                  {!this.state.showCompaniesDialog ? (
+                    <button
+                      className="btn button-primary mb-3"
+                      type="button"
+                      hidden={this.state.showCompaniesDialog}
+                      onClick={() => {
+                        this.setState({ showCompaniesDialog: true });
+                      }}
+                    >
+                      &larr; &nbsp; Select Company
+                    </button>
+                  ) : (
+                    <Companies
+                      isLoading={true}
+                      onCompanySelection={this.handleOnCompanySelection}
+                      isOpen={this.state.showCompaniesDialog}
+                    />
+                  )}
                   <label htmlFor="role">Choose Role</label>
                   <select
                     ref={this.role}

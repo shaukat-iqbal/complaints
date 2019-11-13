@@ -2,6 +2,7 @@ import React from "react";
 import Form from "./form";
 import Loading from "./loading";
 import Joi from "joi-browser";
+import _ from "lodash";
 import { compressImage } from "../../services/imageService";
 import {
   updateCompanyDetails,
@@ -9,6 +10,8 @@ import {
   createDetailsFormData
 } from "../../services/companyDetailsService";
 import { toast } from "react-toastify";
+import { getCompany } from "../../services/companiesService";
+import { convertToPicture } from "../../services/userService";
 class CompanyDetailsForm extends Form {
   state = {
     data: {
@@ -44,8 +47,36 @@ class CompanyDetailsForm extends Form {
   }
 
   componentDidMount() {
-    this.setState({ isLoading: false });
+    if (this.props.match) {
+      const { id: companyId } = this.props.match.params;
+      this.populateUserDetails(companyId);
+    } else {
+      this.setState({ isLoading: false });
+    }
   }
+
+  populateUserDetails = async companyId => {
+    try {
+      const { data: company } = await getCompany(companyId);
+      let data = {};
+      data.name = company.name;
+      data.address = company.address;
+      data.phone = company.phone;
+      if (company.profilePicture) {
+        var profilePicture = convertToPicture(company.profilePicture.data);
+      }
+      this.setState({
+        data,
+        profilePath: company.profilePath,
+        profile: profilePicture,
+        isLoading: false
+      });
+    } catch (error) {
+      if (error.response && error.response.status === "404") {
+        alert("company not found");
+      }
+    }
+  };
   handleRemoveProfilePicture = () => {
     this.setState({ profile: null, profilePath: null });
   };
@@ -65,6 +96,7 @@ class CompanyDetailsForm extends Form {
   };
 
   doSubmit = async () => {
+    this.setState({ isLoading: true });
     let companyId;
     if (this.props.match) {
       const { id } = this.props.match.params;
@@ -74,11 +106,13 @@ class CompanyDetailsForm extends Form {
     try {
       if (companyId) {
         await updateCompanyDetails(fd, companyId);
+        toast.success("Company profile updated");
         // this.props.history.push("/login");
-        return;
       } else {
         await insertCompanyDetails(fd);
+        toast.success("New Company added.");
       }
+      this.setState({ isLoading: false });
       if (this.props.enableNext) this.props.enableNext();
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -102,7 +136,6 @@ class CompanyDetailsForm extends Form {
     }
     // let companyId = "helo";
     const { isEditView, isProfileView, profile, isLoading } = this.state;
-    const { onNext } = this.props;
     let heading = "Enter";
     if (isEditView) heading = "Edit";
     if (isProfileView) heading = "Profile";

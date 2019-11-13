@@ -116,6 +116,6 @@ export function getReport() {
 export function getReportOfMonth(body) {
   return http.get(
     config.apiUrl +
-      `/admin-complaints/generateReport/pdf/${body.from}/${body.to}`
+      `/admin-complaints/generateReport/${body.companyId}/${body.from}/${body.to}`
   );
 }

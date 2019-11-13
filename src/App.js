@@ -31,7 +31,7 @@ class App extends Component {
         <Switch>
           <Route path="/categories" component={CategoriesList} />
           <Route
-            path="/welcome"
+            path="/welcome/:id"
             render={props => (
               <>
                 <div className="container d-flex justify-content-center">

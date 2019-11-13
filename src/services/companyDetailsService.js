@@ -1,13 +1,13 @@
 import http from "./httpService";
 import { apiUrl } from "../config.json";
 
-let endPoint = apiUrl + "/company-details";
+let endPoint = apiUrl + "/companies";
 
 export function insertCompanyDetails(details) {
   return http.post(endPoint, details);
 }
 export function updateCompanyDetails(details, id) {
-  return http.put(endPoint + id, details);
+  return http.put(endPoint + "/" + id, details);
 }
 
 export function createDetailsFormData({ data, profilePath }) {

@@ -8,11 +8,11 @@ import {
 import { toast } from "react-toastify";
 class Features extends Component {
   state = {
-    isSave: false
+    isSaveEnabled: false
   };
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     let configToken = getConfigToken();
     if (configToken) {
       let updatedConfigObj = { ...configToken };
@@ -27,23 +27,29 @@ class Features extends Component {
         isSeverity: false
       };
     }
+    if (this.props.companyId)
+      this.state.updatedConfigObj.companyId = this.props.companyId;
   }
+
   handleSwitch = name => {
     let val = !this.state.updatedConfigObj[name];
     let updatedConfigObj = this.state.updatedConfigObj;
     updatedConfigObj[name] = val;
-    this.setState({ updatedConfigObj, isSave: true });
+    this.setState({ updatedConfigObj, isSaveEnabled: true });
   };
 
   handleSaveSettings = async () => {
+    let { updatedConfigObj } = this.state;
+    // if (this.props.companyId && !updatedConfigObj.companyId)
+    //   updatedConfigObj.companyId = this.props.companyId;
     try {
       let configuration;
       if (this.props.isStepper) {
-        let { data } = await addConfiguration(this.state.updatedConfigObj);
+        let { data } = await addConfiguration(updatedConfigObj);
         configuration = data;
       } else {
         let { data } = await updateConfiguration(
-          this.state.updatedConfigObj,
+          updatedConfigObj,
           this.state.configToken._id
         );
         configuration = data;
@@ -59,7 +65,7 @@ class Features extends Component {
     return (
       <div>
         <div className="d-flex justify-content-end mb-2">
-          {this.state.isSave && (
+          {this.state.isSaveEnabled && (
             <button
               className="btn btn-primary btn-sm"
               onClick={this.handleSaveSettings}

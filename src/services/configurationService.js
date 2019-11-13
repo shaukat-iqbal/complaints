@@ -2,8 +2,8 @@ import http from "./httpService";
 import config from "../config.json";
 const endPoint = config.apiUrl + "/config/";
 
-export function getConfiguration() {
-  return http.get(endPoint);
+export function getConfiguration(id) {
+  return http.get(endPoint + id);
 }
 
 export function deleteConfiguration(id) {

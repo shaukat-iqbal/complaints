@@ -164,7 +164,9 @@ class Message extends React.Component {
                         ) : (
                           <span className={styles.message__name}>
                             {this.state.assignee && (
-                              <span>{this.state.assignee.name}</span>
+                              <span>
+                                {this.state.assignee.name.split(" ")[0]}
+                              </span>
                             )}
                             :
                           </span>

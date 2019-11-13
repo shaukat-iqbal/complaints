@@ -18,6 +18,12 @@
   font-weight: bold;
   font-size: 23px;
 }
+.modal-heading {
+  color: #8c55aa;
+  font-family: "Ubuntu", sans-serif;
+  font-weight: bold;
+  font-size: 28px;
+}
 .submit {
   cursor: pointer;
   border-radius: 5em;

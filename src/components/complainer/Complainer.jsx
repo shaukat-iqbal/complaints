@@ -11,10 +11,11 @@ import ListGroup from "../common/listGroup";
 import { getCategories } from "../../services/categoryService";
 import CompalinerTable from "./complainerTable/complainerTable";
 import SearchBox from "./searchBox";
-import Showcase from "./showcase";
 import openSocket from "socket.io-client";
 import Spinner from "../common/Spinner/Spinner";
 import GraphBanner from "../common/GraphsBanner";
+import ComplaintForm from "./ComplaintForm/complaintForm";
+import Loading from "../common/loading";
 
 class Complainer extends Component {
   state = {
@@ -32,7 +33,6 @@ class Complainer extends Component {
   async componentDidMount() {
     try {
       const user = auth.getCurrentUser();
-
       if (!user || user.role !== "complainer") {
         toast.error("Access denied to this Route!");
         this.props.history.replace("/");
@@ -127,7 +127,11 @@ class Complainer extends Component {
       currentPage: 1
     });
   };
-
+  toggleComplaintForm = () => {
+    let isFormEnabled = this.state.isFormEnabled;
+    let now = !isFormEnabled;
+    this.setState({ isFormEnabled: now });
+  };
   // render
   render() {
     // get paged data
@@ -149,12 +153,14 @@ class Complainer extends Component {
           <Navbar user={this.state.user} assignees={assignees} />
 
           <div className="container">
-            <Link
-              to="/complainer/new-complaint"
+            <button
+              type="button"
+              onClick={this.toggleComplaintForm}
+              // to="/complainer/new-complaint"
               className="btn button-primary mb-2"
             >
               New Complaint &rarr;
-            </Link>
+            </button>
             <h4>There are no complaints in the database</h4>
           </div>
         </>
@@ -176,26 +182,11 @@ class Complainer extends Component {
 
     const complaints = paginate(sorted, currentPage, pageSize);
 
-    // complaints length for showing number
-    const inprogress = allComplaints.filter(c => c.status === "in-progress")
-      .length;
-    const resolved = allComplaints.filter(
-      c => c.status === "closed - relief granted"
-    ).length;
-    const closed = allComplaints.filter(
-      c => c.status === "closed - relief can't be granted"
-    ).length;
-
     // get paged data end
     return (
       <React.Fragment>
         <Navbar user={this.state.user} assignees={assignees} />
-
-        {this.state.isLoading && (
-          <div className="d-flex justify-content-center mt-5">
-            <Spinner />
-          </div>
-        )}
+        {this.state.isLoading && <Loading />}
 
         <div className="container">
           {/* {this.state.user && <h3>Hello {this.state.user.name} !</h3>}
@@ -208,6 +199,10 @@ class Complainer extends Component {
           {this.state.complaints.length > 0 && (
             <GraphBanner complaints={this.state.complaints} />
           )}
+          <ComplaintForm
+            isOpen={this.state.isFormEnabled}
+            onClose={this.toggleComplaintForm}
+          />
           {count !== 0 && (
             <div className="row">
               <div className="col-md-2 mb-2">
@@ -218,12 +213,14 @@ class Complainer extends Component {
                 />
               </div>
               <div className="col-md-10">
-                <Link
-                  to="/complainer/new-complaint"
+                <button
+                  type="button"
+                  onClick={this.toggleComplaintForm}
+                  // to="/complainer/new-complaint"
                   className="btn button-primary mb-2"
                 >
                   New Complaint &rarr;
-                </Link>
+                </button>
 
                 {sorted.length > 0 ? (
                   <>
@@ -248,7 +245,13 @@ class Complainer extends Component {
                     />
                   </>
                 ) : (
-                  <h4 className="mt-2">No Complaint </h4>
+                  <>
+                    <h4 className="mt-2">No Complaint </h4>
+                    <SearchBox
+                      value={searchQuery}
+                      onChange={this.handleSearch}
+                    />
+                  </>
                 )}
               </div>
             </div>

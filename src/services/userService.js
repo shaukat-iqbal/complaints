@@ -27,7 +27,8 @@ export function createFormData({
   currentUser,
   responsibilities,
   profilePath,
-  isAssignee
+  isAssignee,
+  companyId
 }) {
   const fd = new FormData();
   fd.append("name", data.name);
@@ -47,6 +48,7 @@ export function createFormData({
       fd.append("profilePath", profilePath);
     }
   }
+  if (companyId) fd.append("companyId", companyId);
   return fd;
 }
 

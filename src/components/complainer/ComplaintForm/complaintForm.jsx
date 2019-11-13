@@ -19,6 +19,7 @@ import { getAllowedAttachments } from "../../../services/attachmentsService";
 import "./complaintForm.css";
 import { MyLocation } from "@material-ui/icons";
 import { getConfigToken } from "../../../services/configurationService";
+import Loading from "../../common/loading";
 class ComplaintForm extends Form {
   state = {
     data: {
@@ -144,14 +145,13 @@ class ComplaintForm extends Form {
   doSubmit = async () => {
     this.setState({ isDialogOpen: false });
     this.setState({ isLoading: true });
-
     const data = new FormData();
     data.append("title", this.state.data.title);
-    data.append("details", this.state.details);
     data.append("location", this.state.data.location);
+    data.append("details", this.state.details);
     data.append("categoryId", this.state.categoryId);
     data.append("complaint", this.state.selectedFile);
-    if (this.state.data.longitude && this.state.data.latitude) {
+    if (this.state.coords) {
       data.append("longitude", this.state.coords.longitude);
       data.append("latitude", this.state.coords.latitude);
     }
@@ -160,7 +160,7 @@ class ComplaintForm extends Form {
     try {
       await saveComplaint(data);
       toast.success("Complaint is successfully registered.");
-      this.props.history.replace("/complainer");
+      // this.props.history.replace("/complainer");
     } catch (error) {
       toast.error("Could not lodge a complaint");
     }
@@ -191,10 +191,10 @@ class ComplaintForm extends Form {
     return true;
   };
 
-  handleClose = () => {
-    this.setState({ open: false });
-    this.props.history.replace("/complainer");
-  };
+  // handleClose = () => {
+  //   this.setState({ open: false });
+  //   this.props.history.replace("/complainer");
+  // };
 
   handleDetailsChange = ({ currentTarget: input }) => {
     this.setState({ detailsError: "" });
@@ -241,8 +241,8 @@ class ComplaintForm extends Form {
     return (
       <React.Fragment>
         <Dialog
-          open={this.state.open}
-          // onClose={this.handleClose}
+          open={this.props.isOpen}
+          onClose={this.props.onClose}
           aria-labelledby="form-dialog-title"
           fullWidth={true}
           scroll={"paper"}
@@ -262,20 +262,15 @@ class ComplaintForm extends Form {
             </div>
           </Modal>
 
-          {this.state.isLoading && (
-            <div className="d-flex justify-content-center">
-              <Spinner />
-            </div>
-          )}
+          {this.state.isLoading && <Loading />}
 
           {!this.state.isLoading && (
             <>
               {/* <h3 className="pb-2">Please Fill this Form Carefully</h3> */}
               <DialogTitle id="form-dialog-title">
-                <div>
-                  <h5 className="stylishHeading">Complaint</h5>
-                </div>
+                <h5 className="modal-heading">Complaint</h5>
               </DialogTitle>
+
               <DialogContent>
                 <form onSubmit={this.ToggleConfirmation}>
                   <div className="form-group">
@@ -408,7 +403,7 @@ class ComplaintForm extends Form {
                           className="col-6"
                           style={{ borderRight: "2px solid #999999" }}
                         >
-                          Get your current location
+                          Gps Location
                         </div>
                         <div className="col-6 d-flex flex-column p-0 m-0">
                           <div
@@ -453,12 +448,12 @@ class ComplaintForm extends Form {
                 <div className="d-flex justify-content-end">
                   <button
                     className="btn button-secondary mr-3"
-                    onClick={this.handleClose}
+                    onClick={this.props.onClose}
                   >
                     Close
                   </button>
                   <button
-                    className="btn button-secondary mr-3"
+                    className="btn btn-secondary mr-3 rounded-pill"
                     onClick={this.ToggleConfirmation}
                   >
                     Register

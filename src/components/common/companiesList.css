@@ -1,0 +1,27 @@
+.company:hover {
+  background-color: #84dcdc;
+  cursor: pointer;
+  color: rgb(156, 145, 170);
+}
+
+/* .company option {
+  padding: 20px;
+  background-color: rgb(147, 172, 171);
+} */
+
+.company {
+  width: auto;
+  height: 100px;
+  color: rgb(27, 3, 3);
+  font-weight: bold;
+  font-family: "Ubuntu", sans-serif;
+  /* padding: 20px; */
+  /* background-color: rgba(113, 165, 103, 0.6); */
+  background-color: rgb(84, 68, 100, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.Cli {
+  background-color: brown;
+}

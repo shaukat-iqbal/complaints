@@ -9,7 +9,8 @@ import Joi from "joi-browser";
 import {
   createCategory,
   updateCategoryById,
-  getCategories
+  getCategories,
+  getRootCategory
 } from "../services/categoryService";
 class CategoryForm extends Form {
   state = {
@@ -30,9 +31,11 @@ class CategoryForm extends Form {
   async componentDidMount() {
     const { data: allCategories } = await getCategories();
     this.setState({ allCategories });
+
     this.populateForm(this.props.category, allCategories);
   }
-  populateForm = (category, allCategories) => {
+
+  populateForm = async (category, allCategories) => {
     let { data } = this.state;
     let parentCategoryName = null;
     if (this.props.requestType === "addChild") {
@@ -48,7 +51,9 @@ class CategoryForm extends Form {
       }
     } else if (this.props.requestType === "new") {
       data.hasChild = false;
-      data.parentCategory = allCategories.find(c => c.name === "Root")._id;
+      let { data: root } = await getRootCategory();
+      console.log(root);
+      data.parentCategory = root._id;
     }
     this.setState({
       data,

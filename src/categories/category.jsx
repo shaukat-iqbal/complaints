@@ -50,8 +50,8 @@ const Category = ({
         <div key={uuid()}>
           {/* <Accordion defaultActiveKey=""> */}
           <Card>
-            <Accordion.Toggle as={Card.text} eventKey={category._id}>
-              <div style={{ position: "relative" }}>
+            <Accordion.Toggle as={Card.text} bg="dark" eventKey={category._id}>
+              <div className="category-design" style={{ position: "relative" }}>
                 <div className={classes}>{category.name}</div>
                 <div
                   onDragStart={e => onDragStart(e, category._id)}

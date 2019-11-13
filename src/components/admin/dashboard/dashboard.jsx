@@ -212,16 +212,6 @@ class Dashboard extends Component {
 
     const complaints = paginate(sorted, currentPage, pageSize);
 
-    // complaints length for showing number
-    const inprogress = allComplaints.filter(c => c.status === "in-progress")
-      .length;
-    const resolved = allComplaints.filter(
-      c => c.status === "closed - relief granted"
-    ).length;
-    const closed = allComplaints.filter(
-      c => c.status === "closed - relief can't be granted"
-    ).length;
-
     // get paged data end
     return (
       <React.Fragment>

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { createUsers } from "../../../services/userService";
 import CsvResponse from "./csvResponse";
+import { toast } from "react-toastify";
 class FileUpload extends Component {
   state = {
     assignees: null,
@@ -37,6 +38,7 @@ class FileUpload extends Component {
 
       //remove first indexed array i.e header
       if (errors.length < 2) {
+        toast.success("Users successfully Created.");
         const redirectTo = "/admin/users/" + currentTarget.name + "s";
         this.props.history.push(redirectTo);
       }
