@@ -6,7 +6,6 @@ import openSocket from "socket.io-client";
 
 import auth from "../../services/authService";
 import AssigneeDashboard from "./dashboard/AssigneeDashboard";
-import AdminComplaintDetail from "./AssigneeComplaintDetail";
 import NavbarAssignee from "./navbar/navbarAssignee";
 
 import {
@@ -168,11 +167,7 @@ class Assignee extends React.Component {
                 />
               )}
             />
-            <Route
-              exact
-              path="/assignee/:id"
-              component={AdminComplaintDetail}
-            />
+
             <Redirect exact from="/assignee" to="/assignee/dashboard" />
           </Switch>
         </div>

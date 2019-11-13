@@ -9,7 +9,6 @@ import mainAdmin from "./components/admin/mainAdmin";
 import Login from "./components/login";
 import Notfound from "./components/NotFound";
 import Logout from "./components/logout";
-import ComplaintDetail from "./components/complainer/complaintDetail/complaintDetail";
 import Message from "./components/common/message/message";
 import AssigneeMessage from "./components/common/message/assigneeMessages";
 import RegisterForm from "./components/admin/usersManagement/Register";
@@ -49,7 +48,6 @@ class App extends Component {
               </>
             )}
           />
-          <Route path="/complainer/:id" component={ComplaintDetail} />
           <Route
             path="/profile/:id/:role"
             render={props => (

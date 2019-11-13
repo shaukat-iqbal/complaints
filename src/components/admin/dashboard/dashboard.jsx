@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import Spinner from "../../common/Spinner/Spinner";
 import GraphBanner from "../../common/GraphsBanner";
 import { countComplainers } from "../../../services/complainerService";
+import ComplaintDetail from "../../common/ComplaintDetail";
 
 class Dashboard extends Component {
   state = {
@@ -140,7 +141,10 @@ class Dashboard extends Component {
   // handle detail
   handleDetail = complaint => {
     // console.log(complaint);
-    this.props.history.replace(`/admin/${complaint._id}`);
+    this.setState({ selectedComplaint: complaint, isDetailFormEnabled: true });
+  };
+  handleClose = () => {
+    this.setState({ selectedComplaint: null, isDetailFormEnabled: false });
   };
 
   // handle pagination
@@ -223,6 +227,13 @@ class Dashboard extends Component {
 
         {/* <Showcase resolved={resolved} inprogress={inprogress} closed={closed} /> */}
         <div className="container">
+          {this.state.selectedComplaint && (
+            <ComplaintDetail
+              isOpen={this.state.isDetailFormEnabled}
+              onClose={this.handleClose}
+              complaint={this.state.selectedComplaint}
+            />
+          )}
           {this.state.complaints.length > 0 && (
             <GraphBanner
               complaints={this.state.complaints}

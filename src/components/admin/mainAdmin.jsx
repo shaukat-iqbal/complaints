@@ -7,7 +7,6 @@ import auth from "../../services/authService";
 import Configuration from "./Configuration";
 import Dashboard from "./dashboard/dashboard";
 import Chart from "./chart";
-import AdminComplaintDetail from "./AdminComplaintDetail";
 import NavbarAdmin from "./navbar/navbarAdmin";
 import UserManagementContainer from "./usersManagement/container/userManagement";
 
@@ -56,16 +55,6 @@ const mainAdmin = props => {
                 {" "}
                 <NavbarAdmin />
                 <Chart {...props} />{" "}
-              </div>
-            )}
-          />
-          <Route
-            path="/admin/:id"
-            render={props => (
-              <div>
-                {" "}
-                <NavbarAdmin />
-                <AdminComplaintDetail {...props} />{" "}
               </div>
             )}
           />

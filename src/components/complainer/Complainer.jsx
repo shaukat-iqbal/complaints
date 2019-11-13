@@ -16,6 +16,7 @@ import Spinner from "../common/Spinner/Spinner";
 import GraphBanner from "../common/GraphsBanner";
 import ComplaintForm from "./ComplaintForm/complaintForm";
 import Loading from "../common/loading";
+import ComplaintDetail from "../common/ComplaintDetail";
 
 class Complainer extends Component {
   state = {
@@ -94,10 +95,18 @@ class Complainer extends Component {
     });
   };
 
+  // // handle detail
+  // handleDetail = complaint => {
+  //   // console.log(complaint);
+  //   this.props.history.replace(`/complainer/${complaint._id}`);
+  // };
   // handle detail
   handleDetail = complaint => {
     // console.log(complaint);
-    this.props.history.replace(`/complainer/${complaint._id}`);
+    this.setState({ selectedComplaint: complaint, isDetailFormEnabled: true });
+  };
+  handleClose = () => {
+    this.setState({ selectedComplaint: null, isDetailFormEnabled: false });
   };
 
   // handle Category Select
@@ -185,6 +194,13 @@ class Complainer extends Component {
     // get paged data end
     return (
       <React.Fragment>
+        {this.state.selectedComplaint && (
+          <ComplaintDetail
+            isOpen={this.state.isDetailFormEnabled}
+            onClose={this.handleClose}
+            complaint={this.state.selectedComplaint}
+          />
+        )}
         <Navbar user={this.state.user} assignees={assignees} />
         {this.state.isLoading && <Loading />}
 

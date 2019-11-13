@@ -7,7 +7,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Button from "@material-ui/core/Button";
 
 import SearchBox from "../../complainer/searchBox";
-import Showcase from "../../complainer/showcase";
 import AssigneeTable from "../AssigneeTable";
 import Pagination from "../../common/pagination";
 import ListGroup from "../../common/listGroup";
@@ -21,6 +20,7 @@ import { toast } from "react-toastify";
 import { getAssigneeCategories } from "../../../services/categoryService";
 import SpamList from "../spamlist";
 import GraphBanner from "../../common/GraphsBanner";
+import ComplaintDetail from "../../common/ComplaintDetail";
 
 class AssigneeDashboard extends Component {
   state = {
@@ -145,6 +145,14 @@ class AssigneeDashboard extends Component {
     this.setState({ checkedComplaint: null });
   };
 
+  // handle detail
+  handleDetail = complaint => {
+    // console.log(complaint);
+    this.setState({ selectedComplaint: complaint, isDetailFormEnabled: true });
+  };
+  handleClose = () => {
+    this.setState({ selectedComplaint: null, isDetailFormEnabled: false });
+  };
   // render
   render() {
     // get paged data
@@ -196,17 +204,6 @@ class AssigneeDashboard extends Component {
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
     const complaints = paginate(sorted, currentPage, pageSize);
-
-    // complaints length for showing number
-    const inprogress = this.props.complaints.filter(
-      c => c.status === "in-progress"
-    ).length;
-    const resolved = this.props.complaints.filter(
-      c => c.status === "closed - relief granted"
-    ).length;
-    const closed = this.props.complaints.filter(
-      c => c.status === "closed - relief can't be granted"
-    ).length;
 
     // get paged data end
     return (
@@ -286,6 +283,14 @@ class AssigneeDashboard extends Component {
           <div className="container">
             {this.props.complaints.length > 0 && (
               <GraphBanner complaints={[...this.props.complaints]} />
+            )}
+
+            {this.state.selectedComplaint && (
+              <ComplaintDetail
+                isOpen={this.state.isDetailFormEnabled}
+                onClose={this.handleClose}
+                complaint={this.state.selectedComplaint}
+              />
             )}
             {checkedComplaint && (
               <div

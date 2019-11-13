@@ -237,6 +237,7 @@ class RegisterForm extends Form {
       }
     }
   };
+
   render() {
     let userId;
     if (this.props.match) {
