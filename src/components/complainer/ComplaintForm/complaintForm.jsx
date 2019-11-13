@@ -127,22 +127,14 @@ class ComplaintForm extends Form {
 
     this.setState({ selectedFile: file });
     if (file.type.split("/")[0] === "image") {
-      let compressedImg = await compressImage(file);
-      console.log("Un KBs", file.size / 1024);
-      console.log("compressed KBs", compressedImg.size / 1024);
-      if (compressedImg.size / 1024 > +type.maxSize) {
-        toast.error("The file size is larger than allowed size.");
-        this.setState({ selectedFile: null });
-        return;
-      }
-      this.setState({ selectedFile: compressedImg });
-    } else {
-      if (file.size / 1024 > +type.maxSize) {
-        toast.error("The file size is larger than allowed size.");
-        this.setState({ selectedFile: null });
-        return;
-      }
+      file = await compressImage(file);
     }
+    if (file.size / 1024 > +type.maxSize) {
+      toast.error("The file size is larger than allowed size.");
+      this.setState({ selectedFile: null });
+      return;
+    }
+    this.setState({ selectedFile: file });
   };
 
   doSubmit = async () => {
