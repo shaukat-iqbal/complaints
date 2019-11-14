@@ -57,15 +57,15 @@ class GraphBanner extends Component {
   render() {
     return (
       <div className="row mb-3">
-        <div className="col-4 ">
+        <div className="col-md-4">
           <BarChart complaints={this.state.complaints} />
         </div>
         {this.state.chartData && (
-          <div className="col-4  ">
+          <div className="col-md-4  ">
             <LineChart chartData={this.state.chartData} />
           </div>
         )}
-        <div className="col-4  ">
+        <div className="col-md-4  ">
           <PieChart complaints={this.state.complaints} />
         </div>
       </div>

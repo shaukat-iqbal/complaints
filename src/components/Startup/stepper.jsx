@@ -8,13 +8,10 @@ import StepLabel from "@material-ui/core/StepLabel";
 import Check from "@material-ui/icons/Check";
 import SettingsIcon from "@material-ui/icons/Settings";
 import StepConnector from "@material-ui/core/StepConnector";
-import Button from "@material-ui/core/Button";
 import Members from "../admin/Higher Authorities/Members";
 import AdminForm from "../common/adminForm";
 import Features from "../admin/Configuration/Features";
 import Attachments from "../admin/Attachments/Attachments";
-import RegisterForm from "../admin/usersManagement/Register";
-import FileUpload from "../admin/usersManagement/fileUpload";
 import CompanyDetailsForm from "../common/companyDetailsForm";
 import "./stepper.css";
 import { Link } from "react-router-dom";
@@ -26,8 +23,11 @@ import {
   SupervisedUserCircleRounded,
   Attachment
 } from "@material-ui/icons";
+import { DialogTitle, Grow } from "@material-ui/core";
+
 import CategoriesRenderer from "../../categories/CategoriesRenderer";
 import { getConfiguration } from "../../services/configurationService";
+import Registration from "../admin/usersManagement/Registration";
 
 const useQontoStepIconStyles = makeStyles({
   root: {
@@ -203,7 +203,13 @@ function getStepContent(step, enableNext, props) {
         </div>
       );
     case 2:
-      return <Features isStepper={true} companyId={props.match.params.id} />;
+      return (
+        <Features
+          isStepper={true}
+          enableNext={enableNext}
+          companyId={props.match.params.id}
+        />
+      );
     case 3:
       return <CategoriesRenderer enableNext={enableNext} isStepper={true} />;
     case 4:
@@ -211,12 +217,7 @@ function getStepContent(step, enableNext, props) {
     case 5:
       return <Members enableNext={enableNext} />;
     case 6:
-      return (
-        <div className="d-flex justify-content-around flex-wrap">
-          <RegisterForm stepper={true} />
-          <FileUpload />
-        </div>
-      );
+      return <Registration isStepper={true} />;
     default:
       return "Unknown step";
   }
@@ -224,26 +225,28 @@ function getStepContent(step, enableNext, props) {
 
 export default function CustomizedSteppers(props) {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(6);
+  const [activeStep, setActiveStep] = React.useState(2);
   const [isNextEnabled, setIsNextEnabled] = React.useState(false);
   const steps = getSteps();
 
-  function handleSkip() {
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-  }
-
-  function handleNext() {
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-
-    setIsNextEnabled(false);
-  }
-
   function enableNext() {
-    setIsNextEnabled(true);
+    setActiveStep(pre => pre + 1);
+    // setIsNextEnabled(true);
   }
-  function handleBack() {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
-  }
+
+  // function handleSkip() {
+  //   setActiveStep(prevActiveStep => prevActiveStep + 1);
+  // }
+
+  // function handleNext() {
+  //   setActiveStep(prevActiveStep => prevActiveStep + 1);
+
+  //   setIsNextEnabled(false);
+  // }
+
+  // function handleBack() {
+  //   setActiveStep(prevActiveStep => prevActiveStep - 1);
+  // }
 
   // useEffect(async () => {
   //   try {
@@ -282,7 +285,7 @@ export default function CustomizedSteppers(props) {
             <div className={classes.instructions}>
               {getStepContent(activeStep, enableNext, props)}
             </div>
-            <div className="mt-3">
+            {/* <div className="mt-3">
               <Button
                 disabled={activeStep === 0}
                 onClick={handleBack}
@@ -327,6 +330,7 @@ export default function CustomizedSteppers(props) {
                 </>
               )}
             </div>
+          */}
           </div>
         )}
       </div>

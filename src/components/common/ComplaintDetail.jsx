@@ -37,6 +37,7 @@ export default function ComplaintDetail(props) {
   useEffect(() => {
     setComplaint(props.complaint);
     let currentUser = getCurrentUser();
+    // let configToken=
     if (!currentUser) window.location = "/login";
     setUser(currentUser);
   }, []);

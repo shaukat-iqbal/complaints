@@ -146,7 +146,7 @@ class Users extends Component {
               </div>
               <div className="d-flex flex-wrap flex-column mx-5 ">
                 <div className="align-self-end mr-4 ">
-                  <p>Showing {totalCount} Users.</p>
+                  <p className="m-0">Showing {totalCount} Users.</p>
                   <div className="input-group">
                     <SearchBox
                       value={searchQuery}
@@ -159,34 +159,36 @@ class Users extends Component {
                       onChange={this.handleSearch}
                       value={searchQuery}
                     ></input> */}
-                    <div className="input-group-append">
-                      <button
-                        className="btn btn-outline-secondary dropdown-toggle my-3"
-                        style={{ width: "100px" }}
-                        type="button"
-                        data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
-                      >
-                        {this.state.searchCriteria}
-                      </button>
-                      <div className="dropdown-menu">
-                        <option
-                          className="dropdown-item"
-                          value="Name"
-                          onClick={e => this.handleSearchCriteria(e)}
+                    {this.props.type === "assignees" && (
+                      <div className="input-group-append">
+                        <button
+                          className="btn btn-outline-secondary dropdown-toggle my-3"
+                          style={{ width: "100px" }}
+                          type="button"
+                          data-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false"
                         >
-                          Name
-                        </option>
-                        <option
-                          className="dropdown-item"
-                          value="Category"
-                          onClick={e => this.handleSearchCriteria(e)}
-                        >
-                          Category
-                        </option>
+                          {this.state.searchCriteria}
+                        </button>
+                        <div className="dropdown-menu">
+                          <option
+                            className="dropdown-item"
+                            value="Name"
+                            onClick={e => this.handleSearchCriteria(e)}
+                          >
+                            Name
+                          </option>
+                          <option
+                            className="dropdown-item"
+                            value="Category"
+                            onClick={e => this.handleSearchCriteria(e)}
+                          >
+                            Category
+                          </option>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 

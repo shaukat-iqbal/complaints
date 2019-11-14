@@ -4,7 +4,7 @@ import Joi from "joi-browser";
 import Form from "./common/form";
 import Loading from "./common/loading";
 import Companies from "./common/companies";
-import auth from "../services/authService";
+import auth, { getCurrentUser } from "../services/authService";
 import { getConfiguration } from "../services/configurationService";
 import "./login.css";
 class Login extends Form {
@@ -46,7 +46,7 @@ class Login extends Form {
   doSubmit = async () => {
     const { data } = this.state;
     const role = this.role.current.value;
-    localStorage.setItem("login", role);
+    // localStorage.setItem("login", role);
     try {
       const response = await auth.login(
         data.email,
@@ -80,6 +80,10 @@ class Login extends Form {
       let { data: config } = await getConfiguration(id);
       localStorage.setItem("configuration", JSON.stringify(config));
       this.setState({ configToken: config });
+      let user = getCurrentUser();
+      if (user) {
+        this.props.history.replace(`/${user.role}`);
+      }
     } catch (error) {
       console.log(error);
 

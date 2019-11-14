@@ -6,6 +6,7 @@ import {
   addConfiguration
 } from "../../../services/configurationService";
 import { toast } from "react-toastify";
+import Loading from "../../common/loading";
 class Features extends Component {
   state = {
     isSaveEnabled: false
@@ -16,6 +17,7 @@ class Features extends Component {
     let configToken = getConfigToken();
     if (configToken) {
       let updatedConfigObj = { ...configToken };
+
       delete updatedConfigObj._id;
       delete updatedConfigObj.__v;
       this.state.configToken = configToken;
@@ -39,6 +41,7 @@ class Features extends Component {
   };
 
   handleSaveSettings = async () => {
+    this.setState({ isLoading: true });
     let { updatedConfigObj } = this.state;
     // if (this.props.companyId && !updatedConfigObj.companyId)
     //   updatedConfigObj.companyId = this.props.companyId;
@@ -57,13 +60,22 @@ class Features extends Component {
 
       localStorage.setItem("configuration", JSON.stringify(configuration));
       toast.info("Settings Updated");
+      this.setState({ isLoading: false });
+
+      if (this.props.enableNext) this.props.enableNext();
     } catch (error) {
-      toast.warn("An Error Occurred");
+      console.log(error);
+      if (error.response && error.response.status === 400) {
+        toast.warn("Bad request" + error);
+      }
+      // toast.warn("An Error Occurred");
+      this.setState({ isLoading: false });
     }
   };
   render() {
     return (
       <div>
+        {this.state.isLoading && <Loading />}
         <div className="d-flex justify-content-end mb-2">
           {this.state.isSaveEnabled && (
             <button

@@ -13,6 +13,7 @@ import Spinner from "../../common/Spinner/Spinner";
 import GraphBanner from "../../common/GraphsBanner";
 import { countComplainers } from "../../../services/complainerService";
 import ComplaintDetail from "../../common/ComplaintDetail";
+import Loading from "../../common/loading";
 
 class Dashboard extends Component {
   state = {
@@ -190,14 +191,14 @@ class Dashboard extends Component {
 
     if (count === 0) {
       return (
-        <>
+        <div className="container d-flex vh-100 vw-100 justify-content-center  ">
           {this.state.isLoading && (
             <div className="d-flex justify-content-center mt-5">
-              <Spinner />
+              <Loading />
             </div>
           )}
-          {count === 0 && <h4>There are no complaints.</h4>}
-        </>
+          <h4>There are no complaints.</h4>
+        </div>
       );
     }
 
