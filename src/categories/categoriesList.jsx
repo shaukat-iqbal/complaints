@@ -13,12 +13,14 @@ import uuid from "uuid";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { toast } from "react-toastify";
+import SearchBox from "../components/common/searchBox";
 class CategoriesList extends Component {
   state = {
     allCategories: [],
     categoryFormEnabled: false,
     selectedCategory: "",
-    csvUploadComponent: false
+    csvUploadComponent: false,
+    searchQuery: ""
   };
   constructor(props) {
     super(props);
@@ -30,7 +32,8 @@ class CategoriesList extends Component {
       const { data: allCategories } = await getCategories();
       // const { data: categories } = await getCategoriesWithNoParent();
       let categories = allCategories.filter(c => c.name !== "Root");
-      this.setState({ allCategories: categories });
+      let checkedRootCategories = categories.filter(c => !c.parentCategory);
+      this.setState({ allCategories: categories, checkedRootCategories });
     }
   }
 
@@ -217,23 +220,80 @@ class CategoriesList extends Component {
       toast.error("Something wrong occured. Please try again.");
     }
   };
-
   handleCSVUpload = () => {
     this.setState({ csvUploadComponent: true });
   };
+
   handleHideCsvComponent = () => {
     this.setState({ csvUploadComponent: false });
   };
+
+  handleSearch = query => {
+    this.setState({ searchQuery: query, currentPage: 1 });
+  };
+
+  getPagedData = () => {
+    const { searchQuery, allCategories, checkedRootCategories } = this.state;
+
+    let filtered = allCategories;
+    if (searchQuery) {
+      filtered = allCategories.filter(
+        category =>
+          !category.parentCategory &&
+          category.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    } else {
+      filtered = allCategories.filter(category => !category.parentCategory);
+    }
+
+    return { totalCount: filtered.length, data: filtered };
+  };
+
+  toggleChecked = e => {
+    alert(e.target.checked);
+    let { checkedRootCategories, allCategories } = this.state;
+    let index = checkedRootCategories.findIndex(c => c._id === e.target.name);
+    if (index >= 0) checkedRootCategories.splice(index, 1);
+    else {
+      let root = allCategories.find(c => c._i === e.target.name);
+      if (root) checkedRootCategories.push(root);
+    }
+    this.setState({ checkedRootCategories });
+  };
   render() {
     const { allCategories } = this.state;
-    const rootCategories = allCategories.filter(c => !c.parentCategory);
-    const length = rootCategories.length;
+    // const rootCategories = allCategories.filter(c => !c.parentCategory);
+    // const length = rootCategories.length;
+    // const { searchQuery } = this.state;
 
+    const { totalCount: length, data: rootCategories } = this.getPagedData();
     return (
       <div>
         <div className="p-3 border rounded-sm d-flex justify-content-center mb-1 gradiantHeading">
           <h3 style={{ color: "white" }}>Categories</h3>
         </div>
+        {/* {allCategories.length > 0 && (
+          <div className="border border-primary p-3 ">
+            {allCategories.map(category => {
+              if (category.parentCategory) return null;
+              return (
+                <div className="form-check">
+                  <input
+                    className=" form-check-input"
+                    type="checkbox"
+                    onClick={e => this.toggleChecked(e)}
+                    name={category._id}
+                    key={uuid()}
+                  />
+                  <label className="form-check-label" htmlFor="">
+                    {category.name}
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+        )} */}
+
         {!this.state.csvUploadComponent ? (
           <>
             <div className="container card p-1  ">
@@ -254,6 +314,7 @@ class CategoriesList extends Component {
                       Upload Csv
                     </button>
                   </div>
+
                   {this.state.orderChanged && (
                     <button
                       className="btn btn-primary btn-round mb-3"
@@ -263,6 +324,12 @@ class CategoriesList extends Component {
                     </button>
                   )}
                 </div>
+
+                <SearchBox
+                  value={this.state.searchQuery}
+                  onChange={this.handleSearch}
+                />
+
                 <Accordion defaultActiveKey="">
                   <div
                     className="p-3 shadow-lg"
@@ -270,7 +337,7 @@ class CategoriesList extends Component {
                     onDrop={this.onDrop}
                     id={null}
                   >
-                    {length &&
+                    {length > 0 &&
                       rootCategories.map(category =>
                         category.hasChild ? (
                           <div key={category._id + "parent"}>

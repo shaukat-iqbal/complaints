@@ -8,6 +8,7 @@ import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import PlainCategoryForm from "./PlainCategoryForm";
 import { toast } from "react-toastify";
 import { insertMultipleCategories } from "../services/categoryService";
+import SearchBox from "../components/common/searchBox";
 class TemporaryCategoriesList extends Component {
   state = {
     allCategories: [],
@@ -34,7 +35,26 @@ class TemporaryCategoriesList extends Component {
     //   this.setState({ allCategories: categories });
     // }
   }
+  handleSearch = query => {
+    this.setState({ searchQuery: query, currentPage: 1 });
+  };
 
+  getPagedData = () => {
+    const { searchQuery, allCategories } = this.state;
+
+    let filtered = allCategories;
+    if (searchQuery) {
+      filtered = allCategories.filter(
+        category =>
+          !category.parentCategory &&
+          category.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+    } else {
+      filtered = allCategories.filter(category => !category.parentCategory);
+    }
+
+    return { totalCount: filtered.length, data: filtered };
+  };
   onDragStart = (ev, categoryId) => {
     console.log("Category being dragged", categoryId);
     ev.dataTransfer.setData("categoryId", categoryId);
@@ -248,8 +268,9 @@ class TemporaryCategoriesList extends Component {
 
   render() {
     const { allCategories } = this.state;
-    const rootCategories = allCategories.filter(c => !c.parentCategory);
-    const length = rootCategories.length;
+    // const rootCategories = allCategories.filter(c => !c.parentCategory);
+    // const length = rootCategories.length;
+    const { totalCount: length, data: rootCategories } = this.getPagedData();
 
     return (
       <div className="container card p-1">
@@ -287,6 +308,12 @@ class TemporaryCategoriesList extends Component {
               </div>
             )}
           </div>
+          {length > 0 && (
+            <SearchBox
+              value={this.state.searchQuery}
+              onChange={this.handleSearch}
+            />
+          )}
           {this.state.allCategories.length > 0 ? (
             <Accordion defaultActiveKey="">
               <div

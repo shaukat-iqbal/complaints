@@ -20,7 +20,8 @@ class Users extends Component {
     pageSize: 4,
     searchQuery: "",
     sortColumn: { path: "name", order: "asc" },
-    isLoading: true
+    isLoading: true,
+    searchCriteria: "Name"
   };
 
   async componentDidMount() {
@@ -85,14 +86,32 @@ class Users extends Component {
       currentPage,
       sortColumn,
       searchQuery,
+      searchCriteria,
       users: allAssignees
     } = this.state;
 
     let filtered = allAssignees;
-    if (searchQuery)
-      filtered = allAssignees.filter(assignee =>
-        assignee.name.toLowerCase().startsWith(searchQuery.toLowerCase())
-      );
+    if (searchQuery) {
+      if (searchCriteria === "Name") {
+        filtered = allAssignees.filter(assignee =>
+          assignee.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+        );
+      } else {
+        if (searchQuery === "null") {
+          filtered = allAssignees.filter(
+            assignee => !assignee.responsibilities.length
+          );
+        } else {
+          filtered = allAssignees.filter(assignee => {
+            if (!assignee.responsibilities.length) return null;
+            let a = assignee.responsibilities.find(r =>
+              r.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+            );
+            return a;
+          });
+        }
+      }
+    }
 
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
@@ -101,6 +120,10 @@ class Users extends Component {
     return { totalCount: filtered.length, data: users };
   };
 
+  handleSearchCriteria = e => {
+    let searchCriteria = e.target.value;
+    this.setState({ searchCriteria });
+  };
   render() {
     const { length: count } = this.state.users;
     const { pageSize, currentPage, searchQuery } = this.state;
@@ -124,8 +147,49 @@ class Users extends Component {
               <div className="d-flex flex-wrap flex-column mx-5 ">
                 <div className="align-self-end mr-4 ">
                   <p>Showing {totalCount} Users.</p>
-                  <SearchBox value={searchQuery} onChange={this.handleSearch} />
+                  <div className="input-group">
+                    <SearchBox
+                      value={searchQuery}
+                      onChange={this.handleSearch}
+                    />
+                    {/* <input
+                      type="text"
+                      className="form-control"
+                      aria-label="Text input with dropdown button"
+                      onChange={this.handleSearch}
+                      value={searchQuery}
+                    ></input> */}
+                    <div className="input-group-append">
+                      <button
+                        className="btn btn-outline-secondary dropdown-toggle my-3"
+                        style={{ width: "100px" }}
+                        type="button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                      >
+                        {this.state.searchCriteria}
+                      </button>
+                      <div className="dropdown-menu">
+                        <option
+                          className="dropdown-item"
+                          value="Name"
+                          onClick={e => this.handleSearchCriteria(e)}
+                        >
+                          Name
+                        </option>
+                        <option
+                          className="dropdown-item"
+                          value="Category"
+                          onClick={e => this.handleSearchCriteria(e)}
+                        >
+                          Category
+                        </option>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
                 {totalCount > 0 ? (
                   <div
                     style={{ minHeight: "500px" }}

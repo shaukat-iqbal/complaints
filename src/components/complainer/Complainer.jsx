@@ -60,7 +60,7 @@ class Complainer extends Component {
 
   // getting all complaints
   getAllComplaints = async () => {
-    this.setState({ isLoading: true });
+    // this.setState({ isLoading: true });
     const { data: complaints } = await getComplaints();
     const { data: allcategories } = await getCategories();
 
@@ -73,9 +73,17 @@ class Complainer extends Component {
     });
     const categories = [{ _id: "", name: "All Categories" }, ...temp];
 
-    this.setState({ complaints, categories });
-    this.setState({ isLoading: false });
+    this.setState({ complaints, categories, isLoading: false });
+    const uniqueAssignees = this.getUniqueAssignees(complaints);
+    this.setState(prevState => {
+      return {
+        assignees: uniqueAssignees
+      };
+    });
+  };
 
+  getUniqueAssignees = complaints => {
+    if (!complaints.length) return [];
     let arr = [];
 
     for (let i = 0; i < complaints.length; i++) {
@@ -87,12 +95,7 @@ class Complainer extends Component {
     const uniqueAssignees = _.uniqBy(arr, function(o) {
       return o._id;
     });
-
-    this.setState(prevState => {
-      return {
-        assignees: uniqueAssignees
-      };
-    });
+    return uniqueAssignees;
   };
 
   // // handle detail
@@ -136,6 +139,16 @@ class Complainer extends Component {
       currentPage: 1
     });
   };
+
+  closeComplaintForm = complaint => {
+    if (complaint) {
+      let { complaints } = this.state;
+      complaints.unshift(complaint);
+      this.setState({ complaints });
+    }
+    this.toggleComplaintForm();
+  };
+
   toggleComplaintForm = () => {
     let isFormEnabled = this.state.isFormEnabled;
     let now = !isFormEnabled;
@@ -217,6 +230,7 @@ class Complainer extends Component {
           )}
           <ComplaintForm
             isOpen={this.state.isFormEnabled}
+            onSuccess={this.closeComplaintForm}
             onClose={this.toggleComplaintForm}
           />
           {count !== 0 && (

@@ -1,25 +1,24 @@
 import React from "react";
 import Joi from "joi-browser";
-import { DialogActions } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Form from "../../common/form";
+import { DialogActions } from "@material-ui/core";
 import { toast } from "react-toastify";
 import { compressImage } from "../../../services/imageService";
-import Form from "../../common/form";
 import {
   getCategories,
   getSentimentCategory
 } from "../../../services/categoryService";
 import { saveComplaint } from "../../../services/complaintService";
 import Modal from "../../common/Modal/Modal";
-import Spinner from "../../common/Spinner/Spinner";
 import Categories from "../../common/categories";
 import { getAllowedAttachments } from "../../../services/attachmentsService";
-import "./complaintForm.css";
 import { MyLocation } from "@material-ui/icons";
 import { getConfigToken } from "../../../services/configurationService";
 import Loading from "../../common/loading";
+import "./complaintForm.css";
 class ComplaintForm extends Form {
   state = {
     data: {
@@ -98,8 +97,7 @@ class ComplaintForm extends Form {
       });
     }
 
-    this.setState({ isLoading: false });
-    this.setState({ isDialogOpen: true });
+    this.setState({ isLoading: false, isDialogOpen: true });
   };
 
   cancelDialog = () => {
@@ -153,13 +151,16 @@ class ComplaintForm extends Form {
     if (this.state.data.severity)
       data.append("severity", this.state.data.severity);
     try {
-      await saveComplaint(data);
+      let { data: complaint } = await saveComplaint(data);
       toast.success("Complaint is successfully registered.");
+      this.setState({ isLoading: false });
+
+      this.props.onSuccess(complaint);
       // this.props.history.replace("/complainer");
     } catch (error) {
       toast.error("Could not lodge a complaint");
+      this.setState({ isLoading: false });
     }
-    this.setState({ isLoading: false });
   };
 
   // for file
