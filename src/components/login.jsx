@@ -159,7 +159,9 @@ class Login extends Form {
                     </button>
                   </div>
                   <br />
-                  <Link to="/recoverpassword">Forgot Password?</Link>
+                  <Link to={`/recoverpassword/${this.state.data.companyId}`}>
+                    Forgot Password?
+                  </Link>
                   <br />
                   {configToken && configToken.isAccountCreation && (
                     <Link to="/register">

@@ -3,13 +3,19 @@ import { getUserByEmail, recoverPassword } from "../../services/userService";
 import Joi from "joi-browser";
 import FindUser from "../admin/usersManagement/findUser";
 import RecoverPassword from "../admin/usersManagement/recoverPassword";
+import Loading from "./loading";
 
 class PasswordManagement extends Component {
   state = {
-    data: { email: "", role: "admin" },
+    data: { email: "", role: "admin", companyId: "" },
     error: "",
     user: null
   };
+  constructor(props) {
+    super(props);
+    if (props.match.params.companyId)
+      this.state.data.companyId = props.match.params.companyId;
+  }
 
   handleChange = ({ currentTarget }) => {
     const data = { ...this.state.data };
@@ -23,9 +29,14 @@ class PasswordManagement extends Component {
     email: Joi.string()
       .email()
       .required(),
-
+    companyId: Joi.string().required(),
     role: Joi.string().required()
   };
+  componentDidMount() {
+    if (!this.props.match.params.companyId) window.location = "/";
+
+    // this.state.data.companyId = :props.match.params.companyId;
+  }
 
   handleCancel = () => {
     this.props.history.push("/login");
@@ -40,18 +51,20 @@ class PasswordManagement extends Component {
   };
 
   handleSearch = async () => {
+    this.setState({ isLoading: true });
     const errorMessage = this.validate();
     if (errorMessage) {
-      this.setState({ error: errorMessage });
+      this.setState({ error: errorMessage, isLoading: false });
       return;
     }
-    const { email, role } = this.state.data;
+    const { email, role, companyId } = this.state.data;
     try {
-      const { data: user } = await getUserByEmail(email, role);
+      const { data: user } = await getUserByEmail({ email, role, companyId });
       console.log(user);
-      this.setState({ user });
+      this.setState({ user, isLoading: false });
     } catch (error) {
       if (error.response && error.response.status === 404) {
+        this.setState({ isLoading: false });
         alert("No user with given Email");
       }
     }
@@ -61,14 +74,20 @@ class PasswordManagement extends Component {
     this.setState({ user: null });
   };
   handleSend = async () => {
+    this.setState({ isLoading: true });
+
     try {
       const { data: message } = await recoverPassword({
         email: this.state.user.email,
-        role: this.state.data.role
+        role: this.state.data.role,
+        companyId: this.state.data.companyId
       });
+      this.setState({ isLoading: false });
+
       alert(message);
       this.props.history.push("/login");
     } catch (error) {
+      this.setState({ isLoading: false });
       if (error.response && error.response.status === 404) alert("Not found ");
     }
   };
@@ -79,6 +98,7 @@ class PasswordManagement extends Component {
         className="container-fluid min-vh-100"
         style={{ backgroundColor: "#E9EBEE" }}
       >
+        {this.state.isLoading && <Loading />}
         {!user && (
           <FindUser
             error={error}

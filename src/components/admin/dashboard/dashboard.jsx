@@ -14,16 +14,14 @@ import GraphBanner from "../../common/GraphsBanner";
 import { countComplainers } from "../../../services/complainerService";
 import ComplaintDetail from "../../common/ComplaintDetail";
 import Loading from "../../common/loading";
+import DashboardCards from "../DashboardCards";
+import Complaints from "../../common/Complaints";
 
 class Dashboard extends Component {
   state = {
     complaints: [],
     categories: [],
-    pageSize: 9,
-    currentPage: 1,
-    sortColumn: { path: "title", order: "asc" },
-    searchQuery: "",
-    selectedCategory: null,
+    selectedComplaints: [],
     isLoading: false
   };
   async componentDidUpdate(prevProps, prevState) {
@@ -54,13 +52,7 @@ class Dashboard extends Component {
     this.getComplaints();
     this.checkingSocketConnection();
     let { data: months } = await countComplainers();
-
     this.setState({ countUsers: months });
-    // const { data: allcategories } = await getCategories();
-    // const categories = [{ _id: "", name: "All Categories" }, ...allcategories];
-
-    // this.setState({ categories });
-    // console.log("i am in CDM", complaints);
   }
 
   checkingSocketConnection = () => {
@@ -126,67 +118,76 @@ class Dashboard extends Component {
   getComplaints = async () => {
     this.setState({ isLoading: true });
     const { data: complaints } = await getAdminComplaints();
-    const { data: allcategories } = await getCategories();
-
     let temp = [];
     complaints.forEach(complaint => {
-      let cat = allcategories.find(c => c._id === complaint.category._id);
-      let available = temp.find(ca => ca._id === cat._id);
-      if (!available) temp.push(cat);
+      let available = temp.find(ca => ca._id === complaint.category._id);
+      if (!available) temp.push(complaint.category);
     });
     const categories = [{ _id: "", name: "All Categories" }, ...temp];
-    this.setState({ isLoading: false, complaints, categories });
+    this.countFeedbacks(complaints);
+    this.setState({
+      isLoading: false,
+      complaints,
+      selectedComplaints: complaints,
+      categories
+    });
     // this.aggregateMonthWiseComplaints(complaints);
   };
 
-  // handle detail
-  handleDetail = complaint => {
-    // console.log(complaint);
-    this.setState({ selectedComplaint: complaint, isDetailFormEnabled: true });
-  };
-  handleClose = () => {
-    this.setState({ selectedComplaint: null, isDetailFormEnabled: false });
-  };
-
-  // handle pagination
-  handlePageChange = page => {
-    this.setState({ currentPage: page });
+  calculateDays = stamp => {
+    var date = new Date(stamp);
+    let d = new Date();
+    let days =
+      Math.ceil(Math.abs(d.getTime() - date.getTime()) / (1000 * 3600 * 24)) -
+      1;
+    return days;
   };
 
-  // handle Category Select
-  handleCategorySelect = category => {
-    this.setState({
-      selectedCategory: category,
-      searchQuery: "",
-      currentPage: 1
+  handleSelectedComplaints = index => {
+    console.log(index);
+    let selectedComplaints = [];
+    switch (index) {
+      case 1:
+        selectedComplaints = this.state.positiveFeedback;
+        break;
+      case 2:
+        selectedComplaints = this.state.negativeFeedback;
+        break;
+      case 3:
+        selectedComplaints = this.state.delayed;
+        break;
+      case 4:
+        selectedComplaints = this.state.complaints;
+        break;
+
+      default:
+        break;
+    }
+    this.setState({ selectedComplaints });
+  };
+
+  countFeedbacks = complaints => {
+    let positiveFeedback = [],
+      delayed = [],
+      negativeFeedback = [];
+    complaints.forEach(complaint => {
+      let days = this.calculateDays(complaint.timeStamp) + 1;
+      if (days > 5) {
+        delayed.push(complaint);
+      }
+      if (complaint.feedbackTags) {
+        if (complaint.feedbackTags === "satisfied")
+          positiveFeedback.push(complaint);
+        else negativeFeedback.push(complaint);
+      }
     });
-  };
-
-  // handle Sort
-  handleSort = sortColumn => {
-    this.setState({ sortColumn });
-  };
-
-  // handle Search
-  handleSearch = query => {
-    this.setState({
-      searchQuery: query,
-      selectedCategory: null,
-      currentPage: 1
-    });
+    this.setState({ positiveFeedback, negativeFeedback, delayed });
   };
 
   // render
   render() {
     // get paged data
-    const {
-      complaints: allComplaints,
-      pageSize,
-      sortColumn,
-      currentPage,
-      selectedCategory,
-      searchQuery
-    } = this.state;
+
     const { length: count } = this.state.complaints;
 
     if (count === 0) {
@@ -202,22 +203,6 @@ class Dashboard extends Component {
       );
     }
 
-    let filtered = allComplaints;
-    if (searchQuery) {
-      filtered = allComplaints.filter(c =>
-        c.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    } else if (selectedCategory && selectedCategory._id) {
-      filtered = allComplaints.filter(
-        c => c.category._id === selectedCategory._id
-      );
-    }
-
-    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
-
-    const complaints = paginate(sorted, currentPage, pageSize);
-
-    // get paged data end
     return (
       <React.Fragment>
         {this.state.isLoading && (
@@ -228,50 +213,30 @@ class Dashboard extends Component {
 
         {/* <Showcase resolved={resolved} inprogress={inprogress} closed={closed} /> */}
         <div className="container">
-          {this.state.selectedComplaint && (
-            <ComplaintDetail
-              isOpen={this.state.isDetailFormEnabled}
-              onClose={this.handleClose}
-              complaint={this.state.selectedComplaint}
-            />
-          )}
           {this.state.complaints.length > 0 && (
             <GraphBanner
               complaints={this.state.complaints}
               usersCount={this.state.countUsers}
             />
           )}
-          {count !== 0 && (
-            <>
-              <div className="row">
-                <div className="col-md-2">
-                  <ListGroup
-                    items={this.state.categories}
-                    selectedItem={this.state.selectedCategory}
-                    onItemSelect={this.handleCategorySelect}
-                  />
-                </div>
-                <div className="col-md-10">
-                  <p>Showing {filtered.length} complaints</p>
 
-                  <SearchBox value={searchQuery} onChange={this.handleSearch} />
-
-                  <AdminTable
-                    complaints={complaints}
-                    sortColumn={sortColumn}
-                    onSort={this.handleSort}
-                    onDetail={this.handleDetail}
-                  />
-                  <Pagination
-                    itemsCount={filtered.length}
-                    pageSize={pageSize}
-                    currentPage={currentPage}
-                    onPageChange={this.handlePageChange}
-                  />
-                </div>
-              </div>
-            </>
+          {this.state.complaints.length > 0 && (
+            <div className="mb-3">
+              <DashboardCards
+                positive={this.state.positiveFeedback.length}
+                negative={this.state.negativeFeedback.length}
+                delayed={this.state.delayed.length}
+                total={this.state.complaints.length}
+                onClick={this.handleSelectedComplaints}
+              />
+            </div>
           )}
+          {
+            <Complaints
+              complaints={this.state.selectedComplaints}
+              categories={this.state.categories}
+            />
+          }
         </div>
       </React.Fragment>
     );

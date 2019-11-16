@@ -82,8 +82,8 @@ export function getUser(userId, role) {
   return http.get(`${apiUrl}/${role}s/${userId}`);
 }
 
-export function getUserByEmail(email, role) {
-  return http.get(`${apiUrl}/${role}s/email/${email}`);
+export function getUserByEmail(body) {
+  return http.post(`${apiUrl}/admins/user/search`, body);
 }
 
 export function recoverPassword(body) {

@@ -27,6 +27,7 @@ class App extends Component {
     return (
       <div className="App ">
         <ToastContainer />
+
         <Switch>
           <Route path="/categories" component={CategoriesList} />
           <Route
@@ -40,14 +41,6 @@ class App extends Component {
             )}
           />
 
-          <Route
-            path="/complainer/new-complaint"
-            render={props => (
-              <>
-                <ComplaintForm {...props} />
-              </>
-            )}
-          />
           <Route
             path="/profile/:id/:role"
             render={props => (
@@ -68,7 +61,10 @@ class App extends Component {
               </div>
             )}
           />
-          <Route path="/recoverpassword" component={PasswordManagement} />
+          <Route
+            path="/recoverpassword/:companyId"
+            component={PasswordManagement}
+          />
           <Route path="/resetpassword" component={ResetPassword} />
 
           <Route path="/login" component={Login} />

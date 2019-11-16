@@ -19,6 +19,9 @@ import { getCurrentUser } from "../../../../services/authService";
 import UserLogo from "../../../common/logo";
 import CategoriesList from "../../../../categories/categoriesList";
 import Settings from "../../Configuration/Settings";
+import DashboardCards from "../../DashboardCards";
+import Dashboard from "../../dashboard/dashboard";
+import { Toolbar } from "@material-ui/core";
 const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
@@ -77,7 +80,7 @@ function UserManagement(props) {
             height: "150px"
           }}
         >
-          <UserLogo width="70px" height="70px" />
+          <UserLogo management={true} />
           <p className="text-white m-0 mt-1">
             {getCurrentUser().name.split(" ")[0]}
           </p>
@@ -123,7 +126,7 @@ function UserManagement(props) {
         {[
           {
             label: "Home",
-            path: "/admin/",
+            path: "/admin/users",
             icon: <i className="fa fa-home mr-4 fa-2x"></i>
           },
           {
@@ -163,7 +166,7 @@ function UserManagement(props) {
     <div className={classes.root}>
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
-        <div>
+        <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -173,7 +176,10 @@ function UserManagement(props) {
           >
             <MenuIcon />
           </IconButton>
-        </div>
+          <div className={"d-flex text-center  w-100"}>
+            <button>Hello</button>
+          </div>
+        </Toolbar>
       </AppBar>
       <nav className={classes.drawer} aria-label="mailbox folders">
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
@@ -205,8 +211,10 @@ function UserManagement(props) {
           </Drawer>
         </Hidden>
       </nav>
-      <main className={`${classes.content} container-fluid pt-0`}>
+      <main className={`${classes.content} container-fluid `}>
+        <div className={classes.toolbar} />
         <div>
+          <Route path="/admin/users/" exact component={Dashboard} />
           <Route
             path="/admin/users/register"
             exact

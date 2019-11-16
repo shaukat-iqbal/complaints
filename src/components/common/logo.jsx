@@ -9,18 +9,22 @@ const useStyles = makeStyles({
     height: 50
   },
   bigAvatar: {
+    width: 50,
+    height: 50
+  },
+  management: {
     width: 60,
     height: 60
   }
 });
-const UserLogo = ({ width = "50px", height = "50px" }) => {
+const UserLogo = props => {
   const classes = useStyles();
   if (localStorage.getItem("profilePicture")) {
     return (
       <Avatar
         alt="logo"
         src={getProfilePicture()}
-        className={classes.bigAvatar}
+        className={props.management ? classes.management : classes.bigAvatar}
       />
 
       // <img

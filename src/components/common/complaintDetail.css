@@ -1,5 +1,5 @@
 .complaint-header {
-  height: 35%;
+  height: 40%;
   position: sticky;
   left: 0;
   top: 0;
@@ -25,13 +25,13 @@
 
 .complaint-body {
   background-color: aliceblue;
-  height: 70%;
+  height: 65%;
   width: 100%;
   position: absolute;
   border-radius: 40px;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
-  top: 25%;
+  top: 33%;
   left: 0;
   padding-top: 20px;
   /* padding: 15px 15%; */
@@ -53,7 +53,7 @@
 .complaintControls {
   position: absolute;
   right: 35px;
-  top: 52%;
+  top: 65%;
   /* min-width: 80px; */
   padding: 5px;
   background-color: rgba(238, 238, 238, 0.103);

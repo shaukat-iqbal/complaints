@@ -16,6 +16,7 @@ import Loading from "./loading";
 import { getCurrentUser } from "../../services/authService";
 import "./complaintDetail.css";
 import { capitalizeFirstLetter } from "../../services/helper";
+import { getConfigToken } from "../../services/configurationService";
 
 export default function ComplaintDetail(props) {
   const [openAssigneeDialog, setopenAssigneeDialog] = useState(true);
@@ -27,6 +28,7 @@ export default function ComplaintDetail(props) {
   const [edit, setEdit] = useState(false);
   const [remarks, setRemarks] = useState("");
   const statusValue = useRef(null);
+  let isMessaging = false;
   const [displayFeedback, setDisplayFeedback] = useState(false);
   const [feedback, setFeedback] = useState({
     feedbackRemarks: "",
@@ -37,7 +39,8 @@ export default function ComplaintDetail(props) {
   useEffect(() => {
     setComplaint(props.complaint);
     let currentUser = getCurrentUser();
-    // let configToken=
+    let configToken = getConfigToken();
+    if (configToken) isMessaging = configToken.isMessaging;
     if (!currentUser) window.location = "/login";
     setUser(currentUser);
   }, []);
@@ -221,13 +224,14 @@ export default function ComplaintDetail(props) {
                     )}
 
                   {/* The person who is responsible or complainer can start  or see chat */}
-                  {(user._id === complaint.complainer._id ||
-                    user._id === complaint.assignedTo._id) && (
-                    <i
-                      className="fa fa-envelope controlIcon"
-                      onClick={() => handleMessaging(complaint)}
-                    ></i>
-                  )}
+                  {isMessaging &&
+                    (user._id === complaint.complainer._id ||
+                      user._id === complaint.assignedTo._id) && (
+                      <i
+                        className="fa fa-envelope controlIcon"
+                        onClick={() => handleMessaging(complaint)}
+                      ></i>
+                    )}
 
                   {/* Assign Task */}
                   {!complaint.assignedTo && user.role === "admin" && (
