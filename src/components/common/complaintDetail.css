@@ -74,6 +74,32 @@
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
 
+.Low-severity {
+  background: #837213d2;
+}
+.Medium-severity {
+  background: #b4c00fd2;
+}
+.High-severity {
+  background: #a50a0ade;
+}
+.severity {
+  margin-left: 10px;
+  border-radius: 5em;
+  color: #fff;
+
+  border: 2;
+  margin-top: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 3px;
+  padding-top: 3px;
+  font-family: "Ubuntu", sans-serif;
+  /* margin-left: 35%; */
+  font-size: 13px;
+  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+}
+
 .complaintCategory {
   margin-left: 10px;
   border-radius: 5em;

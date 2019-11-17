@@ -289,6 +289,11 @@ export default function ComplaintDetail(props) {
                     Category: {complaint.category.name}
                   </span>
                 </div>
+                <div className="d-flex justify-content-between">
+                  <span className={`severity ${complaint.severity}-severity`}>
+                    Severity: {complaint.severity}
+                  </span>
+                </div>
               </div>
               <div className=" complaint-body d-flex justify-content-center ">
                 <table>

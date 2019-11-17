@@ -59,7 +59,8 @@ class ComplaintForm extends Form {
       this.schema.severity = Joi.string()
         .min(1)
         .label("Severity");
-    }
+      }
+      this.state.data.severity="1";
   }
   // componentDidMount
   async componentDidMount() {
