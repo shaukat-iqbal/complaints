@@ -7,7 +7,8 @@ import {
   taskAssignment,
   changeStatus,
   giveFeedback,
-  reOpen
+  reOpen,
+  getComplaint
 } from "../../services/complaintService";
 import { getAllAssignees } from "../../services/assigneeService.js";
 import { toast } from "react-toastify";
@@ -40,8 +41,16 @@ export default function ComplaintDetail(props) {
   });
   // const [categories, setCategories] = useState([]);
 
-  useEffect(() => {
-    setComplaint(props.complaint);
+  useEffect(async () => {
+    if (!props.complaint) {
+      let { data: complaint } = await getComplaint(
+        props.match.params.companyId
+      );
+
+      setComplaint(complaint);
+    } else {
+      setComplaint(props.complaint);
+    }
     let currentUser = getCurrentUser();
     let configToken = getConfigToken();
     if (configToken) {
@@ -229,7 +238,9 @@ export default function ComplaintDetail(props) {
                 <div className="days">{calculateDays()}</div>
                 <div className="complaintControls rounded-pill d-flex  justify-content-end">
                   {/* //Buttons Section  */}
-                  {user._id === complaint.complainer._id &&
+                  {complaint &&
+                    user &&
+                    user._id === complaint.complainer._id &&
                     complaint.status !== "in-progress" &&
                     !complaint.feedbackRemarks && (
                       <i
@@ -247,12 +258,14 @@ export default function ComplaintDetail(props) {
                         onClick={() => handleMessaging(complaint)}
                       ></i>
                     )}
-                  {isReopen && complaint.status !== "in-progress" && (
-                    <i
-                      className="fa fa-refresh controlIcon"
-                      onClick={() => handleReopen(complaint)}
-                    ></i>
-                  )}
+                  {isReopen &&
+                    complaint.status !== "in-progress" &&
+                    user.role === "complainer" && (
+                      <i
+                        className="fa fa-refresh controlIcon"
+                        onClick={() => handleReopen(complaint)}
+                      ></i>
+                    )}
 
                   {/* Assign Task */}
                   {!complaint.assignedTo && user.role === "admin" && (

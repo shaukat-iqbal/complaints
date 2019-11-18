@@ -112,9 +112,9 @@ class Navbar extends React.Component {
                 <UserLogo />
                 <NavLink
                   className="nav-item nav-link text-dark "
-                  to={`/profile/${getCurrentUser()._id}/assignees`}
+                  to={`/assignee/profile/${user._id}/${user.role}s`}
                 >
-                  {getCurrentUser() && getCurrentUser().name.split(" ", 1)}
+                  {user && user.name.split(" ", 1)}
                 </NavLink>
                 <a className="nav-item dropdown">
                   <Link
@@ -134,9 +134,7 @@ class Navbar extends React.Component {
                   >
                     <NavLink
                       className="dropdown-item "
-                      to={`/profile/${auth.getCurrentUser()._id}/${
-                        auth.getCurrentUser().role
-                      }s`}
+                      to={`/assignee/profile/${user._id}/${user.role}s`}
                     >
                       Profile
                     </NavLink>
@@ -168,7 +166,7 @@ class Navbar extends React.Component {
                             onClick={() => {
                               console.log(notification.complaintId);
                               return this.props.history.replace(
-                                `/complaintdetail/${notification.complaintId}`
+                                `/${user.role}/complaintdetail/${notification.complaintId}`
                               );
                             }}
                           >
