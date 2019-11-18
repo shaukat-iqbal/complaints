@@ -52,10 +52,13 @@ class Complainer extends Component {
     const socket = openSocket("http://localhost:5000");
     const user = auth.getCurrentUser();
     socket.on("complaints", data => {
+
       if (
-        data.action === "changed status" &&
+        data.action === "status changed" &&
         user.companyId == data.notification.companyId
       ) {
+
+      
         toast.info(
           `Complaints: "${data.complaint}'s" status is changed to "${data.status}"`
         );

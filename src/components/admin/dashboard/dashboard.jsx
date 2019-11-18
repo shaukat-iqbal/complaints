@@ -16,6 +16,7 @@ import ComplaintDetail from "../../common/ComplaintDetail";
 import Loading from "../../common/loading";
 import DashboardCards from "../DashboardCards";
 import Complaints from "../../common/Complaints";
+import { getConfigToken } from "../../../services/configurationService";
 
 class Dashboard extends Component {
   state = {
@@ -90,12 +91,11 @@ class Dashboard extends Component {
 
   // create new complaint that is created now
   createNewComplaint = complaint => {
-    this.setState(prevState => {
-      const updatedComplaints = [...prevState.complaints];
-      updatedComplaints.unshift(complaint);
-      return { complaints: updatedComplaints };
-    });
-    this.setState({ isLoading: false });
+    const updatedComplaints = [...this.state.complaints];
+    updatedComplaints.unshift(complaint);
+    this.countFeedbacks(updatedComplaints);
+
+    this.setState({ isLoading: false, complaints: updatedComplaints });
   };
 
   // handling after dropping complaint from assignee
@@ -167,12 +167,15 @@ class Dashboard extends Component {
   };
 
   countFeedbacks = complaints => {
+    let config = getConfigToken();
+    let delayedDays = 5;
+    if (config.delayedDays) delayedDays = +config.delayedDays;
     let positiveFeedback = [],
       delayed = [],
       negativeFeedback = [];
     complaints.forEach(complaint => {
       let days = this.calculateDays(complaint.timeStamp) + 1;
-      if (days > 5) {
+      if (days > delayedDays) {
         delayed.push(complaint);
       }
       if (complaint.feedbackTags) {

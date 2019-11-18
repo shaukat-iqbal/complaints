@@ -23,6 +23,15 @@
   background-color: rgba(238, 238, 238, 0.103);
 }
 
+.remarks {
+  position: relative;
+  background-color: burlywood;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  font-size: 12px;
+}
+
 .complaint-body {
   background-color: aliceblue;
   height: 65%;

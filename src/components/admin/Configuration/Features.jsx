@@ -26,7 +26,9 @@ class Features extends Component {
       this.state.updatedConfigObj = {
         isAccountCreation: false,
         isMessaging: false,
-        isSeverity: false
+        isSeverity: false,
+        isReopen: false,
+        delayedDays: 1
       };
     }
     if (this.props.companyId)
@@ -61,7 +63,7 @@ class Features extends Component {
       localStorage.setItem("configuration", JSON.stringify(configuration));
       toast.info("Settings Updated");
       this.setState({ isLoading: false });
-
+      this.setState({ isSaveEnabled: false });
       if (this.props.enableNext) this.props.enableNext();
     } catch (error) {
       console.log(error);
@@ -71,6 +73,12 @@ class Features extends Component {
       // toast.warn("An Error Occurred");
       this.setState({ isLoading: false });
     }
+  };
+
+  handleChange = ({ currentTarget: input }) => {
+    let { updatedConfigObj } = this.state;
+    updatedConfigObj[input.name] = input.value;
+    this.setState({ updatedConfigObj, isSaveEnabled: true });
   };
   render() {
     return (
@@ -122,7 +130,7 @@ class Features extends Component {
           />
         </div>
         <div
-          className="p-3 "
+          className="p-3 mb-4"
           style={{ border: "1px solid #dadce0", borderRadius: "8px" }}
         >
           <p>
@@ -137,6 +145,46 @@ class Features extends Component {
             }}
             checked={this.state.updatedConfigObj.isSeverity}
           />
+        </div>
+        <div
+          className="p-3 mb-4"
+          style={{ border: "1px solid #dadce0", borderRadius: "8px" }}
+        >
+          <p>
+            This feature will enable complainer to re-open the complaint if you
+            are not satisfied <br></br> and want to open the same complaint.
+          </p>
+          <Switch
+            label="Complaint Re-opening Feature"
+            name="isReopen"
+            onClick={() => {
+              this.handleSwitch("isReopen");
+            }}
+            checked={this.state.updatedConfigObj.isReopen}
+          />
+        </div>
+        <div
+          className="p-3 "
+          style={{ border: "1px solid #dadce0", borderRadius: "8px" }}
+        >
+          <p>
+            This feature will enable system to identify delayed complaints based
+            on given days criteria.
+          </p>
+          <div class="input-group mb-3">
+            <div class=" input-group-append">
+              <input
+                type="number"
+                value={this.state.updatedConfigObj.delayedDays}
+                onChange={this.handleChange}
+                min="1"
+                name="delayedDays"
+              />
+              <span class="input-group-text" id="basic-addon1">
+                Days
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     );
