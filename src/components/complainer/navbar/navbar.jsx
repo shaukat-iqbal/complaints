@@ -9,8 +9,10 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import { deleteConversation } from "../../../services/messageService";
+import { Dropdown } from "react-bootstrap";
 import { toast } from "react-toastify";
 import UserLogo from "../../common/logo";
+import { DropdownButton } from "react-bootstrap";
 import { setProfilePictureToken } from "../../../services/imageService";
 
 const url = "/c/message";
@@ -52,7 +54,7 @@ class Navbar extends React.Component {
   };
 
   render() {
-    const { user, assignees } = this.props;
+    const { user, assignees, notifications } = this.props;
 
     return (
       <>
@@ -146,6 +148,32 @@ class Navbar extends React.Component {
                     </NavLink>
                   </div>
                 </a>
+                <Dropdown direction="left">
+                  <Dropdown.Toggle variant="light" id="dropdown-basic">
+                    <i className="fa fa-bell"></i>
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu direction="left" key="left">
+                    {notifications.length > 0 ? (
+                      <>
+                        {notifications.map(notification => (
+                          <Dropdown.Item
+                            onClick={() => {
+                              console.log(notification.complaintId);
+                              return this.props.history.replace(
+                                `/complaintdetail/${notification.complaintId}`
+                              );
+                            }}
+                          >
+                            {notification.msg}
+                          </Dropdown.Item>
+                        ))}
+                      </>
+                    ) : (
+                      <Dropdown.Item>You have No notifications</Dropdown.Item>
+                    )}
+                  </Dropdown.Menu>
+                </Dropdown>
                 <div className="dropdown">
                   <button
                     className="nav-button mt-2 mr-4 navbar-custom"

@@ -7,7 +7,8 @@ import {
   taskAssignment,
   changeStatus,
   giveFeedback,
-  reOpen
+  reOpen,
+  getComplaint
 } from "../../services/complaintService";
 import { getAllAssignees } from "../../services/assigneeService.js";
 import { toast } from "react-toastify";
@@ -41,7 +42,15 @@ export default function ComplaintDetail(props) {
   // const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    setComplaint(props.complaint);
+    async function fetchComplaint(id) {
+      let { data: complaint } = await getComplaint(id);
+      setComplaint(complaint);
+    }
+    if (!props.complaint) {
+      fetchComplaint(props.match.params.companyId);
+    } else {
+      setComplaint(props.complaint);
+    }
     let currentUser = getCurrentUser();
     let configToken = getConfigToken();
     if (configToken) {
@@ -348,15 +357,6 @@ export default function ComplaintDetail(props) {
                                 {remark.split(">")[0]}
                               </p>
                               <p className="">{remark.split(">")[1]}</p>
-                              <p
-                                style={{
-                                  position: "absolute",
-                                  left: "10%",
-                                  bottom: "0",
-                                  width: "15px",
-                                  backgroundColor: "#eee"
-                                }}
-                              ></p>
                             </div>
                           );
                         })}

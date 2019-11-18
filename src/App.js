@@ -20,6 +20,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import AdminForm from "./components/common/adminForm";
 import CustomizedSteppers from "./components/Startup/stepper";
+import ComplaintDetail from "./components/common/ComplaintDetail";
+import { getCurrentUser } from "./services/authService";
 // const Complainer = lazy(() => import("./components/complainer/Complainer"));
 
 class App extends Component {
@@ -29,6 +31,18 @@ class App extends Component {
         <ToastContainer />
 
         <Switch>
+          <Route
+            path="/complaintdetail/:companyId"
+            render={props => (
+              <ComplaintDetail
+                {...props}
+                isOpen={true}
+                onClose={() => {
+                  window.location = "/" + getCurrentUser().role;
+                }}
+              />
+            )}
+          />
           <Route path="/categories" component={CategoriesList} />
           <Route
             path="/welcome/:id"
