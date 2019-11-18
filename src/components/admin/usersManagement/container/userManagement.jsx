@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Route, Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
@@ -22,6 +22,14 @@ import Settings from "../../Configuration/Settings";
 import DashboardCards from "../../DashboardCards";
 import Dashboard from "../../dashboard/dashboard";
 import { Toolbar } from "@material-ui/core";
+import { getAllNotifications } from "../../../../services/notificationService";
+import { Dropdown } from "react-bootstrap";
+
+import config from "../../../../config.json";
+import openSocket from "socket.io-client";
+import { toast } from "react-toastify";
+const scoket = openSocket(config.apiEndpoint);
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
@@ -64,11 +72,55 @@ const useStyles = makeStyles(theme => ({
 function UserManagement(props) {
   const { container } = props;
   const classes = useStyles();
+  const currentUser = getCurrentUser();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [notifications, setNotifications] = React.useState([]);
 
   function handleDrawerToggle() {
     setMobileOpen(!mobileOpen);
   }
+
+  // get NOtifications
+  const getNotifications = async () => {
+    const { data } = await getAllNotifications();
+    console.log(data);
+    setNotifications(oldNotifications => [...oldNotifications, ...data]);
+  };
+
+  useEffect(() => {
+    getNotifications();
+    scoket.on("complaints", data => {
+      if (
+        data.action === "new complaint" &&
+        currentUser.companyId == data.notification.companyId
+      ) {
+        toast.info(data.notification.msg);
+
+        let allNotifications = [...notifications];
+        // allNotifications.find(not => not.msg !== data.notification.msg);
+        allNotifications.unshift(data.notification);
+        setNotifications(oldNotifications => [
+          ...allNotifications,
+          ...oldNotifications
+        ]);
+      }
+
+      if (
+        data.action === "drop" &&
+        currentUser.companyId == data.notification.companyId
+      ) {
+        toast.info(data.notification.msg);
+
+        let allNotifications = [...notifications];
+        // allNotifications.find(not => not.msg !== data.notification.msg);
+        allNotifications.unshift(data.notification);
+        setNotifications(oldNotifications => [
+          ...allNotifications,
+          ...oldNotifications
+        ]);
+      }
+    });
+  }, []);
 
   const drawer = (
     <div>
@@ -167,6 +219,34 @@ function UserManagement(props) {
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
+          <Dropdown className="ml-auto">
+            <Dropdown.Toggle variant="primary" id="dropdown-basic">
+              <i className="fa fa-bell"></i>
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              {/* <Dropdown.Item>notification</Dropdown.Item> */}
+              {notifications.length > 0 ? (
+                <>
+                  {notifications.map(notification => (
+                    <Dropdown.Item>
+                      <p
+                        style={{
+                          color: "black",
+                          fontSize: "16px",
+                          borderBottom: "1px solid #e4e4e4"
+                        }}
+                      >
+                        {notification.msg}
+                      </p>
+                    </Dropdown.Item>
+                  ))}
+                </>
+              ) : (
+                <Dropdown.Item>You have No notifications</Dropdown.Item>
+              )}
+            </Dropdown.Menu>
+          </Dropdown>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -176,9 +256,6 @@ function UserManagement(props) {
           >
             <MenuIcon />
           </IconButton>
-          <div className={"d-flex text-center  w-100"}>
-            <button>Hello</button>
-          </div>
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer} aria-label="mailbox folders">
@@ -211,7 +288,7 @@ function UserManagement(props) {
           </Drawer>
         </Hidden>
       </nav>
-      <main className={`${classes.content} container-fluid `}>
+      <main className={`${classes.content} container-fluid`}>
         <div className={classes.toolbar} />
         <div>
           <Route path="/admin/users/" exact component={Dashboard} />
