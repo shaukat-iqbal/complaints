@@ -343,34 +343,35 @@ class AssigneeDashboard extends Component {
                       onItemSelect={this.handleCategorySelect}
                     />
                   </div>
-                  {sorted.length > 0 ? (
-                    <div className="col-md-10">
-                      <p>Showing {filtered.length} complaints</p>
+                  <div className="col-md-10">
+                    <p>Showing {filtered.length} complaints</p>
 
-                      <SearchBox
-                        value={searchQuery}
-                        onChange={this.handleSearch}
-                      />
-
-                      <AssigneeTable
-                        complaints={complaints}
-                        sortColumn={sortColumn}
-                        onSort={this.handleSort}
-                        onDetail={this.handleDetail}
-                        onCheckBoxChecked={this.handleCheckBoxChecked}
-                        // defaultChecked={defaultChecked}
-                        checkedComplaint={checkedComplaint}
-                      />
-                      <Pagination
-                        itemsCount={filtered.length}
-                        pageSize={pageSize}
-                        currentPage={currentPage}
-                        onPageChange={this.handlePageChange}
-                      />
-                    </div>
-                  ) : (
-                    <h4>No Complaint</h4>
-                  )}
+                    <SearchBox
+                      value={searchQuery}
+                      onChange={this.handleSearch}
+                    />
+                    {sorted.length > 0 ? (
+                      <>
+                        <AssigneeTable
+                          complaints={complaints}
+                          sortColumn={sortColumn}
+                          onSort={this.handleSort}
+                          onDetail={this.handleDetail}
+                          onCheckBoxChecked={this.handleCheckBoxChecked}
+                          // defaultChecked={defaultChecked}
+                          checkedComplaint={checkedComplaint}
+                        />
+                        <Pagination
+                          itemsCount={filtered.length}
+                          pageSize={pageSize}
+                          currentPage={currentPage}
+                          onPageChange={this.handlePageChange}
+                        />
+                      </>
+                    ) : (
+                      <h4>No Complaint</h4>
+                    )}
+                  </div>
                 </div>
               </>
             )}

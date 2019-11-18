@@ -6,7 +6,11 @@ import DialogContent from "@material-ui/core/DialogContent";
 import {
   taskAssignment,
   changeStatus,
-  giveFeedback
+  giveFeedback,
+
+  reOpen,
+  getComplaint
+
 } from "../../services/complaintService";
 import { getAllAssignees } from "../../services/assigneeService.js";
 import { toast } from "react-toastify";
@@ -17,6 +21,7 @@ import { getCurrentUser } from "../../services/authService";
 import "./complaintDetail.css";
 import { capitalizeFirstLetter } from "../../services/helper";
 import { getConfigToken } from "../../services/configurationService";
+import { relative } from "path";
 
 export default function ComplaintDetail(props) {
   const [openAssigneeDialog, setopenAssigneeDialog] = useState(true);
@@ -27,6 +32,8 @@ export default function ComplaintDetail(props) {
   const [error, setError] = useState("");
   const [edit, setEdit] = useState(false);
   const [remarks, setRemarks] = useState("");
+  const [isReopen, setIsReopen] = useState(false);
+
   const statusValue = useRef(null);
   let isMessaging = false;
   const [displayFeedback, setDisplayFeedback] = useState(false);
@@ -36,11 +43,22 @@ export default function ComplaintDetail(props) {
   });
   // const [categories, setCategories] = useState([]);
 
-  useEffect(() => {
-    setComplaint(props.complaint);
+  useEffect(async () => {
+    if (!props.complaint) {
+      let { data: complaint } = await getComplaint(
+        props.match.params.companyId
+      );
+
+      setComplaint(complaint);
+    } else {
+      setComplaint(props.complaint);
+    }
     let currentUser = getCurrentUser();
     let configToken = getConfigToken();
-    if (configToken) isMessaging = configToken.isMessaging;
+    if (configToken) {
+      isMessaging = configToken.isMessaging;
+      setIsReopen(configToken.isReopen);
+    }
     if (!currentUser) window.location = "/login";
     setUser(currentUser);
   }, []);
@@ -185,6 +203,14 @@ export default function ComplaintDetail(props) {
     setDisplayFeedback(false);
     toast.success("Thankyou for your Feedback");
   };
+  const handleReopen = async complaint => {
+    try {
+      await reOpen(complaint._id);
+      toast.success("Complaint has been Re Opened on your request.");
+    } catch (error) {
+      toast.error("Could not Re Open the request.");
+    }
+  };
 
   return (
     <>
@@ -214,7 +240,9 @@ export default function ComplaintDetail(props) {
                 <div className="days">{calculateDays()}</div>
                 <div className="complaintControls rounded-pill d-flex  justify-content-end">
                   {/* //Buttons Section  */}
-                  {user._id === complaint.complainer._id &&
+                  {complaint &&
+                    user &&
+                    user._id === complaint.complainer._id &&
                     complaint.status !== "in-progress" &&
                     !complaint.feedbackRemarks && (
                       <i
@@ -230,6 +258,15 @@ export default function ComplaintDetail(props) {
                       <i
                         className="fa fa-envelope controlIcon"
                         onClick={() => handleMessaging(complaint)}
+                      ></i>
+                    )}
+
+                  {isReopen &&
+                    complaint.status !== "in-progress" &&
+                    user.role === "complainer" && (
+                      <i
+                        className="fa fa-refresh controlIcon"
+                        onClick={() => handleReopen(complaint)}
                       ></i>
                     )}
 
@@ -315,12 +352,30 @@ export default function ComplaintDetail(props) {
                       </td>{" "}
                     </tr>
 
-                    {complaint.remarks && (
+                    {complaint.remarks.length > 0 && (
                       <tr>
                         <td>
                           <label className="userLabel">Remarks</label>
                         </td>
-                        <p className="paragraph">{complaint.remarks}</p>
+                        {complaint.remarks.map(remark => {
+                          return (
+                            <div className="remarks">
+                              <p className="status d-inline-flex">
+                                {remark.split(">")[0]}
+                              </p>
+                              <p className="">{remark.split(">")[1]}</p>
+                              <p
+                                style={{
+                                  position: "absolute",
+                                  left: "10%",
+                                  bottom: "0",
+                                  width: "15px",
+                                  backgroundColor: "#eee"
+                                }}
+                              ></p>
+                            </div>
+                          );
+                        })}
                       </tr>
                     )}
                     {complaint.feedbackRemarks && (

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { Route, Switch, Redirect } from "react-router-dom";
 import openSocket from "socket.io-client";
 
-import auth from "../../services/authService";
+import auth, { getCurrentUser } from "../../services/authService";
 import AssigneeDashboard from "./dashboard/AssigneeDashboard";
 import NavbarAssignee from "./navbar/navbarAssignee";
 
@@ -15,6 +15,8 @@ import {
 } from "../../services/complaintService";
 import Spinner from "../common/Spinner/Spinner";
 import { getAllNotifications } from "../../services/notificationService";
+import RegisterForm from "../admin/usersManagement/Register";
+import ComplaintDetail from "../common/ComplaintDetail";
 
 class Assignee extends React.Component {
   state = {
@@ -81,9 +83,10 @@ class Assignee extends React.Component {
         reconnection: true
       });
       socket.on("complaints", data => {
+        console.log(data);
         if (
           data.action === "new complaint" &&
-          user.companyId == data.notifications.companyId
+          user.companyId == data.notification.companyId
         ) {
           this.setState({ isLoading: true });
           this.createNewComplaint(data.complaint);
@@ -93,7 +96,7 @@ class Assignee extends React.Component {
           this.setState(prevState => {
             const updatednotifications = [...prevState.notifications];
             updatednotifications.unshift(data.notification);
-            return { complaints: updatednotifications };
+            return { notifications: updatednotifications };
           });
         } else if (
           data.action === "task assigned" &&
@@ -107,7 +110,7 @@ class Assignee extends React.Component {
           this.setState(prevState => {
             const updatednotifications = [...prevState.notifications];
             updatednotifications.unshift(data.notification);
-            return { complaints: updatednotifications };
+            return { notifications: updatednotifications };
           });
         } else if (
           data.action === "feedback" &&
@@ -121,7 +124,7 @@ class Assignee extends React.Component {
           this.setState(prevState => {
             const updatednotifications = [...prevState.notifications];
             updatednotifications.unshift(data.notification);
-            return { complaints: updatednotifications };
+            return { notifications: updatednotifications };
           });
         }
       });
@@ -200,7 +203,27 @@ class Assignee extends React.Component {
                 />
               )}
             />
-
+            <Route
+              path="/assignee/profile/:id/:role"
+              exact
+              render={props => (
+                <div className="d-flex justify-content-center py-2 ">
+                  {<RegisterForm isProfileView={true} {...props} />}
+                </div>
+              )}
+            />
+            <Route
+              path="/assignee/complaintdetail/:companyId"
+              render={props => (
+                <ComplaintDetail
+                  isOpen={true}
+                  onClose={() => {
+                    window.location = `/${getCurrentUser().role}`;
+                  }}
+                  {...props}
+                />
+              )}
+            />
             <Redirect exact from="/assignee" to="/assignee/dashboard" />
           </Switch>
         </div>
