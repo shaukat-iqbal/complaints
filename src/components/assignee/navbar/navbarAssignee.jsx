@@ -12,14 +12,23 @@ import Button from "@material-ui/core/Button";
 import auth, { getCurrentUser } from "../../../services/authService";
 import { deleteConversation } from "../../../services/messageService";
 import { setProfilePictureToken } from "../../../services/imageService";
+import { Dropdown } from "react-bootstrap";
 import UserLogo from "../../common/logo";
+import { getAllNotifications } from "../../../services/notificationService";
 
 const url = "/a/message";
 
 class Navbar extends React.Component {
-  state = { complainers: [], confirmation: false, complainer: "" };
+  state = {
+    complainers: [],
+    confirmation: false,
+    complainer: "",
+    notifications: []
+  };
 
   async componentDidMount() {
+    console.log("navbarassigne navbar");
+
     if (!localStorage.getItem("profilePicture")) {
       await setProfilePictureToken(getCurrentUser()._id, "assignee");
       this.setState({ profilePicture: true });
@@ -44,7 +53,7 @@ class Navbar extends React.Component {
   };
 
   render() {
-    const { user, complainers } = this.props;
+    const { user, complainers, notifications } = this.props;
 
     return (
       <>
@@ -142,6 +151,36 @@ class Navbar extends React.Component {
                     </NavLink>
                   </div>
                 </a>
+                <Dropdown direction="left">
+                  <Dropdown.Toggle
+                    variant="light"
+                    id="dropdown-basic"
+                    direction="left"
+                  >
+                    <i className="fa fa-bell"></i>
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu>
+                    {notifications.length > 0 ? (
+                      <>
+                        {notifications.map(notification => (
+                          <Dropdown.Item
+                            onClick={() => {
+                              console.log(notification.complaintId);
+                              return this.props.history.replace(
+                                `/complaintdetail/${notification.complaintId}`
+                              );
+                            }}
+                          >
+                            {notification.msg}
+                          </Dropdown.Item>
+                        ))}
+                      </>
+                    ) : (
+                      <Dropdown.Item>You have No notifications</Dropdown.Item>
+                    )}
+                  </Dropdown.Menu>
+                </Dropdown>
                 <div className="dropdown">
                   <button
                     className="nav-button mt-2 mr-4 navbar-custom"

@@ -17,12 +17,14 @@ import GraphBanner from "../common/GraphsBanner";
 import ComplaintForm from "./ComplaintForm/complaintForm";
 import Loading from "../common/loading";
 import ComplaintDetail from "../common/ComplaintDetail";
+import { getAllNotifications } from "../../services/notificationService";
 
 class Complainer extends Component {
   state = {
     complaints: [],
     categories: [],
     assignees: [],
+    notifications: [],
     pageSize: 9,
     currentPage: 1,
     sortColumn: { path: "title", order: "asc" },
@@ -38,7 +40,9 @@ class Complainer extends Component {
         toast.error("Access denied to this Route!");
         this.props.history.replace("/");
       }
-      this.setState({ user });
+      const { data } = await getAllNotifications();
+      console.log("notifications", data);
+      this.setState({ user, notifications: data });
     } catch (ex) {
       window.location = "/login";
     }
@@ -46,11 +50,20 @@ class Complainer extends Component {
     this.getAllComplaints();
 
     const socket = openSocket("http://localhost:5000");
+    const user = auth.getCurrentUser();
     socket.on("complaints", data => {
-      if (data.action === "changed status") {
+      if (
+        data.action === "changed status" &&
+        user.companyId == data.notification.companyId
+      ) {
         toast.info(
           `Complaints: "${data.complaint}'s" status is changed to "${data.status}"`
         );
+        this.setState(prevState => {
+          const updatednotifications = [...prevState.notifications];
+          updatednotifications.unshift(data.notification);
+          return { complaints: updatednotifications };
+        });
         this.getAllComplaints();
       }
     });
@@ -108,6 +121,7 @@ class Complainer extends Component {
     // console.log(complaint);
     this.setState({ selectedComplaint: complaint, isDetailFormEnabled: true });
   };
+
   handleClose = () => {
     this.setState({ selectedComplaint: null, isDetailFormEnabled: false });
   };
@@ -164,7 +178,8 @@ class Complainer extends Component {
       currentPage,
       selectedCategory,
       searchQuery,
-      assignees
+      assignees,
+      notifications
     } = this.state;
     // const { length: count } = this.state.complaints;
     const { length: count } = this.state.complaints;
@@ -172,7 +187,12 @@ class Complainer extends Component {
     if (count === 0) {
       return (
         <>
-          <Navbar user={this.state.user} assignees={assignees} />
+          <Navbar
+            user={this.state.user}
+            assignees={assignees}
+            notifications={notifications}
+            {...this.props}
+          />
 
           <div className="container">
             <button
@@ -214,7 +234,12 @@ class Complainer extends Component {
             complaint={this.state.selectedComplaint}
           />
         )}
-        <Navbar user={this.state.user} assignees={assignees} />
+        <Navbar
+          user={this.state.user}
+          assignees={assignees}
+          notifications={notifications}
+          {...this.props}
+        />
         {this.state.isLoading && <Loading />}
 
         <div className="container">

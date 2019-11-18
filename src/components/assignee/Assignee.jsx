@@ -13,13 +13,15 @@ import {
   markSpam
 } from "../../services/complaintService";
 import Spinner from "../common/Spinner/Spinner";
+import { getAllNotifications } from "../../services/notificationService";
 
 class Assignee extends React.Component {
   state = {
     complainers: [],
     user: "",
     complaints: [],
-    isLoading: false
+    isLoading: false,
+    notifications: []
   };
 
   isActive = false;
@@ -28,6 +30,9 @@ class Assignee extends React.Component {
     this.isActive = true;
     this.checkSocketConnection();
     const user = auth.getCurrentUser();
+
+    const { data } = await getAllNotifications();
+    this.setState({ notifications: data });
 
     if (!user || user.role !== "assignee") {
       toast.error("Access denied to this route!");
@@ -69,29 +74,54 @@ class Assignee extends React.Component {
 
   // check socket connection
   checkSocketConnection = () => {
+    const user = auth.getCurrentUser();
     if (this.isActive) {
       const socket = openSocket("http://localhost:5000", {
         reconnection: true
       });
       socket.on("complaints", data => {
-        if (data.action === "new complaint") {
+        if (
+          data.action === "new complaint" &&
+          user.companyId == data.notifications.companyId
+        ) {
           this.setState({ isLoading: true });
           this.createNewComplaint(data.complaint);
           toast.info(
             `New Complaint has been registered with title "${data.complaint.title}"`
           );
-        } else if (data.action === "task assigned") {
+          this.setState(prevState => {
+            const updatednotifications = [...prevState.notifications];
+            updatednotifications.unshift(data.notification);
+            return { complaints: updatednotifications };
+          });
+        } else if (
+          data.action === "task assigned" &&
+          user.companyId == data.notifications.companyId
+        ) {
           this.setState({ isLoading: true });
           this.createNewComplaint(data.complaint);
           toast.info(
             `New Complaint has been assigned to you with title "${data.complaint.title}"`
           );
-        } else if (data.action === "feedback") {
+          this.setState(prevState => {
+            const updatednotifications = [...prevState.notifications];
+            updatednotifications.unshift(data.notification);
+            return { complaints: updatednotifications };
+          });
+        } else if (
+          data.action === "feedback" &&
+          user.companyId == data.notifications.companyId
+        ) {
           this.setState({ isLoading: true });
           this.createNewComplaintAfterDropping(data.complaint);
           toast.info(
             `Complainer has given you feedback on Complaint with title "${data.complaint.title}"`
           );
+          this.setState(prevState => {
+            const updatednotifications = [...prevState.notifications];
+            updatednotifications.unshift(data.notification);
+            return { complaints: updatednotifications };
+          });
         }
       });
     }
@@ -149,6 +179,8 @@ class Assignee extends React.Component {
           user={this.state.user}
           complainers={this.state.complainers}
           complaints={this.state.complaints}
+          notifications={this.state.notifications}
+          {...this.props}
         />
         {this.state.isLoading && (
           <div className="d-flex justify-content-center mt-5">
