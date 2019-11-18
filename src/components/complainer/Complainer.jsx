@@ -47,7 +47,7 @@ class Complainer extends Component {
 
     const socket = openSocket("http://localhost:5000");
     socket.on("complaints", data => {
-      if (data.action === "changed status") {
+      if (data.action === "status changed") {
         toast.info(
           `Complaints: "${data.complaint}'s" status is changed to "${data.status}"`
         );

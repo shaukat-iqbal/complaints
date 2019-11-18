@@ -20,6 +20,13 @@ export function saveComplaint(complaint) {
   return http.post(config.apiUrl + "/complainer-complaints", complaint);
 }
 
+// saving a complaint
+export function reOpen(id) {
+  return http.put(config.apiUrl + "/assignee-complaints/" + id, {
+    status: "in-progress"
+  });
+}
+
 // downloading file
 export function downloadFile(complaintId) {
   return http.get(

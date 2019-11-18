@@ -20,7 +20,9 @@ class CategoriesList extends Component {
     categoryFormEnabled: false,
     selectedCategory: "",
     csvUploadComponent: false,
-    searchQuery: ""
+    searchQuery: "",
+    checkedRootCategories: [],
+    sidebarCategories: []
   };
   constructor(props) {
     super(props);
@@ -32,8 +34,9 @@ class CategoriesList extends Component {
       const { data: allCategories } = await getCategories();
       // const { data: categories } = await getCategoriesWithNoParent();
       let categories = allCategories.filter(c => c.name !== "Root");
-      let checkedRootCategories = categories.filter(c => !c.parentCategory);
-      this.setState({ allCategories: categories, checkedRootCategories });
+      // let checkedRootCategories = categories.filter(c => !c.parentCategory);
+      let sidebarCategories = allCategories.filter(c => !c.parentCategory);
+      this.setState({ allCategories: categories, sidebarCategories });
     }
   }
 
@@ -130,8 +133,7 @@ class CategoriesList extends Component {
 
   handleSubmitCategoryForm = category => {
     if (category) {
-      let { allCategories } = this.state;
-
+      let { allCategories, sidebarCategories } = this.state;
       if (this.state.requestType === "addChild") {
         let parentCategoryIndex = allCategories.findIndex(
           c => c._id === category.parentCategory
@@ -140,8 +142,13 @@ class CategoriesList extends Component {
           allCategories[parentCategoryIndex].hasChild = true;
         console.log(parentCategoryIndex, allCategories[parentCategoryIndex]);
       }
+      sidebarCategories.unshift(category);
       allCategories.unshift(category);
-      this.setState({ allCategories, categoryFormEnabled: false });
+      this.setState({
+        allCategories,
+        categoryFormEnabled: false,
+        sidebarCategories
+      });
     } else {
       this.setState({ categoryFormEnabled: false });
     }
@@ -192,7 +199,18 @@ class CategoriesList extends Component {
                       allCategories[parentIndex].hasChild = false;
                   }
                 }
-                this.setState({ allCategories: updated });
+                let { sidebarCategories, checkedRootCategories } = this.state;
+                sidebarCategories = sidebarCategories.filter(
+                  c => c._id !== category._id
+                );
+                checkedRootCategories = checkedRootCategories.filter(
+                  c => c._id !== category._id
+                );
+                this.setState({
+                  allCategories: updated,
+                  sidebarCategories,
+                  checkedRootCategories
+                });
               } else {
                 toast.warn(
                   "We are sorry its not leaf node. Please adjust its decendents first then delete it."
@@ -234,34 +252,37 @@ class CategoriesList extends Component {
 
   getPagedData = () => {
     const { searchQuery, allCategories, checkedRootCategories } = this.state;
-
-    let filtered = allCategories;
+    let categories = allCategories;
+    if (checkedRootCategories.length > 0) categories = checkedRootCategories;
+    let filtered = categories;
     if (searchQuery) {
-      filtered = allCategories.filter(
+      filtered = categories.filter(
         category =>
           !category.parentCategory &&
           category.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     } else {
-      filtered = allCategories.filter(category => !category.parentCategory);
+      filtered = categories.filter(category => !category.parentCategory);
     }
 
     return { totalCount: filtered.length, data: filtered };
   };
 
   toggleChecked = e => {
-    alert(e.target.checked);
     let { checkedRootCategories, allCategories } = this.state;
-    let index = checkedRootCategories.findIndex(c => c._id === e.target.name);
-    if (index >= 0) checkedRootCategories.splice(index, 1);
-    else {
-      let root = allCategories.find(c => c._i === e.target.name);
+    if (e.target.checked) {
+      let root = allCategories.find(c => c._id == e.target.name);
       if (root) checkedRootCategories.push(root);
+    } else {
+      let index = checkedRootCategories.findIndex(c => c._id == e.target.name);
+      if (index >= 0) checkedRootCategories.splice(index, 1);
     }
-    this.setState({ checkedRootCategories });
+
+    this.setState({ checkedRootCategories, [e.target.name]: e.target.checked });
   };
+
   render() {
-    const { allCategories } = this.state;
+    const { allCategories, sidebarCategories } = this.state;
     // const rootCategories = allCategories.filter(c => !c.parentCategory);
     // const length = rootCategories.length;
     // const { searchQuery } = this.state;
@@ -269,136 +290,142 @@ class CategoriesList extends Component {
     const { totalCount: length, data: rootCategories } = this.getPagedData();
     return (
       <div>
-        <div className="p-3 border rounded-sm d-flex justify-content-center mb-1 gradiantHeading">
+        {/* <div className="p-3 border rounded-sm d-flex justify-content-center mb-1 gradiantHeading">
           <h3 style={{ color: "white" }}>Categories</h3>
-        </div>
-        {/* {allCategories.length > 0 && (
-          <div className="border border-primary p-3 ">
-            {allCategories.map(category => {
-              if (category.parentCategory) return null;
-              return (
-                <div className="form-check">
-                  <input
-                    className=" form-check-input"
-                    type="checkbox"
-                    onClick={e => this.toggleChecked(e)}
-                    name={category._id}
-                    key={uuid()}
-                  />
-                  <label className="form-check-label" htmlFor="">
-                    {category.name}
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-        )} */}
-
+        </div> */}
         {!this.state.csvUploadComponent ? (
-          <>
-            <div className="container card p-1  ">
-              <div className="card-body">
-                <div className="d-flex ">
-                  <div className="d-flex mr-auto">
-                    <button
-                      className="btn btn-secondary rounded-pill mb-3 "
-                      onClick={this.handleNewCategory}
-                    >
-                      Create Category...
-                    </button>
-
-                    <button
-                      className="btn btn-primary rounded-pill ml-1 mb-3"
-                      onClick={this.handleCSVUpload}
-                    >
-                      Upload Csv
-                    </button>
-                  </div>
-
-                  {this.state.orderChanged && (
-                    <button
-                      className="btn btn-primary btn-round mb-3"
-                      onClick={this.handleSave}
-                    >
-                      Save
-                    </button>
-                  )}
+          <div className="row">
+            <div className=" col-md-2 ">
+              {sidebarCategories.length > 0 && (
+                <div
+                  className="border border-light p-3 rounded-lg ml-1"
+                  style={{ backgroundColor: "#eee", marginTop: "35px" }}
+                >
+                  {sidebarCategories.map(category => {
+                    return (
+                      <div className="form-check p-1">
+                        <input
+                          className=" form-check-input"
+                          type="checkbox"
+                          checked={this.state[category._id]}
+                          onClick={e => this.toggleChecked(e)}
+                          name={category._id}
+                          key={uuid()}
+                        />
+                        <label className="form-check-label" htmlFor="">
+                          {category.name}
+                        </label>
+                      </div>
+                    );
+                  })}
                 </div>
-
-                <SearchBox
-                  value={this.state.searchQuery}
-                  onChange={this.handleSearch}
-                />
-
-                <Accordion defaultActiveKey="">
-                  <div
-                    className="p-3 shadow-lg"
-                    onDragOver={this.onDragOver}
-                    onDrop={this.onDrop}
-                    id={null}
-                  >
-                    {length > 0 &&
-                      rootCategories.map(category =>
-                        category.hasChild ? (
-                          <div key={category._id + "parent"}>
-                            <Category
-                              key={uuid()}
-                              category={category}
-                              onEdit={this.handleEditCategory}
-                              onAddChild={this.handleAddChild}
-                              onDelete={this.handleDeleteCategory}
-                              onDragStart={this.onDragStart}
-                            />
-                            <Childs
-                              key={uuid()}
-                              category={category}
-                              onEdit={this.handleEditCategory}
-                              onAddChild={this.handleAddChild}
-                              onDelete={this.handleDeleteCategory}
-                              allCategories={allCategories}
-                              onDragOver={this.onDragOver}
-                              onDrop={this.onDrop}
-                              onDragStart={this.onDragStart}
-                            />
-                          </div>
-                        ) : (
-                          <div
-                            onDragOver={this.onDragOver}
-                            id={category._id}
-                            onDrop={this.onDrop}
-                            key={category._id + "single"}
-                          >
-                            <Category
-                              key={uuid()}
-                              category={category}
-                              onEdit={this.handleEditCategory}
-                              onAddChild={this.handleAddChild}
-                              onDelete={this.handleDeleteCategory}
-                              onDragOver={this.onDragOver}
-                              onDragStart={this.onDragStart}
-                            />
-                          </div>
-                        )
-                      )}
-                  </div>
-                </Accordion>
-              </div>
-              {this.state.categoryFormEnabled && (
-                <CategoryForm
-                  requestType={this.state.requestType}
-                  category={this.state.selectedCategory}
-                  isOpen={this.state.categoryFormEnabled}
-                  onSubmitForm={this.handleSubmitCategoryForm}
-                  allCategories={allCategories}
-                  onClose={this.handleCloseCategoryForm}
-                />
               )}
             </div>
-          </>
+            <div className="col-md-10">
+              <div className="container card p-1  ">
+                <div className="card-body">
+                  <div className="d-flex ">
+                    <div className="d-flex mr-auto">
+                      <button
+                        className="btn btn-secondary rounded-pill mb-3 "
+                        onClick={this.handleNewCategory}
+                      >
+                        Create Category...
+                      </button>
+
+                      <button
+                        className="btn btn-primary rounded-pill ml-1 mb-3"
+                        onClick={this.handleCSVUpload}
+                      >
+                        Upload Csv
+                      </button>
+                    </div>
+
+                    {this.state.orderChanged && (
+                      <button
+                        className="btn btn-primary btn-round mb-3"
+                        onClick={this.handleSave}
+                      >
+                        Save
+                      </button>
+                    )}
+                  </div>
+
+                  <SearchBox
+                    value={this.state.searchQuery}
+                    onChange={this.handleSearch}
+                  />
+
+                  <Accordion defaultActiveKey="">
+                    <div
+                      className="p-3 shadow-lg"
+                      onDragOver={this.onDragOver}
+                      onDrop={this.onDrop}
+                      id={null}
+                    >
+                      {length > 0 &&
+                        rootCategories.map(category =>
+                          category.hasChild ? (
+                            <div key={category._id + "parent"}>
+                              <Category
+                                key={uuid()}
+                                category={category}
+                                onEdit={this.handleEditCategory}
+                                onAddChild={this.handleAddChild}
+                                onDelete={this.handleDeleteCategory}
+                                onDragStart={this.onDragStart}
+                              />
+                              <Childs
+                                key={uuid()}
+                                category={category}
+                                onEdit={this.handleEditCategory}
+                                onAddChild={this.handleAddChild}
+                                onDelete={this.handleDeleteCategory}
+                                allCategories={allCategories}
+                                onDragOver={this.onDragOver}
+                                onDrop={this.onDrop}
+                                onDragStart={this.onDragStart}
+                              />
+                            </div>
+                          ) : (
+                            <div
+                              onDragOver={this.onDragOver}
+                              id={category._id}
+                              onDrop={this.onDrop}
+                              key={category._id + "single"}
+                            >
+                              <Category
+                                key={uuid()}
+                                category={category}
+                                onEdit={this.handleEditCategory}
+                                onAddChild={this.handleAddChild}
+                                onDelete={this.handleDeleteCategory}
+                                onDragOver={this.onDragOver}
+                                onDragStart={this.onDragStart}
+                              />
+                            </div>
+                          )
+                        )}
+                    </div>
+                  </Accordion>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
           <CategoriesRenderer
             isStepper={false}
             hideComponent={this.handleHideCsvComponent}
+          />
+        )}
+        {this.state.categoryFormEnabled && (
+          <CategoryForm
+            requestType={this.state.requestType}
+            category={this.state.selectedCategory}
+            isOpen={this.state.categoryFormEnabled}
+            onSubmitForm={this.handleSubmitCategoryForm}
+            allCategories={allCategories}
+            onClose={this.handleCloseCategoryForm}
           />
         )}
       </div>
