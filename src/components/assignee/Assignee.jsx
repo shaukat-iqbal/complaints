@@ -93,11 +93,11 @@ class Assignee extends React.Component {
           this.setState(prevState => {
             const updatednotifications = [...prevState.notifications];
             updatednotifications.unshift(data.notification);
-            return { complaints: updatednotifications };
+            return { notifications: updatednotifications };
           });
         } else if (
           data.action === "task assigned" &&
-          user.companyId == data.notifications.companyId
+          user.companyId == data.notification.companyId
         ) {
           this.setState({ isLoading: true });
           this.createNewComplaint(data.complaint);
@@ -107,11 +107,11 @@ class Assignee extends React.Component {
           this.setState(prevState => {
             const updatednotifications = [...prevState.notifications];
             updatednotifications.unshift(data.notification);
-            return { complaints: updatednotifications };
+            return { notifications: updatednotifications };
           });
         } else if (
           data.action === "feedback" &&
-          user.companyId == data.notifications.companyId
+          user.companyId == data.notification.companyId
         ) {
           this.setState({ isLoading: true });
           this.createNewComplaintAfterDropping(data.complaint);
@@ -121,7 +121,7 @@ class Assignee extends React.Component {
           this.setState(prevState => {
             const updatednotifications = [...prevState.notifications];
             updatednotifications.unshift(data.notification);
-            return { complaints: updatednotifications };
+            return { notifications: updatednotifications };
           });
         }
       });
