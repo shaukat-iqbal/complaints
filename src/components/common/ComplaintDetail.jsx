@@ -357,15 +357,6 @@ export default function ComplaintDetail(props) {
                                 {remark.split(">")[0]}
                               </p>
                               <p className="">{remark.split(">")[1]}</p>
-                              <p
-                                style={{
-                                  position: "absolute",
-                                  left: "10%",
-                                  bottom: "0",
-                                  width: "15px",
-                                  backgroundColor: "#eee"
-                                }}
-                              ></p>
                             </div>
                           );
                         })}
