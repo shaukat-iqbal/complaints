@@ -53,7 +53,7 @@ class Complainer extends Component {
     const user = auth.getCurrentUser();
     socket.on("complaints", data => {
       if (
-        data.action === "changed status" &&
+        data.action === "status changed" &&
         user.companyId == data.notification.companyId
       ) {
         toast.info(

@@ -83,7 +83,7 @@ class Assignee extends React.Component {
       socket.on("complaints", data => {
         if (
           data.action === "new complaint" &&
-          user.companyId == data.notifications.companyId
+          user.companyId == data.notification.companyId
         ) {
           this.setState({ isLoading: true });
           this.createNewComplaint(data.complaint);
