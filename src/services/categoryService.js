@@ -56,10 +56,8 @@ export function deleteCategory(id) {
   return http.delete(config.apiUrl + "/categories/" + id);
 }
 // getting categories for selection with no parent
-export function insertMultipleCategories(categories) {
-  return http.post(config.apiUrl + `/categories/bulk`, {
-    categories: categories
-  });
+export function insertMultipleCategories(body) {
+  return http.post(config.apiUrl + `/categories/bulk`, body);
 }
 
 export function updateMultipleCategories(categories) {

@@ -65,6 +65,7 @@ class RegisterForm extends Form {
     //siProfile determines wheter to view the form as profile i.e view details
     this.state.isProfileView = props.isProfileView;
     this.state.isEditView = props.isEditView;
+    this.state.isLoading = true;
     if (
       !(props.isProfileView || props.isEditView) &&
       user &&
@@ -95,8 +96,9 @@ class RegisterForm extends Form {
       if (id && role) {
         this.populateUserDetails(id, role.substring(0, role.length - 1));
       }
+    } else {
+      this.setState({ isLoading: false });
     }
-    this.setState({ isLoading: false });
   }
 
   populateUserDetails = async (userId, role) => {
@@ -305,12 +307,15 @@ class RegisterForm extends Form {
                   <AssignedCategoriesList
                     responsibilities={responsibilities}
                     onDelete={this.handleDelete}
-                    hidden={isProfileView}
+                    hidden={
+                      isProfileView || this.state.currentUser.role !== "admin"
+                    }
                   />
-                  {this.renderCategoriesDialogButton(
-                    this.handleCategoryDialogButton,
-                    isProfileView
-                  )}
+                  {this.state.currentUser.role === "admin" &&
+                    this.renderCategoriesDialogButton(
+                      this.handleCategoryDialogButton,
+                      isProfileView
+                    )}
                 </React.Fragment>
               )}
 

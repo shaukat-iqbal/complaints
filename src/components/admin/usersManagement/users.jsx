@@ -61,7 +61,9 @@ class Users extends Component {
     }
   };
   handleProfile = user => {
-    this.props.history.push(`/profile/${user._id}/${this.props.type}`);
+    this.props.history.push(
+      `/admin/users/profile/${user._id}/${this.props.type}`
+    );
   };
   handleEdit = user => {
     this.props.history.replace(
@@ -139,11 +141,6 @@ class Users extends Component {
             </p>
           ) : (
             <>
-              <div className="p-3 border rounded-sm d-flex justify-content-center mb-1 gradiantHeading">
-                <h3 style={{ color: "white" }}>
-                  {capitalizeFirstLetter(this.props.type)}
-                </h3>
-              </div>
               <div className="d-flex flex-wrap flex-column mx-5 ">
                 <div className="align-self-end mr-4 ">
                   <p className="m-0">Showing {totalCount} Users.</p>

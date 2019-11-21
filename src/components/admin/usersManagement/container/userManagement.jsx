@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Route, Link } from "react-router-dom";
+import { Route, Link, NavLink } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -24,13 +24,16 @@ import Dashboard from "../../dashboard/dashboard";
 import { Toolbar } from "@material-ui/core";
 import { getAllNotifications } from "../../../../services/notificationService";
 import { Dropdown } from "react-bootstrap";
-
+import Chart from "../../chart";
 import config from "../../../../config.json";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
+import Notifications from "../../../common/Notifications";
+import AdminForm from "../../../common/adminForm";
+import ResetPassword from "../../../common/resetPassword";
 const scoket = openSocket(config.apiEndpoint);
 
-const drawerWidth = 240;
+const drawerWidth = 220;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -121,92 +124,95 @@ function UserManagement(props) {
       }
     });
   }, []);
+  //   <div
+  //   className="d-flex flex-column align-items-center p-3 gradiantHeading"
+  //   style={{
+  //     // backgroundColor: "#4D5672",
+  //     height: "150px"
+  //   }}
+  // >
+  //   <p className="text-white m-0 mt-1">
+  //     {getCurrentUser().name.split(" ")[0]}
+  //   </p>
+  //   <p className="text-white text-center m-0">Admin</p>
+  // </div>
 
   const drawer = (
-    <div>
-      <div className={classes.toolbar}>
-        <div
-          className="d-flex flex-column align-items-center p-3"
-          style={{
-            backgroundColor: "#4D5672",
-            height: "150px"
-          }}
+    <div style={{ backgroundColor: "#4582FF", color: "#eee", height: "100%" }}>
+      <div
+        className={classes.toolbar + " d-flex align-items-center p-0"}
+        style={{ background: "#2F5BB2" }}
+      >
+        <NavLink
+          className="nav-item nav-link d-flex align-items-center p-0 pl-2 text-white "
+          to={`/admin/users/profile/${getCurrentUser()._id}/admins`}
         >
           <UserLogo management={true} />
-          <p className="text-white m-0 mt-1">
+          <p className="p-0 m-0 ml-2 drawerLogo">
             {getCurrentUser().name.split(" ")[0]}
           </p>
-          <p className="text-white text-center m-0">Admin</p>
-        </div>
+        </NavLink>
       </div>
       <Divider />
 
       <List>
         {[
           {
-            label: "Create Account",
+            label: "Home",
+            path: "/admin/users",
+            icon: <i className="fa fa-home mr-4 drawerBtns"></i>
+          },
+          {
+            label: "Create Accounts",
             path: "/admin/users/register",
-            icon: <i className="fa fa-plus mr-4 fa-2x"></i>
+            icon: <i className="fa fa-plus mr-4 drawerBtns   "></i>
           },
           {
             label: "Assignees",
             path: "/admin/users/assignees",
-            icon: <i className="fa fa-list mr-4 fa-2x"></i>
+            icon: <i className="fa fa-list mr-4 drawerBtns"></i>
           },
           {
             label: "Complainers",
             path: "/admin/users/complainers",
-            icon: <i className="fa fa-list-alt mr-4 fa-2x"></i>
-          }
-        ].map(item => (
-          <Link
-            key={item.label}
-            className="nav-item nav-link text-dark p-0"
-            to={item.path || "/admin"}
-            style={{ textDecoration: "none" }}
-          >
-            <ListItem button key={item.label}>
-              {item.icon}
-              <ListItemText primary={item.label} />
-            </ListItem>
-          </Link>
-        ))}
-      </List>
-
-      <Divider />
-      <List>
-        {[
-          {
-            label: "Home",
-            path: "/admin/users",
-            icon: <i className="fa fa-home mr-4 fa-2x"></i>
+            icon: <i className="fa fa-list-alt mr-4 drawerBtns"></i>
           },
+
           {
             label: "Configuration",
             path: "/admin/users/configuration",
-            icon: <i className="fa fa-cog mr-4 fa-2x"></i>
+            icon: <i className="fa fa-cog mr-4 drawerBtns"></i>
           },
           {
             label: "Categories",
             path: "/admin/users/categories",
-            icon: <i className="fa fa-list-alt mr-4 fa-2x"></i>
+            icon: <i className="fa fa-list-alt mr-4 drawerBtns"></i>
           },
-
+          {
+            label: "Reports/Charts",
+            path: "/admin/users/reports",
+            icon: <i className="fa fa-line-chart mr-4 drawerBtns"></i>
+          },
+          {
+            label: "Reset Password",
+            path: "/admin/users/resetpassword",
+            icon: <i className="fa fa-key mr-4 drawerBtns"></i>
+          },
           {
             label: "Logout",
             path: "/logout",
-            icon: <i className="fa fa-sign-out mr-4 fa-2x"></i>
+            icon: <i className="fa fa-sign-out mr-4 drawerBtns"></i>
           }
         ].map(item => (
           <Link
             key={item.label}
-            className="nav-item nav-link text-dark p-0"
+            className="nav-item nav-link  p-0 "
             to={item.path || "/admin"}
             style={{ textDecoration: "none" }}
           >
             <ListItem button key={item.label}>
               {item.icon}
-              <ListItemText primary={item.label} />
+              <ListItemText style={{ color: "#FFFFFF" }} primary={item.label} />
             </ListItem>
           </Link>
         ))}
@@ -217,36 +223,11 @@ function UserManagement(props) {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar position="fixed" className={`${classes.appBar} gradiantHeading `}>
         <Toolbar>
-          <Dropdown className="ml-auto">
-            <Dropdown.Toggle variant="primary" id="dropdown-basic">
-              <i className="fa fa-bell"></i>
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              {/* <Dropdown.Item>notification</Dropdown.Item> */}
-              {notifications.length > 0 ? (
-                <>
-                  {notifications.map(notification => (
-                    <Dropdown.Item>
-                      <p
-                        style={{
-                          color: "black",
-                          fontSize: "16px",
-                          borderBottom: "1px solid #e4e4e4"
-                        }}
-                      >
-                        {notification.msg}
-                      </p>
-                    </Dropdown.Item>
-                  ))}
-                </>
-              ) : (
-                <Dropdown.Item>You have No notifications</Dropdown.Item>
-              )}
-            </Dropdown.Menu>
-          </Dropdown>
+          <div className="ml-auto">
+            <Notifications notifications={notifications} />
+          </div>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -290,16 +271,13 @@ function UserManagement(props) {
       </nav>
       <main className={`${classes.content} container-fluid`}>
         <div className={classes.toolbar} />
-        <div>
+        <div className="mt-4">
           <Route path="/admin/users/" exact component={Dashboard} />
           <Route
             path="/admin/users/register"
             exact
             render={props => (
               <div>
-                <div className="p-3 border rounded-lg d-flex justify-content-center mb-1 gradiantHeading">
-                  <h3 style={{ color: "white" }}>Accounts</h3>
-                </div>
                 <div className="d-flex justify-content-around flex-wrap">
                   <RegisterForm /> <FileUpload {...props} />
                 </div>
@@ -312,9 +290,6 @@ function UserManagement(props) {
           path="/admin/users/edit/:id/:role"
           render={props => (
             <div>
-              <div className="p-3 border rounded-lg d-flex justify-content-center mb-1 gradiantHeading">
-                <h3 style={{ color: "white" }}>User</h3>
-              </div>
               <div className="d-flex justify-content-around flex-wrap">
                 <RegisterForm isEditView={true} {...props} />
               </div>
@@ -335,8 +310,26 @@ function UserManagement(props) {
           path="/admin/users/complainers"
           render={props => <Users type="complainers" {...props} />}
         />
+        <Route
+          path="/admin/users/reports"
+          render={props => <Chart {...props} />}
+        />
         <Route path="/admin/users/categories" component={CategoriesList} />
         <Route path="/admin/users/configuration" component={Settings} />
+        <Route path="/admin/users/resetpassword" component={ResetPassword} />
+
+        <Route
+          path="/admin/users/profile/:id/:role"
+          render={props => (
+            <div className="d-flex justify-content-center py-2 ">
+              {props.match.params.role !== "admins" ? (
+                <RegisterForm isProfileView={true} {...props} />
+              ) : (
+                <AdminForm isProfileView={true} {...props} />
+              )}
+            </div>
+          )}
+        />
         {/* <Redirect from="/admin/users" to="/admin/users/register" /> */}
       </main>
     </div>

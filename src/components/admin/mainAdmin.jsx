@@ -28,7 +28,7 @@ const mainAdmin = props => {
       <div>
         <Switch>
           <Route path="/admin/users" component={UserManagementContainer} />
-          <Route
+          {/* <Route
             path="/admin/configuration"
             render={props => (
               <div>
@@ -57,9 +57,9 @@ const mainAdmin = props => {
                 <Chart {...props} />{" "}
               </div>
             )}
-          />
+          /> */}
 
-          <Redirect exact from="/admin" to="/admin/dashboard" />
+          <Redirect exact from="/admin" to="/admin/users" />
         </Switch>
       </div>
     </React.Fragment>

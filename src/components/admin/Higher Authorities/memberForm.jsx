@@ -92,7 +92,7 @@ class MemberForm extends Form {
           {!isLoading && (
             <React.Fragment>
               <DialogTitle id="form-dialog-title">
-                Please select the Category
+                Please enter required details
               </DialogTitle>
               <form onSubmit={this.handleSubmit}>
                 <DialogContent dividers={true}>

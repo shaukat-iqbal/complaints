@@ -66,7 +66,7 @@ class DashboardCards extends Component {
               }}
             >
               <div className="icon icon4">
-                <i className="fa fa-thumbs-up fa-2x"></i>
+                <i className="fa fa-archive fa-2x"></i>
               </div>
               <div className="info info4">
                 <h5>{total}</h5>

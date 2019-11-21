@@ -298,8 +298,13 @@ class CategoriesList extends Component {
             <div className=" col-md-2 ">
               {sidebarCategories.length > 0 && (
                 <div
-                  className="border border-light p-3 rounded-lg ml-1"
-                  style={{ backgroundColor: "#eee", marginTop: "35px" }}
+                  className="border border-light p-3 rounded-lg  ml-1"
+                  style={{
+                    backgroundColor: "#FDFDFD",
+                    marginTop: "35px",
+                    maxHeight: "400px",
+                    overflow: "auto"
+                  }}
                 >
                   {sidebarCategories.map(category => {
                     return (

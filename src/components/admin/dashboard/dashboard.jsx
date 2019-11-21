@@ -1,19 +1,10 @@
 import React, { Component } from "react";
 import { getAdminComplaints } from "../../../services/complaintService";
-import Pagination from "../../common/pagination";
-import { paginate } from "../../../utils/paginate";
-import ListGroup from "../../common/listGroup";
-import { getCategories } from "../../../services/categoryService";
-import AdminTable from "../AdminTable";
-import _ from "lodash";
-import SearchBox from "../../complainer/searchBox";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
 import Spinner from "../../common/Spinner/Spinner";
 import GraphBanner from "../../common/GraphsBanner";
 import { countComplainers } from "../../../services/complainerService";
-import ComplaintDetail from "../../common/ComplaintDetail";
-import Loading from "../../common/loading";
 import DashboardCards from "../DashboardCards";
 import Complaints from "../../common/Complaints";
 import { getConfigToken } from "../../../services/configurationService";
@@ -31,23 +22,6 @@ class Dashboard extends Component {
       this.setState({ countUsers: months });
     }
   }
-
-  // aggregateMonthWiseComplaints = complaints => {
-  //   let months = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  //   for (let i = 0; i < complaints.length; i++) {
-  //     const complaint = complaints[i];
-  //     var date = new Date(complaint.timeStamp);
-  //     let now = new Date();
-  //     let year = date.getFullYear();
-  //     if (now.getFullYear() !== year) continue;
-  //     let index = date.getMonth();
-  //     months[index]++;
-  //   }
-  //   let chartData = {};
-  //   chartData.data = months;
-  //   chartData.label = "Monthly Complaints";
-  //   this.setState({ chartData, complaints });
-  // };
 
   async componentDidMount() {
     this.getComplaints();
@@ -85,6 +59,18 @@ class Dashboard extends Component {
         toast.info(
           `Complainer has given feedback on Complaint with title "${data.complaint.title}"`
         );
+      } else {
+        console.log(data.complaint);
+        let { selectedComplaints } = this.state;
+        let index = selectedComplaints.findIndex(
+          c => c._id == data.complaint._id
+        );
+        if (index >= 0) {
+          selectedComplaints[index] = data.complaint;
+
+          console.log(selectedComplaints[index]);
+        }
+        this.setState({ selectedComplaints });
       }
     });
   };
@@ -195,27 +181,33 @@ class Dashboard extends Component {
 
     if (count === 0) {
       return (
-        <div className="container d-flex vh-100 vw-100 justify-content-center  ">
-          {this.state.isLoading && (
+        <div className="container d-flex  justify-content-center  ">
+          {this.state.isLoading ? (
             <div className="d-flex justify-content-center mt-5">
-              <Loading />
+              <Spinner />
             </div>
+          ) : (
+            <h4>There are no complaints.</h4>
           )}
-          <h4>There are no complaints.</h4>
         </div>
       );
     }
 
     return (
       <React.Fragment>
-        {this.state.isLoading && (
+        {/* {this.state.isLoading && (
           <div className="d-flex justify-content-center mt-5">
             <Spinner />
           </div>
-        )}
+        )} */}
 
         {/* <Showcase resolved={resolved} inprogress={inprogress} closed={closed} /> */}
         <div className="container">
+          {/* {this.state.isLoading && (
+            <div className="d-flex justify-content-center">
+              <Loading />
+            </div>
+          )} */}
           {this.state.complaints.length > 0 && (
             <GraphBanner
               complaints={this.state.complaints}
@@ -247,3 +239,20 @@ class Dashboard extends Component {
 }
 
 export default Dashboard;
+
+// aggregateMonthWiseComplaints = complaints => {
+//   let months = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+//   for (let i = 0; i < complaints.length; i++) {
+//     const complaint = complaints[i];
+//     var date = new Date(complaint.timeStamp);
+//     let now = new Date();
+//     let year = date.getFullYear();
+//     if (now.getFullYear() !== year) continue;
+//     let index = date.getMonth();
+//     months[index]++;
+//   }
+//   let chartData = {};
+//   chartData.data = months;
+//   chartData.label = "Monthly Complaints";
+//   this.setState({ chartData, complaints });
+// };

@@ -43,11 +43,22 @@ export default function ComplaintDetail(props) {
 
   useEffect(() => {
     async function fetchComplaint(id) {
-      let { data: complaint } = await getComplaint(id);
-      setComplaint(complaint);
+      try {
+        let { data: complaint } = await getComplaint(id);
+        setComplaint(complaint);
+      } catch (error) {
+        if (error.response && error.response.status === 404)
+          alert("Complaint is not available");
+        props.onClose();
+        return;
+      }
     }
     if (!props.complaint) {
-      fetchComplaint(props.match.params.companyId);
+      if (props.complaintId) {
+        fetchComplaint(props.complaintId);
+      } else {
+        fetchComplaint(props.match.params.companyId);
+      }
     } else {
       setComplaint(props.complaint);
     }
@@ -117,7 +128,7 @@ export default function ComplaintDetail(props) {
 
   // handle Edit
   const handleEdit = () => {
-    if (user._id !== complaint.assignedTo._id) return;
+    if (!complaint.assignedTo || user._id !== complaint.assignedTo._id) return;
     setEdit(pre => !pre);
   };
 
@@ -256,12 +267,14 @@ export default function ComplaintDetail(props) {
                         onClick={() => handleMessaging(complaint)}
                       ></i>
                     )}
-                  {isReopen && complaint.status !== "in-progress" && (
-                    <i
-                      className="fa fa-refresh controlIcon"
-                      onClick={() => handleReopen(complaint)}
-                    ></i>
-                  )}
+                  {isReopen &&
+                    complaint.status !== "in-progress" &&
+                    user.role === "complainer" && (
+                      <i
+                        className="fa fa-refresh controlIcon"
+                        onClick={() => handleReopen(complaint)}
+                      ></i>
+                    )}
 
                   {/* Assign Task */}
                   {!complaint.assignedTo && user.role === "admin" && (

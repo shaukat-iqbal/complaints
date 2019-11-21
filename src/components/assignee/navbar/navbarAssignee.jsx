@@ -15,6 +15,8 @@ import { setProfilePictureToken } from "../../../services/imageService";
 import { Dropdown } from "react-bootstrap";
 import UserLogo from "../../common/logo";
 import { getAllNotifications } from "../../../services/notificationService";
+import ComplaintDetail from "../../common/ComplaintDetail";
+import Notifications from "../../common/Notifications";
 
 const url = "/a/message";
 
@@ -46,7 +48,9 @@ class Navbar extends React.Component {
     this.setState({ confirmation: false });
     toast.success("Conversation is deleted");
   };
-
+  handleCloseComplaintDetail = () => {
+    this.setState({ isOpen: false, complaintId: null });
+  };
   displayConfirmation = cmp => {
     this.setState({ complainer: cmp });
     this.setState({ confirmation: true });
@@ -151,36 +155,9 @@ class Navbar extends React.Component {
                     </NavLink>
                   </div>
                 </a>
-                <Dropdown direction="left">
-                  <Dropdown.Toggle
-                    variant="light"
-                    id="dropdown-basic"
-                    direction="left"
-                  >
-                    <i className="fa fa-bell"></i>
-                  </Dropdown.Toggle>
 
-                  <Dropdown.Menu>
-                    {notifications.length > 0 ? (
-                      <>
-                        {notifications.map(notification => (
-                          <Dropdown.Item
-                            onClick={() => {
-                              console.log(notification.complaintId);
-                              return this.props.history.replace(
-                                `/complaintdetail/${notification.complaintId}`
-                              );
-                            }}
-                          >
-                            {notification.msg}
-                          </Dropdown.Item>
-                        ))}
-                      </>
-                    ) : (
-                      <Dropdown.Item>You have No notifications</Dropdown.Item>
-                    )}
-                  </Dropdown.Menu>
-                </Dropdown>
+                <Notifications notifications={notifications} />
+
                 <div className="dropdown">
                   <button
                     className="nav-button mt-2 mr-4 navbar-custom"

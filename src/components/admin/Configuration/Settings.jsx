@@ -24,9 +24,6 @@ class Settings extends Component {
   render() {
     return (
       <>
-        <div className="p-3 mt-0 border rounded-sm d-flex justify-content-center mb-1 gradiantHeading">
-          <h3 style={{ color: "white" }}>Configuration</h3>
-        </div>
         <div className="container">
           <Features />
 

@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { createDetailsFormData } from "../../services/companyDetailsService";
 import { registerAdmin } from "../../services/userService";
 import Form from "./form";
+import httpService from "../../services/httpService";
 
 class AdminForm extends Form {
   state = {
@@ -179,7 +180,9 @@ class AdminForm extends Form {
             this.state.data.companyId,
             "/auth-admin"
           );
+          console.log(response.headers["x-auth-token"]);
           localStorage.setItem("token", response.headers["x-auth-token"]);
+          httpService.setJwt(response.headers["x-auth-token"]);
         }
         toast.info("Account Created");
       }

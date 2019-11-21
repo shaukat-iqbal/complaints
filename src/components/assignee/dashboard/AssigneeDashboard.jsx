@@ -40,9 +40,13 @@ class AssigneeDashboard extends Component {
   };
   constructor(props) {
     super(props);
-    this.state.complaints = props.complaints;
+    this.state.complaints = this.props.complaints;
   }
 
+  //WARNING! To be deprecated in React v17. Use new lifecycle static getDerivedStateFromProps instead.
+  componentWillReceiveProps(nextProps) {
+    this.setState({ complaints: nextProps.complaints });
+  }
   async componentDidMount() {
     this.getAllCategories();
   }
@@ -116,12 +120,16 @@ class AssigneeDashboard extends Component {
 
   // handle drop responsibility
   handleDropResponsibility = async complaint => {
+    let { complaints: original } = this.state;
     try {
       await dropResponsibility(complaint._id);
+      let complaints = original.filter(c => c._id !== complaint._id);
+      this.setState({ complaints });
     } catch (ex) {
       if (ex.response && ex.response.status === "400") {
         return toast.warn("Something went wrong");
       }
+      this.setState({ complaints: original });
     }
 
     toast.success("You have successfully dropped Responsibility");
@@ -168,7 +176,7 @@ class AssigneeDashboard extends Component {
       confirmDrop,
       displaySpamList
     } = this.state;
-    const { length: count } = this.props.complaints;
+    const { length: count } = this.state.complaints;
 
     if (count === 0) {
       return (
@@ -190,13 +198,13 @@ class AssigneeDashboard extends Component {
       );
     }
 
-    let filtered = this.props.complaints;
+    let filtered = this.state.complaints;
     if (searchQuery) {
-      filtered = this.props.complaints.filter(c =>
+      filtered = this.state.complaints.filter(c =>
         c.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
     } else if (selectedCategory && selectedCategory._id) {
-      filtered = this.props.complaints.filter(
+      filtered = this.state.complaints.filter(
         c => c.category._id === selectedCategory._id
       );
     }
@@ -281,8 +289,8 @@ class AssigneeDashboard extends Component {
             closed={closed}
           /> */}
           <div className="container">
-            {this.props.complaints.length > 0 && (
-              <GraphBanner complaints={[...this.props.complaints]} />
+            {this.state.complaints.length > 0 && (
+              <GraphBanner complaints={[...this.state.complaints]} />
             )}
 
             {this.state.selectedComplaint && (

@@ -15,6 +15,7 @@ import PieChart from "./charts/pie";
 import BarChart from "./charts/bar";
 import LineChart from "./charts/LineChart";
 import { getConfigToken } from "../../services/configurationService.js";
+import { countComplainers } from "../../services/complainerService.js";
 
 const Chart = props => {
   const [reportname, setReportname] = useState("");
@@ -22,6 +23,7 @@ const Chart = props => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
   const [complaints, setComplaints] = useState([]);
+  const [complainersCount, setComplainersCount] = useState([]);
   // handleGenerateReport
   const handleGenerateReport = async body => {
     // window.open(
@@ -46,6 +48,8 @@ const Chart = props => {
   };
   useEffect(async () => {
     let { data: complaints } = await getAdminComplaints();
+    let { data: months } = await countComplainers();
+    setComplainersCount(months);
     setComplaints(complaints);
   }, []);
 
@@ -112,7 +116,7 @@ const Chart = props => {
         <div className="col-4  ">
           <LineChart
             chartData={{
-              data: [1, 2, 3, 3],
+              data: complainersCount,
               label: "showing from chart compo"
             }}
           />

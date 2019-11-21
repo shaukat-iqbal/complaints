@@ -3,6 +3,7 @@ import Papa from "papaparse";
 import TemporaryCategoriesList from "./TemporaryCategoriesList";
 import Joi from "joi-browser";
 import { toast } from "react-toastify";
+import { getCurrentUser } from "../services/authService";
 
 class CategoriesRenderer extends React.Component {
   state = {

@@ -23,7 +23,7 @@ import {
   SupervisedUserCircleRounded,
   Attachment
 } from "@material-ui/icons";
-import { DialogTitle, Grow } from "@material-ui/core";
+import { DialogTitle, Grow, Button } from "@material-ui/core";
 
 import CategoriesRenderer from "../../categories/CategoriesRenderer";
 import { getConfiguration } from "../../services/configurationService";
@@ -225,7 +225,7 @@ function getStepContent(step, enableNext, props) {
 
 export default function CustomizedSteppers(props) {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(2);
+  const [activeStep, setActiveStep] = React.useState(0);
   const [isNextEnabled, setIsNextEnabled] = React.useState(false);
   const steps = getSteps();
 
@@ -234,9 +234,9 @@ export default function CustomizedSteppers(props) {
     // setIsNextEnabled(true);
   }
 
-  // function handleSkip() {
-  //   setActiveStep(prevActiveStep => prevActiveStep + 1);
-  // }
+  function handleSkip() {
+    setActiveStep(prevActiveStep => prevActiveStep + 1);
+  }
 
   // function handleNext() {
   //   setActiveStep(prevActiveStep => prevActiveStep + 1);
@@ -284,6 +284,18 @@ export default function CustomizedSteppers(props) {
           <div>
             <div className={classes.instructions}>
               {getStepContent(activeStep, enableNext, props)}
+            </div>
+            <div className="mt-3">
+              {activeStep === 6 && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSkip}
+                  className={classes.button}
+                >
+                  Skip
+                </Button>
+              )}
             </div>
             {/* <div className="mt-3">
               <Button

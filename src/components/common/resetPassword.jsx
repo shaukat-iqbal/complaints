@@ -131,7 +131,7 @@ class ResetPassword extends Form {
                     </div>
                   </div>
                   <div className="col-4 border-left">
-                    <div className="my-5 ml-3">
+                    <div className="my-5 ml-3 d-flex flex-column justify-content-center">
                       {profilePicture ? (
                         <img
                           src={profilePicture}

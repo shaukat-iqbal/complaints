@@ -9,6 +9,7 @@ import PlainCategoryForm from "./PlainCategoryForm";
 import { toast } from "react-toastify";
 import { insertMultipleCategories } from "../services/categoryService";
 import SearchBox from "../components/common/searchBox";
+import { getCurrentUser } from "../services/authService";
 class TemporaryCategoriesList extends Component {
   state = {
     allCategories: [],
@@ -27,14 +28,7 @@ class TemporaryCategoriesList extends Component {
       allCategories: nextProps.categories
     });
   }
-  async componentDidMount() {
-    // if (this.state.allCategories.length < 1) {
-    //   const { data: allCategories } = await getCategories();
-    //   // const { data: categories } = await getCategoriesWithNoParent();
-    //   let categories = allCategories.filter(c => c.name !== "Root");
-    //   this.setState({ allCategories: categories });
-    // }
-  }
+
   handleSearch = query => {
     this.setState({ searchQuery: query, currentPage: 1 });
   };
@@ -252,7 +246,10 @@ class TemporaryCategoriesList extends Component {
       return;
     }
     try {
-      await insertMultipleCategories(this.state.allCategories);
+      await insertMultipleCategories({
+        categories: this.state.allCategories,
+        companyId: getCurrentUser().companyId
+      });
       toast.success("Categories successfully created.");
       if (!this.props.isStepper) window.location = "/admin/users/categories";
       if (this.props.enableNext) this.props.enableNext();

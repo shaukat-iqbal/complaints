@@ -31,7 +31,7 @@ class App extends Component {
         <ToastContainer />
 
         <Switch>
-          <Route
+          {/* <Route
             path="/complaintdetail/:companyId"
             render={props => (
               <ComplaintDetail
@@ -42,7 +42,7 @@ class App extends Component {
                 }}
               />
             )}
-          />
+          /> */}
           <Route path="/categories" component={CategoriesList} />
           <Route
             path="/welcome/:id"

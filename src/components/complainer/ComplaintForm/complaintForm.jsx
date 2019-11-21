@@ -27,7 +27,7 @@ class ComplaintForm extends Form {
     },
     categoryId: "",
     details: "",
-    sentimentCategory: "",
+    selectedCategory: "",
     categoryError: "",
     detailsError: "",
     errors: {},
@@ -59,12 +59,13 @@ class ComplaintForm extends Form {
       this.schema.severity = Joi.string()
         .min(1)
         .label("Severity");
-      }
-      this.state.data.severity="1";
+    }
+    this.state.data.severity = "1";
   }
   // componentDidMount
   async componentDidMount() {
     await this.populateCategories();
+
     this.setState({ isLoading: false });
   }
 
@@ -75,7 +76,20 @@ class ComplaintForm extends Form {
   };
   async populateCategories() {
     const { data: categories } = await getCategories();
-    this.setState({ categories });
+    if (categories.length < 1) {
+      alert("Categories not available");
+      this.props.onClose();
+      return;
+    }
+    let selectedCategory = categories[0];
+    let categoryId = categories[0]._id;
+    let generalCategory = categories.find(c => c.name === "General");
+
+    if (generalCategory) {
+      selectedCategory = generalCategory;
+      categoryId = selectedCategory._id;
+    }
+    this.setState({ categories, selectedCategory, categoryId });
   }
 
   handleCategorySelect = categoryId => {
@@ -106,34 +120,42 @@ class ComplaintForm extends Form {
   };
 
   handleFileChange = async e => {
-    let { attachments } = this.state;
-    // if (this.checkMimeType(e)) {
-    if (!e.target.files[0]) return;
-    let file = e.target.files[0];
-    if (!attachments) {
-      let { data } = await getAllowedAttachments();
-      this.setState({ allowedAttachments: data });
-      attachments = data;
-    }
-    let exe = file.type.split("/")[1].toLowerCase();
+    try {
+      let { attachments } = this.state;
+      // if (this.checkMimeType(e)) {
+      if (!e.target.files[0]) return;
+      let file = e.target.files[0];
+      if (!attachments) {
+        let { data } = await getAllowedAttachments();
+        this.setState({ allowedAttachments: data });
+        attachments = data;
+      }
+      let exe = file.type.split("/")[1].toLowerCase();
 
-    let type = attachments.find(a => a.extentionName.toLowerCase() === exe);
+      let type = attachments.find(a => a.extentionName.toLowerCase() === exe);
 
-    if (!type) {
-      toast.error("You cannot attach '." + exe + "' type file.");
-      return;
-    }
+      if (!type) {
+        toast.error("You cannot attach '." + exe + "' type file.");
+        return;
+      }
 
-    this.setState({ selectedFile: file });
-    if (file.type.split("/")[0] === "image") {
-      file = await compressImage(file);
+      this.setState({ selectedFile: file });
+      if (file.type.split("/")[0] === "image") {
+        try {
+          file = await compressImage(file);
+        } catch (error) {
+          toast.error("Could not compress the file");
+        }
+      }
+      if (file.size / 1024 > +type.maxSize) {
+        toast.error("The file size is larger than allowed size.");
+        this.setState({ selectedFile: null });
+        return;
+      }
+      this.setState({ selectedFile: file });
+    } catch (error) {
+      console.log(error);
     }
-    if (file.size / 1024 > +type.maxSize) {
-      toast.error("The file size is larger than allowed size.");
-      this.setState({ selectedFile: null });
-      return;
-    }
-    this.setState({ selectedFile: file });
   };
 
   doSubmit = async () => {
@@ -210,7 +232,7 @@ class ComplaintForm extends Form {
 
     if (category) {
       this.setState({
-        sentimentCategory: category,
+        selectedCategory: category,
         categoryId: id,
         showCategoriesDialog: false,
         categoryError: ""
@@ -227,11 +249,11 @@ class ComplaintForm extends Form {
     const { data } = await getSentimentCategory(details);
     this.setState(prevState => {
       return {
-        sentimentCategory: data,
+        selectedCategory: data,
         categoryId: data._id
       };
     });
-    console.log(this.state.sentimentCategory);
+    console.log(this.state.selectedCategory);
   };
 
   render() {
@@ -278,7 +300,7 @@ class ComplaintForm extends Form {
                       className="form-control"
                       value={this.state.details}
                       onChange={this.handleDetailsChange}
-                      onBlur={this.handleDetailsBlur}
+                      // onBlur={this.handleDetailsBlur}
                       cols="70"
                       rows="4"
                     />
@@ -302,7 +324,7 @@ class ComplaintForm extends Form {
 
                   {/* category  */}
 
-                  {this.state.sentimentCategory && (
+                  {this.state.selectedCategory && (
                     <>
                       <label>Selected Category</label>
                       <button
@@ -310,7 +332,7 @@ class ComplaintForm extends Form {
                         onClick={this.handleCategoryButton}
                         type="button"
                       >
-                        {this.state.sentimentCategory.name}
+                        {this.state.selectedCategory.name}
                         <i className="fa fa-edit pl-3"></i>
                       </button>
                       <p
@@ -331,7 +353,7 @@ class ComplaintForm extends Form {
 
                       {/* <Category
                           onCategoryId={this.handleCategorySelect}
-                          category={this.state.sentimentCategory}
+                          category={this.state.selectedCategory}
                         /> */}
                     </>
                   )}
