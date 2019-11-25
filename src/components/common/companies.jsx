@@ -19,8 +19,7 @@ class Companies extends Component {
     });
   }
 
-  handleClick = async event => {
-    const id = event.target.value;
+  handleClick = id => {
     this.props.onCompanySelection(id);
   };
 

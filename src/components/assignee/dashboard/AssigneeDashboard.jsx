@@ -21,6 +21,7 @@ import { getAssigneeCategories } from "../../../services/categoryService";
 import SpamList from "../spamlist";
 import GraphBanner from "../../common/GraphsBanner";
 import ComplaintDetail from "../../common/ComplaintDetail";
+import Loading from "../../common/loading";
 
 class AssigneeDashboard extends Component {
   state = {
@@ -114,32 +115,32 @@ class AssigneeDashboard extends Component {
 
   handleDropConfirmation = complaint => {
     this.handleDropResponsibility(complaint);
-    this.setState({ confirmDrop: false });
-    this.setState({ checkedComplaint: "" });
+    this.setState({ confirmDrop: false, checkedComplaint: "" });
   };
 
   // handle drop responsibility
   handleDropResponsibility = async complaint => {
+    this.setState({ isLoading: true });
     let { complaints: original } = this.state;
     try {
       await dropResponsibility(complaint._id);
       let complaints = original.filter(c => c._id !== complaint._id);
-      this.setState({ complaints });
+      this.setState({ complaints, isLoading: false });
     } catch (ex) {
       if (ex.response && ex.response.status === "400") {
         return toast.warn("Something went wrong");
       }
-      this.setState({ complaints: original });
+      this.setState({ complaints: original, isLoading: false });
     }
 
     toast.success("You have successfully dropped Responsibility");
 
-    const { data: complaints } = await getAssigneeComplaints();
-    this.setState({ complaints });
+    // const { data: complaints } = await getAssigneeComplaints();
+    // this.setState({ complaints });
 
-    setTimeout(() => {
-      toast.success("Complaint is assigned to ADMIN for Further Assignment");
-    }, 900);
+    // setTimeout(() => {
+    //   toast.success("Complaint is assigned to ADMIN for Further Assignment");
+    // }, 900);
   };
 
   // handle spam
@@ -217,6 +218,7 @@ class AssigneeDashboard extends Component {
     return (
       <React.Fragment>
         <>
+          {this.state.isLoading && <Loading />}
           {displaySpamList && (
             <SpamList
               displaySpamList={displaySpamList}

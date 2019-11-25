@@ -11,6 +11,27 @@ body {
 
   font-size: 14px;
 }
+
+.notification {
+  max-width: 400px;
+  height: 60px;
+  padding: 6px 30px 5px 12px;
+  border-top: 1px solid #aaaa;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+.notification:hover {
+  cursor: pointer;
+}
+
+.notification-header {
+  width: 400px;
+  height: 30px;
+  background-color: #eee;
+  padding: 8px 6px 12px 12px;
+}
+
 .drawerLogo {
   font-family: "Ubuntu", sans-serif;
   font-size: 18px;

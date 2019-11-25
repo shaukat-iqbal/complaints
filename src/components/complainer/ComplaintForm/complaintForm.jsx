@@ -74,6 +74,21 @@ class ComplaintForm extends Form {
       this.setState({ coords: position.coords });
     });
   };
+
+  getFullPath = id => {
+    let { categories } = this.state;
+    let arr = "";
+    let category = categories.find(c => c._id === id);
+    if (!category) return null;
+    arr += category.name;
+    while (category.parentCategory) {
+      category = categories.find(c => c._id === category.parentCategory);
+      if (!category) break;
+      arr = category.name + "/" + arr;
+    }
+    return arr;
+  };
+
   async populateCategories() {
     const { data: categories } = await getCategories();
     if (categories.length < 1) {
@@ -81,6 +96,7 @@ class ComplaintForm extends Form {
       this.props.onClose();
       return;
     }
+    let fullPath = "/General";
     let selectedCategory = categories[0];
     let categoryId = categories[0]._id;
     let generalCategory = categories.find(c => c.name === "General");
@@ -89,12 +105,11 @@ class ComplaintForm extends Form {
       selectedCategory = generalCategory;
       categoryId = selectedCategory._id;
     }
-    this.setState({ categories, selectedCategory, categoryId });
+    this.setState({ categories, selectedCategory, categoryId, fullPath });
   }
 
   handleCategorySelect = categoryId => {
-    this.setState({ categoryError: "" });
-    this.setState({ categoryId: categoryId });
+    this.setState({ categoryId, categoryError: "" });
   };
 
   ToggleConfirmation = e => {
@@ -229,13 +244,15 @@ class ComplaintForm extends Form {
   handleOnCategorySeletion = id => {
     const categories = this.state.categories;
     const category = categories.find(c => c._id === id);
+    let fullPath = this.getFullPath(id);
 
     if (category) {
       this.setState({
         selectedCategory: category,
         categoryId: id,
         showCategoriesDialog: false,
-        categoryError: ""
+        categoryError: "",
+        fullPath
       });
     }
   };
@@ -327,14 +344,21 @@ class ComplaintForm extends Form {
                   {this.state.selectedCategory && (
                     <>
                       <label>Selected Category</label>
-                      <button
-                        className="btn button-primary"
-                        onClick={this.handleCategoryButton}
-                        type="button"
-                      >
-                        {this.state.selectedCategory.name}
-                        <i className="fa fa-edit pl-3"></i>
-                      </button>
+                      <div className="d-flex p-0 m-0">
+                        <div>
+                          <button
+                            className="btn button-primary"
+                            onClick={this.handleCategoryButton}
+                            type="button"
+                          >
+                            {this.state.selectedCategory.name}
+                            <i className="fa fa-edit pl-3"></i>
+                          </button>
+                        </div>
+                        <div className="ml-2 p-0 m-0 align-items-center justify-content-center d-flex ">
+                          <p className="p-0 m-0">{this.state.fullPath}</p>
+                        </div>
+                      </div>
                       <p
                         className="text-muted text-sm-left mt-2"
                         style={{ fontSize: "10px" }}

@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-
 import Complainer from "./components/complainer/Complainer";
-import ComplaintForm from "./components/complainer/ComplaintForm/complaintForm";
 import Assignee from "./components/assignee/Assignee";
 import mainAdmin from "./components/admin/mainAdmin";
 import Login from "./components/login";
@@ -20,8 +18,6 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import AdminForm from "./components/common/adminForm";
 import CustomizedSteppers from "./components/Startup/stepper";
-import ComplaintDetail from "./components/common/ComplaintDetail";
-import { getCurrentUser } from "./services/authService";
 // const Complainer = lazy(() => import("./components/complainer/Complainer"));
 
 class App extends Component {
@@ -31,27 +27,13 @@ class App extends Component {
         <ToastContainer />
 
         <Switch>
-          {/* <Route
-            path="/complaintdetail/:companyId"
-            render={props => (
-              <ComplaintDetail
-                {...props}
-                isOpen={true}
-                onClose={() => {
-                  window.location = "/" + getCurrentUser().role;
-                }}
-              />
-            )}
-          /> */}
           <Route path="/categories" component={CategoriesList} />
           <Route
             path="/welcome/:id"
             render={props => (
-              <>
-                <div className="container d-flex justify-content-center">
-                  <CustomizedSteppers {...props} />
-                </div>
-              </>
+              <div className="container d-flex justify-content-center">
+                <CustomizedSteppers {...props} />
+              </div>
             )}
           />
 

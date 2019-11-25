@@ -62,7 +62,7 @@ class Complainer extends Component {
         this.setState(prevState => {
           const updatednotifications = [...prevState.notifications];
           updatednotifications.unshift(data.notification);
-          return { complaints: updatednotifications };
+          return { notifications: updatednotifications };
         });
         this.getAllComplaints();
       }

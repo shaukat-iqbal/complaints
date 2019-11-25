@@ -281,6 +281,44 @@ class CategoriesList extends Component {
     this.setState({ checkedRootCategories, [e.target.name]: e.target.checked });
   };
 
+  // handleDelete = () => {
+  //   let { checkedRootCategories } = this.state;
+  //   confirmAlert({
+  //     title: "Confirm to submit",
+  //     message: "Do you really want to delete All sub-categories",
+  //     buttons: [
+  //       {
+  //         label: "Yes",
+  //         onClick: async () => {
+  //           try {
+  //             await deleteChildsOf(selectedRootCategory._id);
+  //             await deleteCategory(selectedRootCategory._id);
+  //             let { allCategories } = this.state;
+  //             let updated = allCategories.filter(
+  //               c =>
+  //                 c._id !== selectedRootCategory._id ||
+  //                 c.parentCategory === selectedRootCategory._id
+  //             );
+  //             let sidebarCategories = updated.filter(c => !c.parentCategory);
+  //             checkedRootCategories = checkedRootCategories.filter(
+  //               c => c._id !== selectedRootCategory._id
+  //             );
+  //             this.setState({
+  //               allCategories: updated,
+  //               sidebarCategories,
+  //               checkedRootCategories
+  //             });
+  //           } catch (error) {
+  //             console.log(error);
+  //           }
+  //         }
+  //       },
+  //       {
+  //         label: "No"
+  //       }
+  //     ]
+  //   });
+  // };
   render() {
     const { allCategories, sidebarCategories } = this.state;
     // const rootCategories = allCategories.filter(c => !c.parentCategory);
@@ -345,7 +383,14 @@ class CategoriesList extends Component {
                         Upload Csv
                       </button>
                     </div>
-
+                    {this.state.checkedRootCategories.length > 0 && (
+                      <button
+                        className="btn btn-primary btn-round mb-3"
+                        onClick={this.handleDelete}
+                      >
+                        Delete
+                      </button>
+                    )}
                     {this.state.orderChanged && (
                       <button
                         className="btn btn-primary btn-round mb-3"

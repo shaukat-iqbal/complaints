@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Dropdown } from "react-bootstrap";
 import ComplaintDetail from "./ComplaintDetail";
 import uuid from "uuid";
+import DropdownItem from "react-bootstrap/DropdownItem";
 class Notifications extends Component {
   state = {};
   handleCloseComplaintDetail = () => {
@@ -17,17 +18,26 @@ class Notifications extends Component {
             <i className="fa fa-bell"></i>
           </Dropdown.Toggle>
 
-          <Dropdown.Menu direction="left" key="left">
+          <Dropdown.Menu
+            direction="left"
+            key="left"
+            style={{ paddingTop: "0px" }}
+          >
             {notifications.length > 0 ? (
-              <div style={{ maxHeight: "400px", overflow: "auto" }}>
+              <div
+                style={{
+                  maxHeight: "400px",
+                  overflow: "auto",
+                  maxWidth: "400px"
+                }}
+              >
+                <div className="notification-header" key={uuid()}>
+                  Notifications
+                </div>
+
                 {notifications.map(notification => (
-                  <Dropdown.Item
-                    style={{
-                      width: "250px",
-                      height: "70px",
-                      backgroundColor: "#eee",
-                      margin: "5px 10px"
-                    }}
+                  <div
+                    className="notification"
                     key={uuid()}
                     onClick={() => {
                       // console.log(notification.complaintId);
@@ -40,7 +50,7 @@ class Notifications extends Component {
                     }}
                   >
                     {notification.msg}
-                  </Dropdown.Item>
+                  </div>
                 ))}
               </div>
             ) : (

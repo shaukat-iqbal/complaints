@@ -27,13 +27,14 @@ const CompaniesList = ({ companies, isLoading, onClick, isOpen }) => {
                 {companies.map(company => {
                   return (
                     <div style={{ width: "50%" }}>
-                      <div className="company rounded mr-1 mb-2">
+                      <div
+                        className="company rounded mr-1 mb-2"
+                        onClick={() => {
+                          onClick(company._id);
+                        }}
+                      >
                         {/* <i className="fa fa-plus"></i> */}
-                        <option
-                          key={company._id}
-                          value={company._id}
-                          onClick={onClick}
-                        >
+                        <option key={company._id} value={company._id}>
                           {company.name}
                         </option>
                       </div>

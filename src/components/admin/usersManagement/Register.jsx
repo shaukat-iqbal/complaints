@@ -100,16 +100,22 @@ class RegisterForm extends Form {
       this.setState({ isLoading: false });
     }
   }
+getToolTips=(responsibilities)=>{
+  if(responsibilities.length<1)return [];
+  
+}
 
   populateUserDetails = async (userId, role) => {
     try {
       const { data: user } = await getUser(userId, role);
       const data = {};
       let responsibilities = [];
+      let tooltips = [];
       let isAssignee = false;
       if (role === "assignee") {
         isAssignee = true;
         responsibilities = user.responsibilities;
+        tooltips = this.getToolTips(responsibilities);
       }
       data.name = user.name;
       data.email = user.email;
@@ -255,7 +261,8 @@ class RegisterForm extends Form {
       showCategoriesDialog,
       categories,
       responsibilities,
-      isLoading
+      isLoading,
+      tooltips
     } = this.state;
     const { role } = currentUser;
 
@@ -310,6 +317,7 @@ class RegisterForm extends Form {
                     hidden={
                       isProfileView || this.state.currentUser.role !== "admin"
                     }
+                    tooltips={tooltips}
                   />
                   {this.state.currentUser.role === "admin" &&
                     this.renderCategoriesDialogButton(
