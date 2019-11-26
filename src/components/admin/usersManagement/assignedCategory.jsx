@@ -1,9 +1,14 @@
 import React from "react";
 
-const AssignedCategory = ({ category, onDelete, hidden }) => {
+const AssignedCategory = ({ category, onDelete, hidden, tooltip }) => {
   return (
     <div className="d-flex mb-1">
-      <div className="flex-grow-1">
+      <div
+        className="flex-grow-1"
+        data-toggle="tooltip"
+        data-placement="top"
+        title={`${tooltip}`}
+      >
         <button
           type="button"
           className=" list-group-item list-group-item-action"

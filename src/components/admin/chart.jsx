@@ -46,11 +46,14 @@ const Chart = props => {
       toast.error("Some error occured");
     }
   };
-  useEffect(async () => {
-    let { data: complaints } = await getAdminComplaints();
-    let { data: months } = await countComplainers();
-    setComplainersCount(months);
-    setComplaints(complaints);
+  useEffect(() => {
+    async function setAttributes() {
+      let { data: complaints } = await getAdminComplaints();
+      let { data: months } = await countComplainers();
+      setComplainersCount(months);
+      setComplaints(complaints);
+    }
+    setAttributes();
   }, []);
 
   const onClose = () => {
@@ -110,18 +113,18 @@ const Chart = props => {
       />
 
       <div className="row">
-        <div className="col-4 ">
+        <div className="col-lg-4 col-md-6 col-sm-12 ">
           <BarChart complaints={complaints} />
         </div>
-        <div className="col-4  ">
+        <div className="col-lg-4 col-md-6 col-sm-12  ">
           <LineChart
             chartData={{
               data: complainersCount,
-              label: "showing from chart compo"
+              label: "Users Registered"
             }}
           />
         </div>
-        <div className="col-4  ">
+        <div className="col-lg-4 col-md-6 col-sm-12  ">
           <PieChart complaints={complaints} />
         </div>
       </div>

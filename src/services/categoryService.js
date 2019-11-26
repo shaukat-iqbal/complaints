@@ -55,6 +55,9 @@ export function createCategory(body) {
 export function deleteCategory(id) {
   return http.delete(config.apiUrl + "/categories/" + id);
 }
+export function deleteChildsOf(id) {
+  return http.delete(config.apiUrl + "/categories/childsOf/" + id);
+}
 // getting categories for selection with no parent
 export function insertMultipleCategories(body) {
   return http.post(config.apiUrl + `/categories/bulk`, body);
@@ -68,4 +71,12 @@ export function updateMultipleCategories(categories) {
 
 export function getRootCategory() {
   return http.get(config.apiUrl + "/categories/root/category");
+}
+
+export function getMultiplePaths(body) {
+  return http.post(config.apiUrl + "/categories/get/multiplePaths", body);
+}
+
+export function getSinglePath(id) {
+  return http.get(config.apiUrl + "/categories/fullPath/" + id);
 }

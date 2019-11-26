@@ -58,9 +58,7 @@ class PieChart extends Component {
     return (
       <div className="card bg-light border border-dark">
         <div className="container py-3 ">
-          {this.state.complaints.length < 1 && (
-            <h5>There are no Spam Complaints</h5>
-          )}
+          {this.state.complaints.length < 1 && <h5>No complaints Summary</h5>}
           {this.state.complaints.length > 0 &&
             this.state.chartData.datasets[0].data.length > 0 && (
               <Pie

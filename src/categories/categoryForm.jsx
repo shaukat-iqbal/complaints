@@ -12,6 +12,7 @@ import {
   getCategories,
   getRootCategory
 } from "../services/categoryService";
+import Loading from "../components/common/loading";
 class CategoryForm extends Form {
   state = {
     data: {
@@ -29,6 +30,8 @@ class CategoryForm extends Form {
     hasChild: Joi.boolean()
   };
   async componentDidMount() {
+    this.setState({ isLoading: true });
+
     const { data: allCategories } = await getCategories();
     this.setState({ allCategories });
 
@@ -48,6 +51,12 @@ class CategoryForm extends Form {
         data.parentCategory = category.parentCategory;
         parentCategoryName = this.getparentCategoryName(category.parentCategory)
           .name;
+      } else {
+        let { data: root } = await getRootCategory();
+        if (root) {
+          data.parentCategory = root._id;
+          parentCategoryName = "Root";
+        }
       }
     } else if (this.props.requestType === "new") {
       data.hasChild = false;
@@ -59,7 +68,8 @@ class CategoryForm extends Form {
       data,
       requestType: this.props.requestType,
       parentCategoryName,
-      category
+      category,
+      isLoading: false
     });
   };
 
@@ -79,6 +89,7 @@ class CategoryForm extends Form {
   };
 
   doSubmit = async () => {
+    this.setState({ isLoading: true });
     try {
       let category = null;
       if (this.state.requestType === "edit") {
@@ -98,6 +109,7 @@ class CategoryForm extends Form {
     } catch (error) {
       console.log(error);
     }
+    this.setState({ isLoading: false });
   };
 
   render() {
@@ -115,6 +127,7 @@ class CategoryForm extends Form {
           <form onSubmit={this.handleSubmit}>
             <DialogContent dividers={true}>
               <div className="card-body sahdow-lg">
+                {this.state.isLoading && <Loading />}
                 {this.renderInput("name", "Category Name")}
                 <label className="d-inline-block">Parent Category</label>
                 <div className=" ml-3 d-inline-block">

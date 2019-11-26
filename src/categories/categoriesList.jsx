@@ -3,7 +3,8 @@ import Childs from "./child";
 import {
   getCategories,
   deleteCategory,
-  updateMultipleCategories
+  updateMultipleCategories,
+  deleteChildsOf
 } from "../services/categoryService";
 import Category from "./category";
 import CategoryForm from "./categoryForm";
@@ -14,6 +15,7 @@ import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { toast } from "react-toastify";
 import SearchBox from "../components/common/searchBox";
+import Loading from "../components/common/loading";
 class CategoriesList extends Component {
   state = {
     allCategories: [],
@@ -141,8 +143,9 @@ class CategoriesList extends Component {
         if (parentCategoryIndex >= 0)
           allCategories[parentCategoryIndex].hasChild = true;
         console.log(parentCategoryIndex, allCategories[parentCategoryIndex]);
+      } else {
+        sidebarCategories.unshift(category);
       }
-      sidebarCategories.unshift(category);
       allCategories.unshift(category);
       this.setState({
         allCategories,
@@ -281,44 +284,48 @@ class CategoriesList extends Component {
     this.setState({ checkedRootCategories, [e.target.name]: e.target.checked });
   };
 
-  // handleDelete = () => {
-  //   let { checkedRootCategories } = this.state;
-  //   confirmAlert({
-  //     title: "Confirm to submit",
-  //     message: "Do you really want to delete All sub-categories",
-  //     buttons: [
-  //       {
-  //         label: "Yes",
-  //         onClick: async () => {
-  //           try {
-  //             await deleteChildsOf(selectedRootCategory._id);
-  //             await deleteCategory(selectedRootCategory._id);
-  //             let { allCategories } = this.state;
-  //             let updated = allCategories.filter(
-  //               c =>
-  //                 c._id !== selectedRootCategory._id ||
-  //                 c.parentCategory === selectedRootCategory._id
-  //             );
-  //             let sidebarCategories = updated.filter(c => !c.parentCategory);
-  //             checkedRootCategories = checkedRootCategories.filter(
-  //               c => c._id !== selectedRootCategory._id
-  //             );
-  //             this.setState({
-  //               allCategories: updated,
-  //               sidebarCategories,
-  //               checkedRootCategories
-  //             });
-  //           } catch (error) {
-  //             console.log(error);
-  //           }
-  //         }
-  //       },
-  //       {
-  //         label: "No"
-  //       }
-  //     ]
-  //   });
-  // };
+  handleDelete = () => {
+    let { checkedRootCategories } = this.state;
+    let { allCategories } = this.state;
+    let updated = [];
+    confirmAlert({
+      title: "Confirm to submit",
+      message:
+        "Do you really want to delete All sub-categories of selected category(ies).",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: async () => {
+            this.setState({ isLoading: true });
+
+            for (let index = 0; index < checkedRootCategories.length; index++) {
+              const category = checkedRootCategories[index];
+              await this.deleteOperation(category);
+              updated = allCategories.filter(
+                c => c._id !== category._id || c.parentCategory === category._id
+              );
+              let sidebarCategories = updated.filter(c => !c.parentCategory);
+              this.setState({
+                allCategories: updated,
+                sidebarCategories
+              });
+            }
+            this.setState({ checkedRootCategories: [], isLoading: false });
+          }
+        },
+        {
+          label: "No"
+        }
+      ]
+    });
+  };
+
+  deleteOperation = async selectedRootCategory => {
+    console.log(selectedRootCategory);
+
+    await deleteChildsOf(selectedRootCategory._id);
+    await deleteCategory(selectedRootCategory._id);
+  };
   render() {
     const { allCategories, sidebarCategories } = this.state;
     // const rootCategories = allCategories.filter(c => !c.parentCategory);
@@ -328,6 +335,8 @@ class CategoriesList extends Component {
     const { totalCount: length, data: rootCategories } = this.getPagedData();
     return (
       <div>
+        {this.state.isLoading && <Loading />}
+
         {/* <div className="p-3 border rounded-sm d-flex justify-content-center mb-1 gradiantHeading">
           <h3 style={{ color: "white" }}>Categories</h3>
         </div> */}

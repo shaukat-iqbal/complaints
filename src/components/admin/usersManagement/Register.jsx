@@ -1,7 +1,11 @@
 import React from "react";
 import {
   getCategoriesWithNoParent,
-  getCategoryById
+  getCategoryById,
+  getToolTipLabels,
+  getFullPaths,
+  getSinglePath,
+  getMultiplePaths
 } from "../../../services/categoryService";
 import {
   registerUser,
@@ -34,7 +38,8 @@ class RegisterForm extends Form {
     errors: {},
     isAssignee: false,
     categories: [],
-    isLoading: true
+    isLoading: true,
+    tooltips: []
   };
 
   schema = {
@@ -84,13 +89,6 @@ class RegisterForm extends Form {
   }
 
   async componentDidMount() {
-    // window.addEventListener("beforeunload ", event => {
-    //   event.returnValue = `Are you sure you want to leave?`;
-    // });
-    // window.addEventListener("popstate", event => {
-    //   // alert(confirm("fbmsdbnc"));\
-    //   alert("you are leaving");
-    // });
     if (this.props.match) {
       const { id, role } = this.props.match.params;
       if (id && role) {
@@ -100,10 +98,28 @@ class RegisterForm extends Form {
       this.setState({ isLoading: false });
     }
   }
-getToolTips=(responsibilities)=>{
-  if(responsibilities.length<1)return [];
-  
-}
+
+  getToolTips = async responsibilities => {
+    if (responsibilities.length < 1) return [];
+    let { data } = await getMultiplePaths({
+      responsibilities: responsibilities
+    });
+    let tooltips = this.getFullPath(data);
+    this.setState({ tooltips });
+  };
+
+  getFullPath = responsibilitiesPaths => {
+    let tooltips = [];
+    responsibilitiesPaths.forEach(path => {
+      let tooltip = "";
+      path.forEach(category => {
+        tooltip += " /" + category.name;
+      });
+      tooltips.push(tooltip);
+    });
+
+    return tooltips;
+  };
 
   populateUserDetails = async (userId, role) => {
     try {
@@ -129,7 +145,8 @@ getToolTips=(responsibilities)=>{
         isAssignee,
         profilePath: user.profilePath,
         profile: profilePicture,
-        isLoading: false
+        isLoading: false,
+        tooltips
       });
     } catch (error) {
       if (error.response && error.response.status === "404") {
@@ -181,12 +198,18 @@ getToolTips=(responsibilities)=>{
 
   handleOnCategorySeletion = async id => {
     const responsibilities = [...this.state.responsibilities];
-    const category = responsibilities.filter(category => category._id === id);
-    if (category.length === 0) {
+    let category = responsibilities.find(c => c._id === id);
+    if (!category) {
       const { data: category } = await getCategoryById(id);
       responsibilities.push(category);
     }
     this.setState({ responsibilities, showCategoriesDialog: false });
+    let { data: tooltip } = await getSinglePath(id);
+    let arr = [tooltip];
+    let ttip = this.getFullPath(arr);
+    let { tooltips } = this.state;
+    tooltips.push(ttip[0]);
+    this.setState({ tooltips });
   };
 
   handleDelete = ({ currentTarget }) => {
@@ -198,6 +221,7 @@ getToolTips=(responsibilities)=>{
 
   doSubmit = async () => {
     //only compare passwrods when complainer or assignee is creating account by themselves
+    this.setState({ isLoading: true });
     let userId;
     if (this.props.match) {
       const { id } = this.props.match.params;
@@ -210,7 +234,7 @@ getToolTips=(responsibilities)=>{
       const errors = { ...this.state.errors };
       if (error) {
         errors.confirmPassword = error;
-        this.setState({ errors });
+        this.setState({ errors, isLoading: false });
         return;
       }
     }
@@ -219,11 +243,16 @@ getToolTips=(responsibilities)=>{
     try {
       if (userId) {
         await updateUser(userId, fd, this.state.isAssignee);
-        this.setState({ isEditView: false, isProfileView: true });
+        this.setState({
+          isEditView: false,
+          isProfileView: true,
+          isLoading: false
+        });
         toast.success("User Successfully updated");
         return;
       } else {
         await registerUser(fd, this.state.isAssignee);
+
         toast.success("User create successfully.");
       }
       if (role !== "admin") {
@@ -237,11 +266,11 @@ getToolTips=(responsibilities)=>{
       if (error.response && error.response.status === 400) {
         let errors = { ...this.state.errors };
         errors.email = error.response.data;
-        this.setState({ errors });
+        this.setState({ errors, isLoading: false });
       } else if (error.response && error.response.status === 404) {
         let errors = { ...this.state.errors };
         errors.email = error.response.data;
-        this.setState({ errors });
+        this.setState({ errors, isLoading: false });
       }
     }
   };

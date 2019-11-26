@@ -23,13 +23,20 @@ class DatePickerModal extends Form {
   };
 
   doSubmit = () => {
+    let date = new Date();
     let d1 = new Date(this.state.data.from);
     let d2 = new Date(this.state.data.to);
+    if (date.getTime() < d2.getTime() || date.getTime() < d1.getTime()) {
+      toast.error("Date ' must be valid.");
+      this.setState({ data: { from: "", to: "" } });
+      return;
+    }
     if (d1.getTime() >= d2.getTime()) {
       toast.error("Date 'to' must be larger. Kndly check the order");
       this.setState({ data: { from: this.state.data.from, to: "" } });
       return;
     }
+
     this.props.onSubmit(this.state.data);
   };
   render() {

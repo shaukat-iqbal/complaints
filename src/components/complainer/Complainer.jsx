@@ -35,6 +35,7 @@ class Complainer extends Component {
 
   async componentDidMount() {
     try {
+      this.setState({ isLoading: true });
       const user = auth.getCurrentUser();
       if (!user || user.role !== "complainer") {
         toast.error("Access denied to this Route!");
@@ -67,13 +68,11 @@ class Complainer extends Component {
         this.getAllComplaints();
       }
     });
-
-    this.setState({ isLoading: false });
   }
 
   // getting all complaints
   getAllComplaints = async () => {
-    // this.setState({ isLoading: true });
+    this.setState({ isLoading: true });
     const { data: complaints } = await getComplaints();
     const { data: allcategories } = await getCategories();
 
@@ -90,7 +89,8 @@ class Complainer extends Component {
     const uniqueAssignees = this.getUniqueAssignees(complaints);
     this.setState(prevState => {
       return {
-        assignees: uniqueAssignees
+        assignees: uniqueAssignees,
+        isLoading: false
       };
     });
   };
@@ -179,7 +179,8 @@ class Complainer extends Component {
       selectedCategory,
       searchQuery,
       assignees,
-      notifications
+      notifications,
+      isLoading
     } = this.state;
     // const { length: count } = this.state.complaints;
     const { length: count } = this.state.complaints;
@@ -195,6 +196,7 @@ class Complainer extends Component {
           />
 
           <div className="container">
+            {isLoading && <Loading />}
             <button
               type="button"
               onClick={this.toggleComplaintForm}

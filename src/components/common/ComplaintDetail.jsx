@@ -19,7 +19,6 @@ import { getCurrentUser } from "../../services/authService";
 import "./complaintDetail.css";
 import { capitalizeFirstLetter } from "../../services/helper";
 import { getConfigToken } from "../../services/configurationService";
-import { relative } from "path";
 
 export default function ComplaintDetail(props) {
   const [openAssigneeDialog, setopenAssigneeDialog] = useState(true);
@@ -31,7 +30,7 @@ export default function ComplaintDetail(props) {
   const [edit, setEdit] = useState(false);
   const [remarks, setRemarks] = useState("");
   const [isReopen, setIsReopen] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   const statusValue = useRef(null);
   let isMessaging = false;
   const [displayFeedback, setDisplayFeedback] = useState(false);
@@ -155,9 +154,11 @@ export default function ComplaintDetail(props) {
   };
 
   const handleUserSelected = user => {
+    setIsLoading(true);
     setAssignees(user);
     setopenAssigneeDialog(false);
     handleAssignTask(user);
+    setIsLoading(false);
   };
 
   // handle Assign Task
@@ -241,6 +242,7 @@ export default function ComplaintDetail(props) {
             backgroundColor: "aliceblue"
           }}
         >
+          {isLoading && <Loading />}
           {!complaint ? (
             <Loading />
           ) : (
