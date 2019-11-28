@@ -11,10 +11,7 @@ import AssigneeTable from "../AssigneeTable";
 import Pagination from "../../common/pagination";
 import ListGroup from "../../common/listGroup";
 
-import {
-  getAssigneeComplaints,
-  dropResponsibility
-} from "../../../services/complaintService";
+import { dropResponsibility } from "../../../services/complaintService";
 import { paginate } from "../../../utils/paginate";
 import { toast } from "react-toastify";
 import { getAssigneeCategories } from "../../../services/categoryService";

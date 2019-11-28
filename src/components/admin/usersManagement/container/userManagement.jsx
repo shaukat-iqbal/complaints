@@ -121,7 +121,7 @@ function UserManagement(props) {
         data.action === "drop" &&
         currentUser.companyId == data.notification.companyId
       ) {
-        toast.info(data.notification.msg);
+        // toast.info(data.notification.msg);
 
         let allNotifications = [...notifications];
         // allNotifications.find(not => not.msg !== data.notification.msg);

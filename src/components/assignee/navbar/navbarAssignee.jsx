@@ -164,7 +164,7 @@ class Navbar extends React.Component {
 
                 <NavLink
                   className="nav-item nav-link text-dark "
-                  to={`/profile/${getCurrentUser()._id}/assignees`}
+                  to={`/assignee/profile/${getCurrentUser()._id}/assignees`}
                 >
                   {getCurrentUser() && getCurrentUser().name.split(" ", 1)}
                 </NavLink>
@@ -187,7 +187,7 @@ class Navbar extends React.Component {
                   >
                     <NavLink
                       className="dropdown-item "
-                      to={`/profile/${auth.getCurrentUser()._id}/${
+                      to={`/assignee/profile/${auth.getCurrentUser()._id}/${
                         auth.getCurrentUser().role
                       }s`}
                     >

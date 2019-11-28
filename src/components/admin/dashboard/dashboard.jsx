@@ -33,9 +33,14 @@ class Dashboard extends Component {
   }
 
   checkingSocketConnection = () => {
+    let user = getCurrentUser();
     socket.on("complaints", data => {
+      console.log(data);
+      if (user.companyId !== data.notification.companyId) {
+        return;
+      }
+
       if (data.action === "new complaint") {
-        this.setState({ isLoading: true });
         this.createNewComplaint(data.complaint);
         toast.info(
           `New Complaint has been registered with title "${data.complaint.title}"`
@@ -44,22 +49,21 @@ class Dashboard extends Component {
         toast.warn(
           `Assignee has dropped responsibility with complaint title: "${data.complaint.title}" `
         );
-        this.setState({ isLoading: true });
-        this.createNewComplaintAfterDropping(data.complaint);
+        this.replaceUpdatedComplaint(data.complaint);
 
         // this.createNewComplaint(data.complaint);
       } else if (data.action === "status changed") {
         toast.info(
           `Complaints: "${data.complaint}'s" status is changed to  "${data.complaint.status}" `
         );
-        this.setState({ isLoading: true });
-        this.createNewComplaintAfterDropping(data.complaint);
+        this.replaceUpdatedComplaint(data.complaint);
       } else if (data.action === "feedback") {
-        this.setState({ isLoading: true });
-        this.createNewComplaintAfterDropping(data.complaint);
+        this.replaceUpdatedComplaint(data.complaint);
         toast.info(
           `Complainer has given feedback on Complaint with title "${data.complaint.title}"`
         );
+      } else if (data.action === "task assigned") {
+        this.replaceUpdatedComplaint(data.complaint);
       } else {
         console.log(data.complaint);
         let { selectedComplaints } = this.state;
@@ -94,22 +98,21 @@ class Dashboard extends Component {
     this.setState({ isLoading: false, complaints: updatedComplaints });
   };
 
-  // handling after dropping complaint from assignee
-  createNewComplaintAfterDropping = complaint => {
+  replaceUpdatedComplaint = complaint => {
     this.setState(prevState => {
       const updatedComplaints = [...prevState.complaints];
-
-      for (let i = 0; i < updatedComplaints.length; i++) {
-        if (updatedComplaints[i]._id === complaint._id) {
-          updatedComplaints.splice(i, 1, complaint);
-          // return updatedComplaints.unshift(complaint);
-        }
-      }
-      return { complaints: updatedComplaints };
+      let index = updatedComplaints.findIndex(c => c._id === complaint._id);
+      if (index >= 0) updatedComplaints[index] = complaint;
+      const updatedSelectedComplaints = [...prevState.selectedComplaints];
+      index = updatedSelectedComplaints.findIndex(c => c._id === complaint._id);
+      if (index >= 0) updatedSelectedComplaints[index] = complaint;
+      return {
+        complaints: updatedComplaints,
+        isLoading: false,
+        selectedComplaints: updatedSelectedComplaints
+      };
     });
-    this.setState({ isLoading: false });
   };
-
   // get complaints
   getComplaints = async () => {
     this.setState({ isLoading: true });

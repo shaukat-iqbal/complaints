@@ -10,13 +10,14 @@ import openSocket from "socket.io-client";
 import auth from "../../services/authService";
 import AssigneeDashboard from "./dashboard/AssigneeDashboard";
 import NavbarAssignee from "./navbar/navbarAssignee";
+import Spinner from "../common/Spinner/Spinner";
+import RegisterForm from "./../admin/usersManagement/Register";
+import { getAllNotifications } from "../../services/notificationService";
 
 import {
   getAssigneeComplaints,
   markSpam
 } from "../../services/complaintService";
-import Spinner from "../common/Spinner/Spinner";
-import { getAllNotifications } from "../../services/notificationService";
 const socket = openSocket("http://localhost:5000", {
   reconnection: true
 });
@@ -192,6 +193,16 @@ class Assignee extends React.Component {
                   complaints={this.state.complaints}
                   onSpam={this.handleSpam}
                 />
+              )}
+            />
+            <Route
+              path="/assignee/profile/:id/:role"
+              render={props => (
+                <div className="d-flex justify-content-center py-5 ">
+                  {props.match.params.role !== "admins" && (
+                    <RegisterForm isProfileView={true} {...props} />
+                  )}
+                </div>
               )}
             />
 
