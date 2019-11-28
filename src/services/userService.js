@@ -82,6 +82,10 @@ export function getUser(userId, role) {
   return http.get(`${apiUrl}/${role}s/${userId}`);
 }
 
+export function getSpecificAdmin(id) {
+  return http.get(`${apiUrl}/admins/${id}`);
+}
+
 export function getUserByEmail(body) {
   return http.post(`${apiUrl}/admins/user/search`, body);
 }

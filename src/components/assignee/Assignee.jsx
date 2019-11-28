@@ -17,7 +17,9 @@ import {
 } from "../../services/complaintService";
 import Spinner from "../common/Spinner/Spinner";
 import { getAllNotifications } from "../../services/notificationService";
-
+const socket = openSocket("http://localhost:5000", {
+  reconnection: true
+});
 class Assignee extends React.Component {
   state = {
     complainers: [],
@@ -73,78 +75,66 @@ class Assignee extends React.Component {
 
   componentWillUnmount() {
     this.isActive = false;
+    socket.disconnect(true);
   }
-
   // check socket connection
   checkSocketConnection = () => {
     const user = auth.getCurrentUser();
     if (this.isActive) {
-      const socket = openSocket("http://localhost:5000", {
-        reconnection: true
+      socket.on("msg", data => {
+        if (data.receiver === user._id) {
+          toast.info("New Message");
+        }
       });
       socket.on("complaints", data => {
+        console.log(data);
         if (
-          data.action === "new complaint" &&
-          user.companyId == data.notification.companyId
+          user.companyId !== data.notification.companyId ||
+          user._id !== data.notification.receivers.id
         ) {
-          this.setState({ isLoading: true });
-          this.createNewComplaint(data.complaint);
-          toast.info(
-            `New Complaint has been registered with title "${data.complaint.title}"`
-          );
-          this.setState(prevState => {
-            const updatednotifications = [...prevState.notifications];
-            updatednotifications.unshift(data.notification);
-            return { notifications: updatednotifications };
-          });
-        } else if (
-          data.action === "task assigned" &&
-          user.companyId == data.notification.companyId
-        ) {
-          this.setState({ isLoading: true });
-          this.createNewComplaint(data.complaint);
-          toast.info(
-            `New Complaint has been assigned to you with title "${data.complaint.title}"`
-          );
-          this.setState(prevState => {
-            const updatednotifications = [...prevState.notifications];
-            updatednotifications.unshift(data.notification);
-            return { notifications: updatednotifications };
-          });
-        } else if (
-          data.action === "feedback" &&
-          user.companyId == data.notification.companyId
-        ) {
-          this.setState({ isLoading: true });
-          this.createNewComplaintAfterDropping(data.complaint);
-          toast.info(
-            `Complainer has given you feedback on Complaint with title "${data.complaint.title}"`
-          );
-          this.setState(prevState => {
-            const updatednotifications = [...prevState.notifications];
-            updatednotifications.unshift(data.notification);
-            return { notifications: updatednotifications };
-          });
+          return;
         }
+
+        switch (data.action) {
+          case "new complaint":
+            this.createNewComplaint(data.complaint);
+            toast.info(
+              `New Complaint has been registered with title "${data.complaint.title}"`
+            );
+            break;
+          case "task assigned":
+            this.createNewComplaint(data.complaint);
+            toast.info(
+              `New Complaint has been assigned to you.Title: "${data.complaint.title}"`
+            );
+            break;
+          case "feedback":
+            this.replaceUpdatedComplaint(data.complaint);
+            toast.info(
+              `Complainer has given you feedback on Complaint with title "${data.complaint.title}"`
+            );
+            break;
+          default:
+            break;
+        }
+
+        this.setState(prevState => {
+          const updatednotifications = [...prevState.notifications];
+          updatednotifications.unshift(data.notification);
+          return { notifications: updatednotifications };
+        });
       });
     }
   };
 
   // handling after dropping complaint from assignee
-  createNewComplaintAfterDropping = complaint => {
+  replaceUpdatedComplaint = complaint => {
     this.setState(prevState => {
       const updatedComplaints = [...prevState.complaints];
-
-      for (let i = 0; i < updatedComplaints.length; i++) {
-        if (updatedComplaints[i]._id === complaint._id) {
-          updatedComplaints.splice(i, 1, complaint);
-          // updatedComplaints.unshift(complaint);
-          break;
-        }
-      }
-      return { complaints: updatedComplaints };
+      let index = updatedComplaints.findIndex(c => c._id === complaint._id);
+      if (index >= 0) updatedComplaints[index] = complaint;
+      return { complaints: updatedComplaints, isLoading: false };
     });
-    this.setState({ isLoading: false });
   };
 
   // create new complaint that is created now
@@ -153,9 +143,8 @@ class Assignee extends React.Component {
     this.setState(prevState => {
       const updatedComplaints = [...prevState.complaints];
       updatedComplaints.unshift(complaint);
-      return { complaints: updatedComplaints };
+      return { complaints: updatedComplaints, isLoading: false };
     });
-    this.setState({ isLoading: false });
   };
 
   // handle mark as spam
@@ -169,8 +158,11 @@ class Assignee extends React.Component {
     }
 
     const { data: complaints } = await getAssigneeComplaints();
-    this.setState({ complaints, displaySpamList: false });
-    this.setState({ checkedComplaint: null });
+    this.setState({
+      complaints,
+      displaySpamList: false,
+      checkedComplaint: null
+    });
     // this.props.history.replace("/assignee");
     toast.success("You have successfully Marked this as spam");
   };

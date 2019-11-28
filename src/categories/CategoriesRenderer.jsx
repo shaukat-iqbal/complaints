@@ -3,7 +3,8 @@ import Papa from "papaparse";
 import TemporaryCategoriesList from "./TemporaryCategoriesList";
 import Joi from "joi-browser";
 import { toast } from "react-toastify";
-import { getCurrentUser } from "../services/authService";
+import { getSample } from "../services/csvService";
+import FileSaver from "file-saver";
 
 class CategoriesRenderer extends React.Component {
   state = {
@@ -123,6 +124,13 @@ class CategoriesRenderer extends React.Component {
   hanndleClearAll = () => {
     this.setState({ allCategories: [] });
   };
+
+  handleDownload = async fileName => {
+    console.log(fileName);
+    const response = await getSample(fileName + "");
+    const file = new Blob([response.data], { type: "application/csv" });
+    FileSaver.saveAs(file, "sample.csv");
+  };
   render() {
     return (
       <div className="container">
@@ -141,6 +149,19 @@ class CategoriesRenderer extends React.Component {
             className="col-md-3 col-sm-12 d-flex jumbotron bg-white flex-column shadow-sm"
             style={{ width: "300px", height: "300px" }}
           >
+            <div className="d-flex justify-content-end">
+              <button
+                className="btn btn-sm btn-info"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Download Sample"
+                type="button"
+                onClick={() => this.handleDownload("categories")}
+                style={{ width: "50px" }}
+              >
+                <i className="fa fa-question"></i>
+              </button>
+            </div>
             <p className="display-5">
               Upload <strong>Csv File</strong> to create categories
             </p>

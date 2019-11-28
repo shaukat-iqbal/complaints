@@ -8,6 +8,8 @@ import { sendMessage, getAllMessages } from "../../../services/messageService";
 import authService from "../../../services/authService";
 import styles from "./styles.module.css";
 import { getSpecificAssignee } from "../../../services/assigneeService.js";
+import { getSpecificAdmin } from "../../../services/userService.js";
+import { toast } from "react-toastify";
 
 const socket = openSocket("http://localhost:5000");
 
@@ -24,14 +26,21 @@ class Message extends React.Component {
   async componentDidMount() {
     this.scroll.current.scrollIntoView();
     this.getAllMessages();
-    socket.on("msg", data => {
-      console.log(data);
-    });
 
-    const { data: assignee } = await getSpecificAssignee(
-      this.props.match.params.id
-    );
-    this.setState({ assignee: assignee });
+    try {
+      const { data: assignee } = await getSpecificAssignee(
+        this.props.match.params.id
+      );
+
+      this.setState({ assignee: assignee });
+    } catch (ex) {
+      if (ex.response && ex.response.status == 404) {
+        const { data: assignee } = await getSpecificAdmin(
+          this.props.match.params.id
+        );
+        this.setState({ assignee: assignee });
+      }
+    }
   }
 
   getAllMessages = async () => {
@@ -49,16 +58,24 @@ class Message extends React.Component {
     this.scroll.current.scrollIntoView();
 
     socket.on("msg", data => {
-      console.log(data);
-      this.setState(prevState => {
-        const allMessages = [...prevState.allMessages];
-        allMessages.push(data);
-        return { allMessages: allMessages };
-      });
-      this.scroll.current.scrollIntoView();
+      try {
+        console.log(data);
+        this.setState(prevState => {
+          const allMessages = [...prevState.allMessages];
+          allMessages.push(data);
+          return { allMessages: allMessages };
+        });
+        this.scroll.current.scrollIntoView();
+      } catch (error) {
+        toast.success("Message recieved");
+      }
     });
     this.scroll.current.scrollIntoView();
   };
+
+  componentWillUnmount() {
+    socket.disconnect(true);
+  }
 
   handleChange = ({ currentTarget: input }) => {
     this.setState({ message: input.value });
@@ -73,8 +90,6 @@ class Message extends React.Component {
       formData.append("receiver", this.props.match.params.id);
 
       await sendMessage(formData);
-      this.setState({ message: "" });
-      this.scroll.current.scrollIntoView();
     } else {
       const data = {
         messageBody: this.state.message,
@@ -82,9 +97,9 @@ class Message extends React.Component {
         receiver: this.props.match.params.id
       };
       await sendMessage(data);
-      this.setState({ message: "" });
-      this.scroll.current.scrollIntoView();
     }
+    this.setState({ message: "" });
+    this.scroll.current.scrollIntoView();
   };
 
   handleSendFromEnter = async e => {

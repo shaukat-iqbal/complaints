@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { createUsers } from "../../../services/userService";
 import CsvResponse from "./csvResponse";
 import { toast } from "react-toastify";
+import FileSaver from "file-saver";
+import { getSample } from "../../../services/csvService";
 class FileUpload extends Component {
   state = {
     assignees: null,
@@ -59,6 +61,19 @@ class FileUpload extends Component {
   renderDiv = (userType, name, onClick) => {
     return (
       <div className="d-flex jumbotron bg-white flex-column shadow-lg ">
+        <div className="d-flex justify-content-end">
+          <button
+            className="btn btn-sm btn-info"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Download Sample"
+            type="button"
+            onClick={() => this.handleDownload(name)}
+            style={{ width: "50px" }}
+          >
+            <i className="fa fa-question"></i>
+          </button>
+        </div>
         <p className="display-5">
           Upload <strong>Csv File</strong> to create {userType + "s"} accounts
         </p>
@@ -80,6 +95,12 @@ class FileUpload extends Component {
     );
   };
 
+  handleDownload = async fileName => {
+    console.log(fileName);
+    const response = await getSample(fileName + "");
+    const file = new Blob([response.data], { type: "application/csv" });
+    FileSaver.saveAs(file, "sample.csv");
+  };
   render() {
     return (
       <div className="d-flex flex-column">

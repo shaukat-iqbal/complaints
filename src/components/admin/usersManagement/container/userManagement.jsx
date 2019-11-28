@@ -31,6 +31,8 @@ import { toast } from "react-toastify";
 import Notifications from "../../../common/Notifications";
 import AdminForm from "../../../common/adminForm";
 import ResetPassword from "../../../common/resetPassword";
+import AdminMessages from "../../AdminMessages";
+import { setProfilePictureToken } from "../../../../services/imageService";
 const scoket = openSocket(config.apiEndpoint);
 
 const drawerWidth = 220;
@@ -78,7 +80,7 @@ function UserManagement(props) {
   const currentUser = getCurrentUser();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState([]);
-
+  const [isDp, setIsDp] = useState(false);
   function handleDrawerToggle() {
     setMobileOpen(!mobileOpen);
   }
@@ -92,6 +94,13 @@ function UserManagement(props) {
 
   useEffect(() => {
     getNotifications();
+    async function setProfilePicture() {
+      if (!localStorage.getItem("profilePicture")) {
+        await setProfilePictureToken(getCurrentUser()._id, "admin");
+        setIsDp(true);
+      }
+    }
+    setProfilePicture();
     scoket.on("complaints", data => {
       if (
         data.action === "new complaint" &&
@@ -124,18 +133,6 @@ function UserManagement(props) {
       }
     });
   }, []);
-  //   <div
-  //   className="d-flex flex-column align-items-center p-3 gradiantHeading"
-  //   style={{
-  //     // backgroundColor: "#4D5672",
-  //     height: "150px"
-  //   }}
-  // >
-  //   <p className="text-white m-0 mt-1">
-  //     {getCurrentUser().name.split(" ")[0]}
-  //   </p>
-  //   <p className="text-white text-center m-0">Admin</p>
-  // </div>
 
   const drawer = (
     <div style={{ backgroundColor: "#4582FF", color: "#eee", height: "100%" }}>
@@ -226,7 +223,15 @@ function UserManagement(props) {
       <AppBar position="fixed" className={`${classes.appBar} gradiantHeading `}>
         <Toolbar>
           <div className="ml-auto">
-            <Notifications notifications={notifications} />
+            <div className="d-flex">
+              {" "}
+              <>
+                <AdminMessages />
+              </>
+              <>
+                <Notifications notifications={notifications} />
+              </>
+            </div>
           </div>
           <IconButton
             color="inherit"

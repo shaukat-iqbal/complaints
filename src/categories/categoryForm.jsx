@@ -97,7 +97,8 @@ class CategoryForm extends Form {
           this.state.category._id,
           this.state.data
         );
-        category = data;
+        category = data.category;
+        console.log(category);
       } else if (this.state.requestType === "addChild") {
         let { data } = await createCategory(this.state.data);
         category = data;

@@ -3,10 +3,11 @@ import openSocket from "socket.io-client";
 import { sendMessage, getAllMessages } from "../../../services/messageService";
 import config from "../../../config.json";
 
-import authService from "../../../services/authService";
+import authService, { getCurrentUser } from "../../../services/authService";
 import styles from "./styles.module.css";
 import { Link } from "react-router-dom";
 import { getSpecificComplainer } from "../../../services/complainerService";
+import { toast } from "react-toastify";
 
 const socket = openSocket("http://localhost:5000");
 
@@ -22,14 +23,11 @@ class AssigneeMessage extends React.Component {
 
   async componentDidMount() {
     this.getAllMessages();
-    socket.on("msg", data => {
-      console.log(data);
-    });
 
     const { data: complainer } = await getSpecificComplainer(
       this.props.match.params.id
     );
-    this.setState({ complainer: complainer });
+    this.setState({ complainer });
   }
 
   getAllMessages = async () => {
@@ -45,18 +43,25 @@ class AssigneeMessage extends React.Component {
 
     this.setState({ allMessages: msgs });
     this.scroll.current.scrollIntoView();
+
     socket.on("msg", data => {
-      console.log(data);
-      this.setState(prevState => {
-        const allMessages = [...prevState.allMessages];
-        allMessages.push(data);
-        return { allMessages: allMessages };
-      });
-      this.scroll.current.scrollIntoView();
+      try {
+        console.log(data);
+        this.setState(prevState => {
+          const allMessages = [...prevState.allMessages];
+          allMessages.push(data);
+          return { allMessages: allMessages };
+        });
+        this.scroll.current.scrollIntoView();
+      } catch (error) {
+        toast.info("New Message");
+      }
     });
-    this.scroll.current.scrollIntoView();
   };
 
+  componentWillUnmount() {
+    socket.disconnect(true);
+  }
   handleChange = ({ currentTarget: input }) => {
     this.setState({ message: input.value });
   };
@@ -134,7 +139,10 @@ class AssigneeMessage extends React.Component {
               </div>
             )}
 
-            <Link to="/assignee" className="btn btn-outline-light m-1">
+            <Link
+              to={`/${getCurrentUser().role}`}
+              className="btn btn-outline-light m-1"
+            >
               &larr; Back to Dashboard
             </Link>
           </div>

@@ -18,6 +18,7 @@ import ComplaintForm from "./ComplaintForm/complaintForm";
 import Loading from "../common/loading";
 import ComplaintDetail from "../common/ComplaintDetail";
 import { getAllNotifications } from "../../services/notificationService";
+const socket = openSocket("http://localhost:5000");
 
 class Complainer extends Component {
   state = {
@@ -32,7 +33,9 @@ class Complainer extends Component {
     selectedCategory: null,
     isLoading: false
   };
-
+  componentWillUnmount() {
+    socket.disconnect(true);
+  }
   async componentDidMount() {
     try {
       this.setState({ isLoading: true });
@@ -50,13 +53,23 @@ class Complainer extends Component {
 
     this.getAllComplaints();
 
-    const socket = openSocket("http://localhost:5000");
     const user = auth.getCurrentUser();
+    socket.on("msg", data => {
+      if (data.receiver === user._id) {
+        toast.info("New Message: " + data.messageBody);
+      }
+    });
+
     socket.on("complaints", data => {
       if (
-        data.action === "status changed" &&
-        user.companyId == data.notification.companyId
+        user.companyId !== data.notification.companyId ||
+        user._id !== data.notification.receivers.id
       ) {
+        return;
+      }
+
+      if (data.action === "status changed") {
+        this.replaceUpdatedComplaint(data.complaint);
         toast.info(
           `Complaints: "${data.complaint}'s" status is changed to "${data.status}"`
         );
@@ -65,10 +78,19 @@ class Complainer extends Component {
           updatednotifications.unshift(data.notification);
           return { notifications: updatednotifications };
         });
-        this.getAllComplaints();
+        // this.getAllComplaints();
       }
     });
   }
+  // handling after dropping complaint from assignee
+  replaceUpdatedComplaint = complaint => {
+    this.setState(prevState => {
+      const updatedComplaints = [...prevState.complaints];
+      let index = updatedComplaints.findIndex(c => c._id === complaint._id);
+      if (index >= 0) updatedComplaints[index] = complaint;
+      return { complaints: updatedComplaints, isLoading: false };
+    });
+  };
 
   // getting all complaints
   getAllComplaints = async () => {

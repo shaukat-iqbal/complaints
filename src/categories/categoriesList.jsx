@@ -143,10 +143,20 @@ class CategoriesList extends Component {
         if (parentCategoryIndex >= 0)
           allCategories[parentCategoryIndex].hasChild = true;
         console.log(parentCategoryIndex, allCategories[parentCategoryIndex]);
-      } else {
+        allCategories.unshift(category);
+      } else if (this.state.requestType === "edit") {
+        let index = allCategories.findIndex(c => c._id === category._id);
+        if (index >= 0) {
+          allCategories[index] = category;
+        }
+        index = sidebarCategories.findIndex(c => c._id === category._id);
+        if (index >= 0) {
+          sidebarCategories[index] = category;
+        }
+      } else if (this.state.requestType === "new") {
         sidebarCategories.unshift(category);
+        allCategories.unshift(category);
       }
-      allCategories.unshift(category);
       this.setState({
         allCategories,
         categoryFormEnabled: false,

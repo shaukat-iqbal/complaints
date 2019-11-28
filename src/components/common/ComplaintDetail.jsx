@@ -30,9 +30,9 @@ export default function ComplaintDetail(props) {
   const [edit, setEdit] = useState(false);
   const [remarks, setRemarks] = useState("");
   const [isReopen, setIsReopen] = useState(false);
+  const [isMessaging, setIsMessaging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const statusValue = useRef(null);
-  let isMessaging = false;
   const [displayFeedback, setDisplayFeedback] = useState(false);
   const [feedback, setFeedback] = useState({
     feedbackRemarks: "",
@@ -64,7 +64,7 @@ export default function ComplaintDetail(props) {
     let currentUser = getCurrentUser();
     let configToken = getConfigToken();
     if (configToken) {
-      isMessaging = configToken.isMessaging;
+      setIsMessaging(configToken.isMessaging);
       setIsReopen(configToken.isReopen);
     }
     if (!currentUser) window.location = "/login";
@@ -256,16 +256,22 @@ export default function ComplaintDetail(props) {
                     !complaint.feedbackRemarks && (
                       <i
                         className="fa fa-comments-o controlIcon"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Give Feedback"
                         onClick={() => setDisplayFeedback(true)}
                       ></i>
                     )}
 
                   {/* The person who is responsible or complainer can start  or see chat */}
                   {isMessaging &&
-                    (user._id === complaint.complainer._id ||
-                      user._id === complaint.assignedTo._id) && (
+                    (user._id == complaint.complainer._id ||
+                      user._id == complaint.assignedTo._id) && (
                       <i
                         className="fa fa-envelope controlIcon"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Send Message"
                         onClick={() => handleMessaging(complaint)}
                       ></i>
                     )}
@@ -274,26 +280,39 @@ export default function ComplaintDetail(props) {
                     user.role === "complainer" && (
                       <i
                         className="fa fa-refresh controlIcon"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Re Open the complaint"
                         onClick={() => handleReopen(complaint)}
                       ></i>
                     )}
 
                   {/* Assign Task */}
-                  {!complaint.assignedTo && user.role === "admin" && (
-                    <i
-                      className="fa fa-user controlIcon"
-                      onClick={() => handleAssign(complaint)}
-                    ></i>
-                  )}
+                  {complaint.assignedTo._id === user._id &&
+                    user.role === "admin" && (
+                      <i
+                        className="fa fa-user controlIcon"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Assign the Complaint"
+                        onClick={() => handleAssign(complaint)}
+                      ></i>
+                    )}
 
                   {complaint.files !== "" && (
                     <>
                       <i
                         className="fa fa-paperclip controlIcon"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="View Attached File"
                         onClick={() => handleFileView(complaint)}
                       ></i>
                       <i
                         className="fa fa-download controlIcon"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Download Attached File"
                         onClick={() => handleFileDownload(complaint)}
                       ></i>
                     </>
@@ -302,6 +321,9 @@ export default function ComplaintDetail(props) {
                   {complaint.geolocation && (
                     <i
                       className="fa fa-map-marker controlIcon"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      title="View Location on map"
                       onClick={() => handleMapView(complaint)}
                     ></i>
                   )}
@@ -326,7 +348,12 @@ export default function ComplaintDetail(props) {
                     </span>
                   </label>
                 </div>
-                <div className="d-flex justify-content-between">
+                <div
+                  className="d-flex justify-content-between"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="Click to change status"
+                >
                   <span className="status" onClick={handleEdit}>
                     Status: {complaint.status}
                   </span>

@@ -8,6 +8,8 @@ import { countComplainers } from "../../../services/complainerService";
 import DashboardCards from "../DashboardCards";
 import Complaints from "../../common/Complaints";
 import { getConfigToken } from "../../../services/configurationService";
+import { getCurrentUser } from "../../../services/authService";
+const socket = openSocket("http://localhost:5000");
 
 class Dashboard extends Component {
   state = {
@@ -31,7 +33,6 @@ class Dashboard extends Component {
   }
 
   checkingSocketConnection = () => {
-    const socket = openSocket("http://localhost:5000", { reconnection: true });
     socket.on("complaints", data => {
       if (data.action === "new complaint") {
         this.setState({ isLoading: true });
@@ -73,8 +74,17 @@ class Dashboard extends Component {
         this.setState({ selectedComplaints });
       }
     });
+
+    socket.on("msg", data => {
+      if (data.receiver === getCurrentUser()._id) {
+        toast.info("New Message");
+      }
+    });
   };
 
+  componentWillUnmount() {
+    socket.disconnect(true);
+  }
   // create new complaint that is created now
   createNewComplaint = complaint => {
     const updatedComplaints = [...this.state.complaints];

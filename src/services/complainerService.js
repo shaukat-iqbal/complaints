@@ -16,3 +16,7 @@ export function deleteComplainer(complainerId) {
 export function countComplainers() {
   return http.get(config.apiUrl + "/complainers/count/complainers");
 }
+
+export function getUniqueComplainers() {
+  return http.get(config.apiUrl + "/admin-complaints/get/uniqueComplainers");
+}
