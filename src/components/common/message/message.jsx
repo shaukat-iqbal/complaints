@@ -11,7 +11,7 @@ import { getSpecificAssignee } from "../../../services/assigneeService.js";
 import { getSpecificAdmin } from "../../../services/userService.js";
 import { toast } from "react-toastify";
 
-const socket = openSocket("http://localhost:5000");
+const socket = openSocket(config.apiEndpoint);
 
 class Message extends React.Component {
   state = {

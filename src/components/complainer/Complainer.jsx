@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import _ from "lodash";
-import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar from "./navbar/navbar";
 import auth from "../../services/authService";
@@ -12,13 +11,13 @@ import { getCategories } from "../../services/categoryService";
 import CompalinerTable from "./complainerTable/complainerTable";
 import SearchBox from "./searchBox";
 import openSocket from "socket.io-client";
-import Spinner from "../common/Spinner/Spinner";
 import GraphBanner from "../common/GraphsBanner";
 import ComplaintForm from "./ComplaintForm/complaintForm";
 import Loading from "../common/loading";
 import ComplaintDetail from "../common/ComplaintDetail";
 import { getAllNotifications } from "../../services/notificationService";
-const socket = openSocket("http://localhost:5000");
+import config from "./../../config.json";
+const socket = openSocket(config.apiEndpoint);
 
 class Complainer extends Component {
   state = {

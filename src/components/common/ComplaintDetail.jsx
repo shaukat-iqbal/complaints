@@ -19,6 +19,7 @@ import { getCurrentUser } from "../../services/authService";
 import "./complaintDetail.css";
 import { capitalizeFirstLetter } from "../../services/helper";
 import { getConfigToken } from "../../services/configurationService";
+import config from "./../../config.json";
 
 export default function ComplaintDetail(props) {
   const [openAssigneeDialog, setopenAssigneeDialog] = useState(true);
@@ -111,16 +112,14 @@ export default function ComplaintDetail(props) {
 
   // handle file download
   const handleFileDownload = async complaint => {
-    window.location =
-      "http://localhost:5000/api/complainer-complaints/download/image/" +
-      complaint._id;
+    window.location = `${config.apiEndpoint}/api/complainer-complaints/download/image/${complaint._id}`;
   };
 
   // handle file download
   const handleFileView = async complaint => {
+    // alert(config.apiEndpoint);
     window.open(
-      "http://localhost:5000/api/complainer-complaints/view/image/" +
-        complaint._id,
+      `${config.apiEndpoint}/api/complainer-complaints/view/image/${complaint._id}`,
       "_blank"
     );
   };

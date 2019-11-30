@@ -13,12 +13,12 @@ import NavbarAssignee from "./navbar/navbarAssignee";
 import Spinner from "../common/Spinner/Spinner";
 import RegisterForm from "./../admin/usersManagement/Register";
 import { getAllNotifications } from "../../services/notificationService";
-
+import config from "../../config.json";
 import {
   getAssigneeComplaints,
   markSpam
 } from "../../services/complaintService";
-const socket = openSocket("http://localhost:5000", {
+const socket = openSocket(config.apiEndpoint, {
   reconnection: true
 });
 class Assignee extends React.Component {

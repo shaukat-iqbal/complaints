@@ -9,7 +9,8 @@ import DashboardCards from "../DashboardCards";
 import Complaints from "../../common/Complaints";
 import { getConfigToken } from "../../../services/configurationService";
 import { getCurrentUser } from "../../../services/authService";
-const socket = openSocket("http://localhost:5000");
+import config from "../../../config.json";
+const socket = openSocket(config.apiEndpoint);
 
 class Dashboard extends Component {
   state = {

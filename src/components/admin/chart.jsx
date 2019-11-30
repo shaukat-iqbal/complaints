@@ -26,12 +26,7 @@ const Chart = props => {
   const [complainersCount, setComplainersCount] = useState([]);
   // handleGenerateReport
   const handleGenerateReport = async body => {
-    // window.open(
-    //   "http://localhost:5000/api/admin-complaints//generate/pdf/v1",
-    //   "_blank"
-    // );
     let companyId = getConfigToken().companyId;
-    // const { headers } = await getReport();
     window.open(
       `${config.apiUrl}/admin-complaints/generateReport/${companyId}/${body.from}/${body.to}`
     );

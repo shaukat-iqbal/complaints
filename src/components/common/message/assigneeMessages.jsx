@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import { getSpecificComplainer } from "../../../services/complainerService";
 import { toast } from "react-toastify";
 
-const socket = openSocket("http://localhost:5000");
+const socket = openSocket(config.apiEndpoint);
 
 class AssigneeMessage extends React.Component {
   state = {
