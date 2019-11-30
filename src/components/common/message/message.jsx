@@ -5,11 +5,12 @@ import openSocket from "socket.io-client";
 import config from "../../../config.json";
 
 import { sendMessage, getAllMessages } from "../../../services/messageService";
-import authService from "../../../services/authService";
+import authService, { getCurrentUser } from "../../../services/authService";
 import styles from "./styles.module.css";
 import { getSpecificAssignee } from "../../../services/assigneeService.js";
 import { getSpecificAdmin } from "../../../services/userService.js";
 import { toast } from "react-toastify";
+import { userInfo } from "os";
 
 const socket = openSocket(config.apiEndpoint);
 
@@ -44,38 +45,55 @@ class Message extends React.Component {
   }
 
   getAllMessages = async () => {
+    let user = getCurrentUser();
     const data = {
-      sender: authService.getCurrentUser()._id,
+      sender: user._id,
       receiver: this.props.match.params.id
     };
     const { data: msgs } = await getAllMessages(data);
 
+    // msgs.sort((a, b) => {
+    //   return a.createdAt.localeCompare(b.createdAt);
+    // });
     msgs.sort((a, b) => {
-      return a.createdAt.localeCompare(b.createdAt);
+      return new Date(a.createdAt) - new Date(b.createdAt);
     });
 
     this.setState({ allMessages: msgs });
     this.scroll.current.scrollIntoView();
 
     socket.on("msg", data => {
-      try {
-        console.log(data);
-        this.setState(prevState => {
-          const allMessages = [...prevState.allMessages];
-          allMessages.push(data);
-          return { allMessages: allMessages };
-        });
-        this.scroll.current.scrollIntoView();
-      } catch (error) {
-        toast.success("Message recieved");
+      console.log(data);
+      if (
+        (data.sender === this.props.match.params.id &&
+          data.receiver === user._id) ||
+        (data.sender === user._id &&
+          data.receiver === this.props.match.params.id)
+      ) {
+        try {
+          this.setState(prevState => {
+            const allMessages = [...prevState.allMessages];
+            allMessages.push(data);
+            return { allMessages: allMessages };
+          });
+          this.scroll.current.scrollIntoView();
+        } catch (error) {
+          // if(data.snde)
+          // toast.success("Message Sent");
+        }
       }
+
+      // if (data.receiver != user._id && data.sender != user._id) {
+      //   console.log(user, data);
+      //   return;
+      // }
     });
     this.scroll.current.scrollIntoView();
   };
 
-  componentWillUnmount() {
-    socket.disconnect(true);
-  }
+  //componentWillUnmount() {
+  // socket.disconnect(true);
+  //}
 
   handleChange = ({ currentTarget: input }) => {
     this.setState({ message: input.value });
@@ -201,7 +219,11 @@ class Message extends React.Component {
                               </a>
                             </span>
                           ) : (
-                            <span>{a.messageBody}</span>
+                            <>
+                              <span>{a.messageBody}</span>
+                              <br></br>
+                              {/* <span>{new Date(a.createdAt).getTime()}</span> */}
+                            </>
                           )}
                         </span>
                       </p>

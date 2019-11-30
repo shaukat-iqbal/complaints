@@ -33,6 +33,8 @@ import AdminForm from "../../../common/adminForm";
 import ResetPassword from "../../../common/resetPassword";
 import AdminMessages from "../../AdminMessages";
 import { setProfilePictureToken } from "../../../../services/imageService";
+// import { getConfigToken } from "./../";
+
 const scoket = openSocket(config.apiEndpoint);
 
 const drawerWidth = 220;

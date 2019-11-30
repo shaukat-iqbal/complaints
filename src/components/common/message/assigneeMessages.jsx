@@ -31,37 +31,46 @@ class AssigneeMessage extends React.Component {
   }
 
   getAllMessages = async () => {
+    let user = getCurrentUser();
     const data = {
       sender: this.props.match.params.id,
-      receiver: authService.getCurrentUser()._id
+      receiver: user._id
     };
     const { data: msgs } = await getAllMessages(data);
 
     msgs.sort((a, b) => {
       return a.createdAt.localeCompare(b.createdAt);
     });
+    // msgs.sort((a, b) => {
+    //   return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    // });
 
     this.setState({ allMessages: msgs });
     this.scroll.current.scrollIntoView();
-
     socket.on("msg", data => {
-      try {
-        console.log(data);
-        this.setState(prevState => {
-          const allMessages = [...prevState.allMessages];
-          allMessages.push(data);
-          return { allMessages: allMessages };
-        });
-        this.scroll.current.scrollIntoView();
-      } catch (error) {
-        toast.info("New Message");
+      if (
+        (data.sender === this.props.match.params.id &&
+          data.receiver === user._id) ||
+        (data.sender === user._id &&
+          data.receiver === this.props.match.params.id)
+      ) {
+        try {
+          this.setState(prevState => {
+            const allMessages = [...prevState.allMessages];
+            allMessages.push(data);
+            return { allMessages: allMessages };
+          });
+          this.scroll.current.scrollIntoView();
+        } catch (error) {
+          // toast.success("Message Sent");
+        }
       }
     });
   };
 
-  componentWillUnmount() {
-    socket.disconnect(true);
-  }
+  //componentWillUnmount() {
+  // socket.disconnect(true);
+  //}
   handleChange = ({ currentTarget: input }) => {
     this.setState({ message: input.value });
   };
@@ -186,7 +195,11 @@ class AssigneeMessage extends React.Component {
                               </a>
                             </>
                           ) : (
-                            <span>{a.messageBody}</span>
+                            <>
+                              <span>{a.messageBody}</span>
+                              <br></br>
+                              {/* <span>{new Date(a.createdAt).getTime()}</span> */}
+                            </>
                           )}
                         </span>
                       </p>

@@ -8,6 +8,7 @@ class ComplaintsTable extends Component {
     { path: "category.name", label: "Category" },
     { path: "assignedTo.name", label: "Assigned To" },
     { path: "complainer.name", label: "Complainer" },
+    { path: "timeStamp", label: "Date" },
     {
       key: "detail",
       content: complaint => (

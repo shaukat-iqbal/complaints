@@ -76,7 +76,7 @@ class Assignee extends React.Component {
 
   componentWillUnmount() {
     this.isActive = false;
-    socket.disconnect(true);
+    // socket.disconnect(true);
   }
   // check socket connection
   checkSocketConnection = () => {
@@ -84,7 +84,7 @@ class Assignee extends React.Component {
     if (this.isActive) {
       socket.on("msg", data => {
         if (data.receiver === user._id) {
-          toast.info("New Message");
+          toast.info("New Message:" + data.messageBody);
         }
       });
       socket.on("complaints", data => {

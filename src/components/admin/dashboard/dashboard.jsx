@@ -87,9 +87,9 @@ class Dashboard extends Component {
     });
   };
 
-  componentWillUnmount() {
-    socket.disconnect(true);
-  }
+  //componentWillUnmount() {
+  // socket.disconnect(true);
+  //}
   // create new complaint that is created now
   createNewComplaint = complaint => {
     const updatedComplaints = [...this.state.complaints];
