@@ -32,9 +32,9 @@ class Complainer extends Component {
     selectedCategory: null,
     isLoading: false
   };
-  componentWillUnmount() {
-    socket.disconnect(true);
-  }
+  // componentWillUnmount() {
+  //   socket.disconnect(true);
+  // }
   async componentDidMount() {
     try {
       this.setState({ isLoading: true });
@@ -71,7 +71,7 @@ class Complainer extends Component {
       if (data.action === "status changed") {
         this.replaceUpdatedComplaint(data.complaint);
         toast.info(
-          `Complaints: "${data.complaint}'s" status is changed to "${data.status}"`
+          `Complaints: "${data.complaint.title}'s" status is changed to "${data.status}"`
         );
         this.setState(prevState => {
           const updatednotifications = [...prevState.notifications];
@@ -216,7 +216,11 @@ class Complainer extends Component {
             notifications={notifications}
             {...this.props}
           />
-
+          <ComplaintForm
+            isOpen={this.state.isFormEnabled}
+            onSuccess={this.closeComplaintForm}
+            onClose={this.toggleComplaintForm}
+          />
           <div className="container">
             {isLoading && <Loading />}
             <button

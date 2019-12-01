@@ -60,7 +60,7 @@ class ComplaintForm extends Form {
         .min(1)
         .label("Severity");
     }
-    this.state.data.severity = "1";
+    if (token && token.isSeverity) this.state.data.severity = "1";
   }
   // componentDidMount
   async componentDidMount() {

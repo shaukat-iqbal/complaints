@@ -29,8 +29,6 @@ class Dashboard extends Component {
   async componentDidMount() {
     this.getComplaints();
     this.checkingSocketConnection();
-    let { data: months } = await countComplainers();
-    this.setState({ countUsers: months });
   }
 
   checkingSocketConnection = () => {
@@ -117,6 +115,7 @@ class Dashboard extends Component {
   // get complaints
   getComplaints = async () => {
     this.setState({ isLoading: true });
+    let { data: months } = await countComplainers();
     const { data: complaints } = await getAdminComplaints();
     let temp = [];
     complaints.forEach(complaint => {
@@ -129,7 +128,8 @@ class Dashboard extends Component {
       isLoading: false,
       complaints,
       selectedComplaints: complaints,
-      categories
+      categories,
+      countUsers: months
     });
     // this.aggregateMonthWiseComplaints(complaints);
   };

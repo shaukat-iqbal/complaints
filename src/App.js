@@ -50,7 +50,7 @@ class App extends Component {
             )}
           />
           <Route
-            path="/register"
+            path="/register/:companyId"
             render={props => (
               <div className="d-flex justify-content-center py-5 ">
                 <RegisterForm {...props} />

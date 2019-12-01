@@ -63,7 +63,10 @@ class RegisterForm extends Form {
     if (!user) {
       user = { role: "guest" };
       let configToken = getConfigToken();
-      if (configToken) this.state.companyId = configToken.companyId;
+      if (configToken) {
+        this.state.companyId = configToken.companyId;
+        user.companyId = configToken.companyId;
+      }
     }
     this.state.currentUser = user;
     this.state.companyId = user.companyId;
@@ -86,6 +89,9 @@ class RegisterForm extends Form {
         .min(8)
         .label("Confirm Password");
     }
+    if (props.match) {
+      this.state.companyId = props.match.params.companyId;
+    }
   }
 
   async componentDidMount() {
@@ -94,9 +100,8 @@ class RegisterForm extends Form {
       if (id && role) {
         this.populateUserDetails(id, role.substring(0, role.length - 1));
       }
-    } else {
-      this.setState({ isLoading: false });
     }
+    this.setState({ isLoading: false });
   }
 
   getToolTips = async responsibilities => {
@@ -136,6 +141,7 @@ class RegisterForm extends Form {
       data.name = user.name;
       data.email = user.email;
       data.phone = user.phone;
+
       if (user.profilePicture) {
         var profilePicture = convertToPicture(user.profilePicture.data);
       }
@@ -254,7 +260,9 @@ class RegisterForm extends Form {
         await registerUser(fd, this.state.isAssignee);
 
         toast.success("User create successfully.");
+        this.setState({ isLoading: false });
       }
+
       if (role !== "admin") {
         this.props.history.push("/login");
         return;

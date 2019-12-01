@@ -34,6 +34,9 @@
   margin-bottom: 10px;
 }
 
+.complaint-body table {
+  max-width: 90%;
+}
 .complaint-body {
   background-color: aliceblue;
   height: 65%;

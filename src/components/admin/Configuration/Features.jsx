@@ -171,8 +171,8 @@ class Features extends Component {
             This feature will enable system to identify delayed complaints based
             on given days criteria.
           </p>
-          <div class="input-group mb-3">
-            <div class=" input-group-append">
+          <div className="input-group mb-3">
+            <div className=" input-group-append">
               <input
                 type="number"
                 value={this.state.updatedConfigObj.delayedDays}
@@ -180,7 +180,7 @@ class Features extends Component {
                 min="1"
                 name="delayedDays"
               />
-              <span class="input-group-text" id="basic-addon1">
+              <span className="input-group-text" id="basic-addon1">
                 Days
               </span>
             </div>

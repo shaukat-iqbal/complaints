@@ -89,6 +89,7 @@ class Assignee extends React.Component {
       });
       socket.on("complaints", data => {
         console.log(data);
+
         if (
           user.companyId !== data.notification.companyId ||
           user._id !== data.notification.receivers.id
@@ -104,7 +105,7 @@ class Assignee extends React.Component {
             );
             break;
           case "task assigned":
-            this.createNewComplaint(data.complaint);
+            this.replaceUpdatedComplaint(data.complaint);
             toast.info(
               `New Complaint has been assigned to you.Title: "${data.complaint.title}"`
             );
@@ -113,6 +114,13 @@ class Assignee extends React.Component {
             this.replaceUpdatedComplaint(data.complaint);
             toast.info(
               `Complainer has given you feedback on Complaint with title "${data.complaint.title}"`
+            );
+            break;
+
+          case "reopened":
+            this.replaceUpdatedComplaint(data.complaint);
+            toast.info(
+              `Complaint has been reOpened by complainant. Title "${data.complaint.title}"`
             );
             break;
           default:

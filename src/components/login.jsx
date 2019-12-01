@@ -164,7 +164,7 @@ class Login extends Form {
                   </Link>
                   <br />
                   {configToken && configToken.isAccountCreation && (
-                    <Link to="/register">
+                    <Link to={`/register/${this.state.data.companyId}`}>
                       Not Registered? Register by clicking here.
                     </Link>
                   )}
