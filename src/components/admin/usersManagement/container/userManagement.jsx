@@ -33,6 +33,8 @@ import AdminForm from "../../../common/adminForm";
 import ResetPassword from "../../../common/resetPassword";
 import AdminMessages from "../../AdminMessages";
 import { setProfilePictureToken } from "../../../../services/imageService";
+import { getConfigToken } from "../../../../services/configurationService";
+import { Socket } from "dgram";
 // import { getConfigToken } from "./../";
 
 const scoket = openSocket(config.apiEndpoint);
@@ -82,6 +84,7 @@ function UserManagement(props) {
   const currentUser = getCurrentUser();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState([]);
+  const [isMessaging, setIsMessaging] = React.useState(true);
   const [isDp, setIsDp] = useState(false);
   function handleDrawerToggle() {
     setMobileOpen(!mobileOpen);
@@ -102,40 +105,41 @@ function UserManagement(props) {
         setIsDp(true);
       }
     }
+    setIsMessaging(getConfigToken().isMessaging);
     setProfilePicture();
-    scoket.on("complaints", data => {
-      if (
-        data.action === "new complaint" &&
-        currentUser.companyId == data.notification.companyId
-      ) {
-        toast.info(data.notification.msg);
-
-        let allNotifications = [...notifications];
-        // allNotifications.find(not => not.msg !== data.notification.msg);
-        allNotifications.unshift(data.notification);
-        setNotifications(oldNotifications => [
-          ...allNotifications,
-          ...oldNotifications
-        ]);
-      }
-
-      if (
-        data.action === "drop" &&
-        currentUser.companyId == data.notification.companyId
-      ) {
-        // toast.info(data.notification.msg);
-
-        let allNotifications = [...notifications];
-        // allNotifications.find(not => not.msg !== data.notification.msg);
-        allNotifications.unshift(data.notification);
-        setNotifications(oldNotifications => [
-          ...allNotifications,
-          ...oldNotifications
-        ]);
-      }
-    });
+    listenEvents();
   }, []);
 
+  const listenEvents = () => {
+    scoket.on("config", configuration => {
+      if (currentUser.companyId === configuration.companyId) {
+        setIsMessaging(configuration.isMessaging);
+      }
+    });
+    scoket.on("complaints", data => {
+      if (
+        data.notification.receivers.id !== currentUser._id &&
+        data.notification.receivers.role !== currentUser.role
+      )
+        return;
+
+      if (data.action === "new complaint") {
+        toast.info(data.notification.msg);
+      } else if (data.action === "drop") {
+        // toast.info(data.notification.msg);
+      } else if (data.action === "task assigned") {
+        toast.info(data.notification.msg + "User mens");
+      }
+
+      let allNotifications = [...notifications];
+      // allNotifications.find(not => not.msg !== data.notification.msg);
+      allNotifications.unshift(data.notification);
+      setNotifications(oldNotifications => [
+        ...allNotifications,
+        ...oldNotifications
+      ]);
+    });
+  };
   const drawer = (
     <div style={{ backgroundColor: "#4582FF", color: "#eee", height: "100%" }}>
       <div
@@ -227,9 +231,7 @@ function UserManagement(props) {
           <div className="ml-auto">
             <div className="d-flex">
               {" "}
-              <>
-                <AdminMessages />
-              </>
+              <>{isMessaging && <AdminMessages />}</>
               <>
                 <Notifications notifications={notifications} />
               </>

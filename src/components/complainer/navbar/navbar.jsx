@@ -13,6 +13,11 @@ import { toast } from "react-toastify";
 import UserLogo from "../../common/logo";
 import { setProfilePictureToken } from "../../../services/imageService";
 import Notifications from "../../common/Notifications";
+import config from "./../../../config.json";
+import openSocket from "socket.io-client";
+import { getConfigToken } from "../../../services/configurationService";
+
+const socket = openSocket(config.apiEndpoint);
 
 const url = "/c/message";
 
@@ -20,14 +25,22 @@ class Navbar extends React.Component {
   state = {
     assignees: [],
     confirmation: false,
-    assignee: ""
+    assignee: "",
+    isMessaging: true
   };
 
   async componentDidMount() {
+    let user = getCurrentUser();
     if (!localStorage.getItem("profilePicture")) {
       await setProfilePictureToken(getCurrentUser()._id, "complainer");
       this.setState({ profilePicture: true });
     }
+    this.setState({ isMessaging: getConfigToken().isMessaging });
+    socket.on("config", configuration => {
+      if (user.companyId === configuration.companyId) {
+        this.setState({ isMessaging: configuration.isMessaging });
+      }
+    });
   }
 
   handleDelete = async assignee => {
@@ -46,6 +59,7 @@ class Navbar extends React.Component {
 
   render() {
     const { user, assignees, notifications } = this.props;
+    const { isMessaging } = this.state;
 
     return (
       <>
@@ -102,55 +116,54 @@ class Navbar extends React.Component {
               <div className="navbar-nav ml-auto ">
                 <Notifications notifications={notifications} />
 
-                <div className="dropdown">
-                  <button
-                    className="nav-button mt-2 mr-4 navbar-custom"
-                    type="button"
-                    id="dropdownMenuButton"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <i className="fa fa-envelope mr-1"></i>
-                  </button>
-                  <div
-                    className="dropdown-menu"
-                    aria-labelledby="dropdownMenuButton"
-                  >
-                    {assignees.length > 0 ? (
-                      <>
-                        {assignees.map(as => (
-                          <li
-                            key={as._id}
-                            className="dropdown-item d-flex justify-content-between align-items-center"
-                          >
-                            <Link
+                {isMessaging && (
+                  <div className="dropdown">
+                    <button
+                      className="nav-button mt-2 mr-4 navbar-custom"
+                      type="button"
+                      id="dropdownMenuButton"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                    >
+                      <i className="fa fa-envelope mr-1"></i>
+                    </button>
+                    <div
+                      className="dropdown-menu"
+                      aria-labelledby="dropdownMenuButton"
+                    >
+                      {assignees.length > 0 ? (
+                        <>
+                          {assignees.map(as => (
+                            <li
                               key={as._id}
-                              to={`${url}/${as._id}`}
-                              className="text-decoration-none text-dark"
+                              className="dropdown-item d-flex justify-content-between align-items-center"
                             >
-                              {" "}
-                              {as.name}{" "}
-                            </Link>
-                            <i
-                              className="fa fa-trash pl-5 clickable"
-                              onClick={() => this.displayConfirmation(as)}
-                            />
-                            <div className="dropdown-divider" />
-
-                            {/* Confirmation */}
-
-                            {/* Confirmation end */}
+                              <Link
+                                key={as._id}
+                                to={`${url}/${as._id}`}
+                                className="text-decoration-none text-dark"
+                              >
+                                {as.name}
+                              </Link>
+                              <i
+                                className="fa fa-trash pl-5 clickable"
+                                onClick={() => this.displayConfirmation(as)}
+                              />
+                              <div className="dropdown-divider" />
+                            </li>
+                          ))}
+                        </>
+                      ) : (
+                        <>
+                          <li className="dropdown-item">
+                            You have No messages
                           </li>
-                        ))}
-                      </>
-                    ) : (
-                      <>
-                        <li className="dropdown-item">You have No messages</li>
-                      </>
-                    )}
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
                 <UserLogo />
 
                 <NavLink

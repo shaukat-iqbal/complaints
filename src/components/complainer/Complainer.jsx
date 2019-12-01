@@ -53,6 +53,7 @@ class Complainer extends Component {
     this.getAllComplaints();
 
     const user = auth.getCurrentUser();
+
     socket.on("msg", data => {
       if (data.receiver === user._id) {
         toast.info("New Message: " + data.messageBody);

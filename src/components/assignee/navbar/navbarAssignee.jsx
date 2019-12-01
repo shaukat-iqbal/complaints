@@ -17,7 +17,12 @@ import UserLogo from "../../common/logo";
 import { getAllNotifications } from "../../../services/notificationService";
 import ComplaintDetail from "../../common/ComplaintDetail";
 import Notifications from "../../common/Notifications";
-
+import { getConfigToken } from "../../../services/configurationService";
+import openSocket from "socket.io-client";
+import config from "./../../../config.json";
+const socket = openSocket(config.apiEndpoint, {
+  reconnection: true
+});
 const url = "/a/message";
 
 class Navbar extends React.Component {
@@ -25,13 +30,22 @@ class Navbar extends React.Component {
     complainers: [],
     confirmation: false,
     complainer: "",
-    notifications: []
+    notifications: [],
+    isMessaging: true
   };
 
   async componentDidMount() {
+    let user = getCurrentUser();
     if (!localStorage.getItem("profilePicture")) {
       await setProfilePictureToken(getCurrentUser()._id, "assignee");
     }
+
+    this.setState({ isMessaging: getConfigToken().isMessaging });
+    socket.on("config", configuration => {
+      if (user.companyId === configuration.companyId) {
+        this.setState({ isMessaging: configuration.isMessaging });
+      }
+    });
   }
 
   handleDelete = async complainer => {
@@ -112,54 +126,58 @@ class Navbar extends React.Component {
               <div className="navbar-nav ml-auto ">
                 <Notifications notifications={notifications} />
 
-                <div className="dropdown">
-                  <button
-                    className="nav-button mt-2 mr-4 navbar-custom"
-                    type="button"
-                    id="dropdownMenuButton"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <i className="fa fa-envelope mr-1"></i>
-                  </button>
-                  <div
-                    className="dropdown-menu"
-                    aria-labelledby="dropdownMenuButton"
-                  >
-                    {complainers.length > 0 ? (
-                      <>
-                        {complainers.map(as => (
-                          <li
-                            key={as._id}
-                            className="dropdown-item d-flex justify-content-between align-items-center"
-                          >
-                            <Link
+                {this.state.isMessaging && (
+                  <div className="dropdown">
+                    <button
+                      className="nav-button mt-2 mr-4 navbar-custom"
+                      type="button"
+                      id="dropdownMenuButton"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                    >
+                      <i className="fa fa-envelope mr-1"></i>
+                    </button>
+                    <div
+                      className="dropdown-menu"
+                      aria-labelledby="dropdownMenuButton"
+                    >
+                      {complainers.length > 0 ? (
+                        <>
+                          {complainers.map(as => (
+                            <li
                               key={as._id}
-                              to={`${url}/${as._id}`}
-                              className="text-decoration-none text-dark"
+                              className="dropdown-item d-flex justify-content-between align-items-center"
                             >
-                              {" "}
-                              {as.name}{" "}
-                            </Link>
-                            <i
-                              className="fa fa-trash clickable pl-5"
-                              onClick={() => this.displayConfirmation(as)}
-                            />
+                              <Link
+                                key={as._id}
+                                to={`${url}/${as._id}`}
+                                className="text-decoration-none text-dark"
+                              >
+                                {" "}
+                                {as.name}{" "}
+                              </Link>
+                              <i
+                                className="fa fa-trash clickable pl-5"
+                                onClick={() => this.displayConfirmation(as)}
+                              />
 
-                            {/* Confirmation */}
+                              {/* Confirmation */}
 
-                            {/* Confirmation end */}
+                              {/* Confirmation end */}
+                            </li>
+                          ))}
+                        </>
+                      ) : (
+                        <>
+                          <li className="dropdown-item">
+                            You have No messages
                           </li>
-                        ))}
-                      </>
-                    ) : (
-                      <>
-                        <li className="dropdown-item">You have No messages</li>
-                      </>
-                    )}
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
                 <UserLogo />
 
                 <NavLink
