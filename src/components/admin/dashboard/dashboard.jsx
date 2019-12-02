@@ -172,8 +172,10 @@ class Dashboard extends Component {
     if (config.delayedDays) delayedDays = +config.delayedDays;
     let positiveFeedback = [],
       delayed = [],
-      negativeFeedback = [];
+      negativeFeedback = [],
+      spamComplaints = [];
     complaints.forEach(complaint => {
+      if (complaint.spam) spamComplaints.push(complaint);
       let days = this.calculateDays(complaint.timeStamp) + 1;
       if (days > delayedDays) {
         delayed.push(complaint);
@@ -184,7 +186,12 @@ class Dashboard extends Component {
         else negativeFeedback.push(complaint);
       }
     });
-    this.setState({ positiveFeedback, negativeFeedback, delayed });
+    this.setState({
+      positiveFeedback,
+      negativeFeedback,
+      delayed,
+      spamComplaints
+    });
   };
 
   // render
@@ -234,6 +241,7 @@ class Dashboard extends Component {
               <DashboardCards
                 positive={this.state.positiveFeedback.length}
                 negative={this.state.negativeFeedback.length}
+                spam={this.state.spamComplaints.length}
                 delayed={this.state.delayed.length}
                 total={this.state.complaints.length}
                 onClick={this.handleSelectedComplaints}

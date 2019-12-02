@@ -26,6 +26,7 @@ class DashboardCards extends Component {
               </div>
             </div>
           </div>
+
           <div className="col-md-3 p-1 pr-2">
             <div
               className="dashboardcard "
