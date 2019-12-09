@@ -335,8 +335,6 @@ class ComplaintForm extends Form {
                     Complaint's "severity" will be automatically set based on
                     your Complaint's detail.
                     <br />
-                    In order to get category automatically selected, You have to
-                    leave "details" input after writing
                   </p>
 
                   {/* category  */}
