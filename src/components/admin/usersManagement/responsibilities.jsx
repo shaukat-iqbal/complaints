@@ -10,16 +10,16 @@ const AssignedCategoriesList = ({
     <div className="list-group mb-2">
       <fieldset className="border p-2">
         <legend className="w-auto" style={{ color: "#777", fontSize: "14px" }}>
-          Assigned categories
+          Assigned Responsibilities
         </legend>
 
         {responsibilities.length === 0 ? (
-          <p>No category assigned</p>
+          <p>No responsibility assigned</p>
         ) : (
-          responsibilities.map((category, index) => (
+          responsibilities.map((responsibility, index) => (
             <AssignedCategory
-              key={category._id}
-              category={category}
+              key={responsibility.category._id}
+              responsibility={responsibility}
               onDelete={onDelete}
               hidden={hidden}
               tooltip={tooltips[index]}

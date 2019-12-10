@@ -3,7 +3,8 @@ import CategoriesList from "./categoriesList";
 import {
   getCategoriesWithNoParent,
   getSiblingsOf,
-  getChildsOf
+  getChildsOf,
+  getCategoryById
 } from "../../services/categoryService";
 import "./../admin/usersManagement/categories.css";
 
@@ -20,18 +21,28 @@ class Categories extends Component {
     this.setState({
       categories,
       isLoading: false,
-      isOpen: this.props.isOpen
+      isOpen: this.props.isOpen,
+      parentCategoryName: "Root Categories"
     });
   }
 
   handleClick = async event => {
     const id = event.target.value;
+
+    let { parentCategoryName } = this.state;
+    let location = this.state.categories.find(l => l._id === id);
+    if (location) parentCategoryName = location.name;
+
     const { data: categories } = await getChildsOf(id);
     if (categories.length > 0) {
-      this.setState({ categories });
+      this.setState({ categories, parentCategoryName });
       return;
     }
-    this.props.onCategorySeletion(id);
+    const { categories: allCategories } = this.state;
+    let selected = allCategories.find(c => c._id === id);
+    if (selected) {
+      this.props.onCategorySeletion(selected);
+    }
   };
   // to close the opened categories dialog
   handleClose = () => {
@@ -43,8 +54,11 @@ class Categories extends Component {
       const { data: siblingCategories } = await getSiblingsOf(
         this.state.categories[0].parentCategory
       );
-      if (siblingCategories.length > 0)
+      console.log(siblingCategories, "Siblings");
+
+      if (siblingCategories.length > 0) {
         this.setState({ categories: siblingCategories });
+      }
     } catch (error) {}
   };
 
@@ -52,6 +66,7 @@ class Categories extends Component {
     return (
       <CategoriesList
         categories={this.state.categories}
+        parentCategoryName={this.state.parentCategoryName}
         isLoading={this.state.isLoading}
         onClick={this.handleClick}
         isOpen={this.props.isOpen}

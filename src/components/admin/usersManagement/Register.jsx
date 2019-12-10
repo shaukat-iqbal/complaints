@@ -23,6 +23,7 @@ import Loading from "../../common/loading";
 import { compressImage } from "../../../services/imageService";
 import { toast } from "react-toastify";
 import { getConfigToken } from "../../../services/configurationService";
+import Locations from "../../common/Locations";
 
 class RegisterForm extends Form {
   state = {
@@ -38,6 +39,7 @@ class RegisterForm extends Form {
     errors: {},
     isAssignee: false,
     categories: [],
+    locations: [],
     isLoading: true,
     tooltips: []
   };
@@ -202,27 +204,70 @@ class RegisterForm extends Form {
     this.setState({ isAssignee: !this.state.isAssignee });
   };
 
-  handleOnCategorySeletion = async id => {
-    const responsibilities = [...this.state.responsibilities];
-    let category = responsibilities.find(c => c._id === id);
-    if (!category) {
-      const { data: category } = await getCategoryById(id);
-      responsibilities.push(category);
+  handleOnCategorySeletion = async selectedCategory => {
+    this.setState({
+      tempSelectedCategory: selectedCategory,
+      showLocationsDialog: true,
+      showCategoriesDialog: false
+    });
+    // const responsibilities = [...this.state.responsibilities];
+    // let category = responsibilities.find(c => c._id === selectedCategory._id);
+    // if (!category) {
+    //   responsibilities.push(selectedCategory);
+    // }
+    // this.setState({ responsibilities, showCategoriesDialog: false });
+    // let { data: tooltip } = await getSinglePath(selectedCategory._id);
+    // let arr = [tooltip];
+    // let ttip = this.getFullPath(arr);
+    // let { tooltips } = this.state;
+    // tooltips.push(ttip[0]);
+    // this.setState({ tooltips });
+  };
+
+  handleOnLocationSeletion = async selectedLocation => {
+    this.setState({
+      tempSelectedLocation: selectedLocation,
+      showLocationsDialog: false
+    });
+    this.assignResponsibility();
+  };
+
+  assignResponsibility = () => {
+    const {
+      tempSelectedLocation,
+      tempSelectedCategory,
+      responsibilities
+    } = this.state;
+    let responsibility = {
+      location: tempSelectedLocation,
+      category: tempSelectedCategory
+    };
+
+    let index = responsibilities.findIndex(
+      resp =>
+        resp.location._id === tempSelectedLocation._id &&
+        resp.category._id === tempSelectedCategory._id
+    );
+    if (index < 0) {
+      responsibilities.push(responsibility);
     }
-    this.setState({ responsibilities, showCategoriesDialog: false });
-    let { data: tooltip } = await getSinglePath(id);
-    let arr = [tooltip];
-    let ttip = this.getFullPath(arr);
-    let { tooltips } = this.state;
-    tooltips.push(ttip[0]);
-    this.setState({ tooltips });
+    this.setState({
+      responsibilities,
+      tempSelectedCategory: null,
+      tempSelectedLocation: null
+    });
   };
 
   handleDelete = ({ currentTarget }) => {
     const responsibilities = [...this.state.responsibilities];
-    const index = responsibilities.indexOf(currentTarget.value);
+    let responsibility = currentTarget.value;
+    const index = responsibilities.indexOf(responsibility);
     responsibilities.splice(index, 1);
     this.setState({ responsibilities });
+  };
+
+  handleLocationsClose = () => {
+    this.setState({ showLocationsDialog: false });
   };
 
   doSubmit = async () => {
@@ -233,7 +278,6 @@ class RegisterForm extends Form {
       const { id } = this.props.match.params;
       userId = id;
     }
-
     const { role } = this.state.currentUser;
     if (role !== "admin") {
       const error = this.validatePassword();
@@ -296,10 +340,10 @@ class RegisterForm extends Form {
       isAssignee,
       currentUser,
       showCategoriesDialog,
-      categories,
       responsibilities,
       isLoading,
-      tooltips
+      tooltips,
+      showLocationsDialog
     } = this.state;
     const { role } = currentUser;
 
@@ -369,7 +413,12 @@ class RegisterForm extends Form {
                 onCategorySeletion={this.handleOnCategorySeletion}
                 isOpen={showCategoriesDialog}
                 onClose={this.handleDialogClose}
-                categories={categories}
+              />
+              <Locations
+                isLoading={true}
+                onCategorySeletion={this.handleOnLocationSeletion}
+                isOpen={showLocationsDialog}
+                onClose={this.handleLocationsClose}
               />
             </div>
             <div className="d-flex justify-content-end pr-5  mb-4">

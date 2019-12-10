@@ -1,12 +1,12 @@
 import React from "react";
-
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { DialogActions } from "@material-ui/core";
+
 import "./../admin/usersManagement/categories.css";
-const CategoriesList = ({
-  categories,
+const LocationsList = ({
+  locations,
   isLoading,
   onClick,
   isOpen,
@@ -14,7 +14,7 @@ const CategoriesList = ({
   onBack,
   onTick,
   isCrud,
-  parentCategoryName
+  parentLocationName
 }) => {
   return (
     <React.Fragment>
@@ -36,12 +36,12 @@ const CategoriesList = ({
         {!isLoading && (
           <React.Fragment>
             <DialogTitle id="form-dialog-title">
-              {parentCategoryName}
+              {parentLocationName}
             </DialogTitle>
             <DialogContent dividers={true}>
               <div>
                 <div className="d-flex flex-wrap ">
-                  {categories.map(category => {
+                  {locations.map(category => {
                     return (
                       <div className="mr-1 mb-2" style={{ width: "49%" }}>
                         <div className="category ">
@@ -72,7 +72,7 @@ const CategoriesList = ({
                 Close
               </button>
 
-              {categories.length > 0 && categories[0].parentCategory && (
+              {locations.length > 0 && locations[0].parentLocation && (
                 <button className="btn btn-primary" onClick={onBack}>
                   Back
                 </button>
@@ -85,4 +85,4 @@ const CategoriesList = ({
   );
 };
 
-export default CategoriesList;
+export default LocationsList;

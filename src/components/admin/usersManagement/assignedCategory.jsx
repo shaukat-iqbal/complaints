@@ -1,6 +1,6 @@
 import React from "react";
 
-const AssignedCategory = ({ category, onDelete, hidden, tooltip }) => {
+const AssignedCategory = ({ responsibility, onDelete, hidden, tooltip }) => {
   return (
     <div className="d-flex mb-1">
       <div
@@ -13,17 +13,18 @@ const AssignedCategory = ({ category, onDelete, hidden, tooltip }) => {
           type="button"
           className=" list-group-item list-group-item-action"
         >
-          {category.name}
+          Category:{" " + responsibility.category.name}
+          <br />
+          Location:{" " + responsibility.location.name}
         </button>
       </div>
-      <div>
+      <div hidden={hidden}>
         <button
-          style={{ height: "46px" }}
+          style={{ height: "100%" }}
           type="button"
-          className=" list-group-item list-group-item-action"
-          value={category}
+          className=" list-group-item list-group-item-action d-flex justify-content-center align-items-center"
+          value={responsibility}
           onClick={onDelete}
-          hidden={hidden}
         >
           <i className="fa fa-trash fa-2x" aria-hidden="true" />
         </button>

@@ -19,11 +19,9 @@ import { getCurrentUser } from "../../../../services/authService";
 import UserLogo from "../../../common/logo";
 import CategoriesList from "../../../../categories/categoriesList";
 import Settings from "../../Configuration/Settings";
-import DashboardCards from "../../DashboardCards";
 import Dashboard from "../../dashboard/dashboard";
 import { Toolbar } from "@material-ui/core";
 import { getAllNotifications } from "../../../../services/notificationService";
-import { Dropdown } from "react-bootstrap";
 import Chart from "../../chart";
 import config from "../../../../config.json";
 import openSocket from "socket.io-client";
@@ -34,7 +32,7 @@ import ResetPassword from "../../../common/resetPassword";
 import AdminMessages from "../../AdminMessages";
 import { setProfilePictureToken } from "../../../../services/imageService";
 import { getConfigToken } from "../../../../services/configurationService";
-import { Socket } from "dgram";
+import LocationsList from "../../../Locations/LocationsList";
 // import { getConfigToken } from "./../";
 
 const scoket = openSocket(config.apiEndpoint);
@@ -192,6 +190,11 @@ function UserManagement(props) {
             icon: <i className="fa fa-list-alt mr-4 drawerBtns"></i>
           },
           {
+            label: "Location Tags",
+            path: "/admin/users/locations",
+            icon: <i className="fa fa-list-alt mr-4 drawerBtns"></i>
+          },
+          {
             label: "Reports/Charts",
             path: "/admin/users/reports",
             icon: <i className="fa fa-line-chart mr-4 drawerBtns"></i>
@@ -324,6 +327,7 @@ function UserManagement(props) {
           render={props => <Chart {...props} />}
         />
         <Route path="/admin/users/categories" component={CategoriesList} />
+        <Route path="/admin/users/locations" component={LocationsList} />
         <Route path="/admin/users/configuration" component={Settings} />
         <Route path="/admin/users/resetpassword" component={ResetPassword} />
 
