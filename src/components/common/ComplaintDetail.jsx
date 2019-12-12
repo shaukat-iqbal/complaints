@@ -264,8 +264,8 @@ export default function ComplaintDetail(props) {
 
                   {/* The person who is responsible or complainer can start  or see chat */}
                   {isMessaging &&
-                    (user._id == complaint.complainer._id ||
-                      user._id == complaint.assignedTo._id) && (
+                    (user._id === complaint.complainer._id ||
+                      user._id === complaint.assignedTo._id) && (
                       <i
                         className="fa fa-envelope controlIcon"
                         data-toggle="tooltip"
@@ -347,17 +347,21 @@ export default function ComplaintDetail(props) {
                     </span>
                   </label>
                 </div>
-                <div
-                  className="d-flex justify-content-between"
-                  data-toggle="tooltip"
-                  data-placement="top"
-                  title="Click to change status"
-                >
-                  <span className="status" onClick={handleEdit}>
+                <div className="d-flex justify-content-between">
+                  <span
+                    className="status"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Click to change status"
+                    onClick={handleEdit}
+                  >
                     Status: {complaint.status}
                   </span>
                   <span className="complaintCategory">
                     Category: {complaint.category.name}
+                  </span>
+                  <span className="complaintCategory">
+                    Location: {complaint.locationTag.name}
                   </span>
                 </div>
                 <div className="d-flex justify-content-between">

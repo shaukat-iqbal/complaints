@@ -51,6 +51,7 @@ class FileUpload extends Component {
       if (error.response && error.response.status === 400) {
         alert("In-Valid Format: File should have (name,email,phone) header");
       }
+      console.log(error);
     }
   };
 

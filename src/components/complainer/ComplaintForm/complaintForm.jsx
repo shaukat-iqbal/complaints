@@ -19,6 +19,8 @@ import { MyLocation } from "@material-ui/icons";
 import { getConfigToken } from "../../../services/configurationService";
 import Loading from "../../common/loading";
 import "./complaintForm.css";
+import Locations from "../../common/Locations";
+import { getLocations } from "../../../services/locationService";
 class ComplaintForm extends Form {
   state = {
     data: {
@@ -65,7 +67,7 @@ class ComplaintForm extends Form {
   // componentDidMount
   async componentDidMount() {
     await this.populateCategories();
-
+    await this.populateLocations();
     this.setState({ isLoading: false });
   }
 
@@ -89,6 +91,20 @@ class ComplaintForm extends Form {
     return arr;
   };
 
+  getLocationFullPath = id => {
+    let { locations } = this.state;
+    let path = "";
+    let location = locations.find(c => c._id === id);
+    if (!location) return null;
+    path += location.name;
+    while (location.parentLocation) {
+      location = locations.find(c => c._id === location.parentLocation);
+      if (!location) break;
+      path = location.name + "/" + path;
+    }
+    return path;
+  };
+
   async populateCategories() {
     const { data: categories } = await getCategories();
     if (categories.length < 1) {
@@ -106,6 +122,30 @@ class ComplaintForm extends Form {
       categoryId = selectedCategory._id;
     }
     this.setState({ categories, selectedCategory, categoryId, fullPath });
+  }
+
+  async populateLocations() {
+    const { data: locations } = await getLocations();
+    if (locations.length < 1) {
+      alert("Locations not available");
+      this.props.onClose();
+      return;
+    }
+    let locationFullPath = "/Other";
+    let selectedLocation = locations[0];
+    let locationId = locations[0]._id;
+    let otherLocation = locations.find(l => l.name === "Other");
+
+    if (otherLocation) {
+      selectedLocation = otherLocation;
+      locationId = selectedLocation._id;
+    }
+    this.setState({
+      locations,
+      selectedLocation,
+      locationId,
+      locationFullPath
+    });
   }
 
   handleCategorySelect = categoryId => {
@@ -181,6 +221,7 @@ class ComplaintForm extends Form {
     data.append("location", this.state.data.location);
     data.append("details", this.state.details);
     data.append("categoryId", this.state.categoryId);
+    data.append("locationId", this.state.locationId);
     data.append("complaint", this.state.selectedFile);
     if (this.state.coords) {
       data.append("longitude", this.state.coords.longitude);
@@ -241,22 +282,42 @@ class ComplaintForm extends Form {
   handleCategoryButton = () => {
     this.setState({ showCategoriesDialog: true });
   };
-  handleOnCategorySeletion = id => {
+  handleLocationDialogClose = () => {
+    this.setState({ showLocationsDialog: false });
+  };
+  handleLocationButton = () => {
+    this.setState({ showLocationsDialog: true });
+  };
+  handleOnCategorySelection = selectedCategory => {
     const categories = this.state.categories;
-    const category = categories.find(c => c._id === id);
-    let fullPath = this.getFullPath(id);
+    const category = categories.find(c => c._id === selectedCategory._id);
+    let fullPath = this.getFullPath(selectedCategory._id);
 
     if (category) {
       this.setState({
         selectedCategory: category,
-        categoryId: id,
+        categoryId: selectedCategory._id,
         showCategoriesDialog: false,
         categoryError: "",
         fullPath
       });
     }
   };
-
+  handleOnLocationSelection = selectedLocation => {
+    // console.log(selectedLocation);
+    const locations = this.state.locations;
+    const location = locations.find(c => c._id === selectedLocation._id);
+    let locationFullPath = this.getLocationFullPath(selectedLocation._id);
+    if (location) {
+      this.setState({
+        selectedLocation: location,
+        locationId: selectedLocation._id,
+        showLocationsDialog: false,
+        locationError: "",
+        locationFullPath
+      });
+    }
+  };
   handleDialogClose = () => {
     this.setState({ showCategoriesDialog: false });
   };
@@ -367,7 +428,7 @@ class ComplaintForm extends Form {
 
                       <Categories
                         isLoading={true}
-                        onCategorySeletion={this.handleOnCategorySeletion}
+                        onCategorySeletion={this.handleOnCategorySelection}
                         isOpen={this.state.showCategoriesDialog}
                         onClose={this.handleDialogClose}
                         categories={this.state.categories}
@@ -380,10 +441,50 @@ class ComplaintForm extends Form {
                     </>
                   )}
                   {/* category end  */}
+                  {this.state.selectedLocation && (
+                    <>
+                      <label>Selected Location</label>
+                      <div className="d-flex p-0 m-0">
+                        <div>
+                          <button
+                            className="btn button-primary"
+                            onClick={this.handleLocationButton}
+                            type="button"
+                          >
+                            {this.state.selectedLocation.name}
+                            <i className="fa fa-edit pl-3"></i>
+                          </button>
+                        </div>
+                        <div className="ml-2 p-0 m-0 align-items-center justify-content-center d-flex ">
+                          <p className="p-0 m-0">
+                            {this.state.locationFullPath}
+                          </p>
+                        </div>
+                      </div>
+                      <p
+                        className="text-muted text-sm-left mt-2"
+                        style={{ fontSize: "10px" }}
+                      >
+                        You may change the Location by clicking the location
+                        name
+                      </p>
 
-                  {this.state.categoryError && (
+                      <Locations
+                        isLoading={true}
+                        onCategorySeletion={this.handleOnLocationSelection}
+                        isOpen={this.state.showLocationsDialog}
+                        onClose={this.handleLocationDialogClose}
+                      />
+
+                      {/* <Category
+                          onCategoryId={this.handleCategorySelect}
+                          category={this.state.selectedCategory}
+                        /> */}
+                    </>
+                  )}
+                  {this.state.locationError && (
                     <div className="alert alert-danger">
-                      {this.state.categoryError}
+                      {this.state.locationError}
                     </div>
                   )}
                   {/* {this.renderSelect(

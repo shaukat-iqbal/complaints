@@ -30,6 +30,9 @@ class Dashboard extends Component {
     this.getComplaints();
     this.checkingSocketConnection();
   }
+  componentWillUnmount() {
+    socket.disconnect(true);
+  }
 
   checkingSocketConnection = () => {
     let user = getCurrentUser();
@@ -53,7 +56,7 @@ class Dashboard extends Component {
         // this.createNewComplaint(data.complaint);
       } else if (data.action === "status changed") {
         toast.info(
-          `Complaints: "${data.complaint}'s" status is changed to  "${data.complaint.status}" `
+          `Complaints: "${data.complaint.title}'s" status is changed to  "${data.complaint.status}" `
         );
         this.replaceUpdatedComplaint(data.complaint);
       } else if (data.action === "feedback") {

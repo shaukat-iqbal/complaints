@@ -22,6 +22,7 @@ const User = ({
                 ? profilePicture
                 : require("./../../../resources/img/add.png")
             }
+            // src="https://source.unsplash.com/random/200*200"
             alt="profile pic"
             width="100px"
             height="100px"

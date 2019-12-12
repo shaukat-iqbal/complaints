@@ -12,7 +12,6 @@ import User from "./user";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import uuid from "uuid";
-import { capitalizeFirstLetter } from "../../../services/helper";
 class Users extends Component {
   state = {
     users: [],
@@ -107,7 +106,9 @@ class Users extends Component {
           filtered = allAssignees.filter(assignee => {
             if (!assignee.responsibilities.length) return null;
             let a = assignee.responsibilities.find(r =>
-              r.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+              r.category.name
+                .toLowerCase()
+                .startsWith(searchQuery.toLowerCase())
             );
             return a;
           });
@@ -149,13 +150,7 @@ class Users extends Component {
                       value={searchQuery}
                       onChange={this.handleSearch}
                     />
-                    {/* <input
-                      type="text"
-                      className="form-control"
-                      aria-label="Text input with dropdown button"
-                      onChange={this.handleSearch}
-                      value={searchQuery}
-                    ></input> */}
+
                     {this.props.type === "assignees" && (
                       <div className="input-group-append">
                         <button

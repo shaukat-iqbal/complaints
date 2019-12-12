@@ -44,9 +44,13 @@ class AssigneeMessage extends React.Component {
     // msgs.sort((a, b) => {
     //   return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     // });
+    this.listen(user);
 
     this.setState({ allMessages: msgs });
     this.scroll.current.scrollIntoView();
+  };
+
+  listen = user => {
     socket.on("msg", data => {
       if (
         (data.sender === this.props.match.params.id &&
@@ -68,9 +72,10 @@ class AssigneeMessage extends React.Component {
     });
   };
 
-  //componentWillUnmount() {
-  // socket.disconnect(true);
-  //}
+  // componentWillUnmount() {
+  //   socket.disconnect(true);
+  // }
+
   handleChange = ({ currentTarget: input }) => {
     this.setState({ message: input.value });
   };
