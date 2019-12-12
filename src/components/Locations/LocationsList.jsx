@@ -4,7 +4,8 @@ import {
   getLocations,
   deleteLocation,
   updateMultipleLocations,
-  deleteChildsOf
+  deleteChildsOf,
+  deleteMany
 } from "../../services/locationService";
 import Location from "./Location";
 import LocationForm from "./LocationForm";
@@ -295,9 +296,7 @@ class LocationsList extends Component {
   };
 
   handleDelete = () => {
-    let { checkedRootCategories } = this.state;
     let { allCategories } = this.state;
-    let updated = [];
     confirmAlert({
       title: "Confirm to submit",
       message:
@@ -307,20 +306,26 @@ class LocationsList extends Component {
           label: "Yes",
           onClick: async () => {
             this.setState({ isLoading: true });
+            let toBeDeleted = this.getToBeDeleted();
 
-            for (let index = 0; index < checkedRootCategories.length; index++) {
-              const category = checkedRootCategories[index];
-              await this.deleteOperation(category);
-              updated = allCategories.filter(
-                c => c._id !== category._id || c.parentLocation === category._id
-              );
-              let sidebarCategories = updated.filter(c => !c.parentLocation);
-              this.setState({
-                allCategories: updated,
-                sidebarCategories
-              });
-            }
-            this.setState({ checkedRootCategories: [], isLoading: false });
+            let updated = [...allCategories];
+            toBeDeleted.forEach(id => {
+              updated = updated.filter(location => location._id !== id);
+            });
+
+            let sidebarCategories = updated.filter(
+              location => !location.parentLocation
+            );
+            this.setState({
+              allCategories: updated,
+              sidebarCategories,
+              checkedRootCategories: [],
+              isLoading: false
+            });
+
+            try {
+              await deleteMany({ locations: toBeDeleted });
+            } catch (error) {}
           }
         },
         {
@@ -328,6 +333,21 @@ class LocationsList extends Component {
         }
       ]
     });
+  };
+
+  getToBeDeleted = () => {
+    let { checkedRootCategories, allCategories } = this.state;
+    let toBeDeleted = [];
+    for (let index = 0; index < checkedRootCategories.length; index++) {
+      const rootLocation = checkedRootCategories[index];
+      toBeDeleted.push(rootLocation._id);
+      allCategories.forEach(location => {
+        if (location.parentLocation === rootLocation._id) {
+          toBeDeleted.push(location._id);
+        }
+      });
+    }
+    return toBeDeleted;
   };
 
   deleteOperation = async selectedRootCategory => {

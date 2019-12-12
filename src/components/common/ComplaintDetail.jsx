@@ -373,14 +373,16 @@ export default function ComplaintDetail(props) {
               <div className=" complaint-body d-flex justify-content-center ">
                 <table>
                   <tbody>
-                    <tr>
-                      <td>
-                        <label className="userLabel">Location</label>
-                      </td>
-                      <td>
-                        <p className="paragraph">{complaint.location}</p>
-                      </td>
-                    </tr>
+                    {complaint.location && (
+                      <tr>
+                        <td>
+                          <label className="userLabel">Location</label>
+                        </td>
+                        <td>
+                          <p className="paragraph">{complaint.location}</p>
+                        </td>
+                      </tr>
+                    )}
                     <tr>
                       <td>
                         <label className="userLabel">Description</label>

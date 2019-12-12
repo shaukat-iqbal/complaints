@@ -252,7 +252,7 @@ class TemporaryLocationsList extends Component {
         companyId: getCurrentUser().companyId
       });
       toast.success("Categories successfully created.");
-      if (!this.props.isStepper) window.location = "/admin/users/categories";
+      if (!this.props.isStepper) window.location = "/admin/users/locations";
       if (this.props.enableNext) this.props.enableNext();
     } catch (error) {
       toast.error("Something wrong occured. Please try again.");

@@ -369,6 +369,8 @@ class ComplaintForm extends Form {
               </DialogTitle>
 
               <DialogContent>
+                {this.renderInput("title", "Title")}
+
                 <form onSubmit={this.ToggleConfirmation}>
                   <div className="form-group">
                     <label htmlFor="details">Complaint Description</label>
@@ -475,11 +477,6 @@ class ComplaintForm extends Form {
                         isOpen={this.state.showLocationsDialog}
                         onClose={this.handleLocationDialogClose}
                       />
-
-                      {/* <Category
-                          onCategoryId={this.handleCategorySelect}
-                          category={this.state.selectedCategory}
-                        /> */}
                     </>
                   )}
                   {this.state.locationError && (
@@ -492,7 +489,6 @@ class ComplaintForm extends Form {
                       "Choose category",
                       this.state.categories
                     )} */}
-                  {this.renderInput("title", "Title")}
                   {this.state.configToken &&
                     this.state.configToken.isSeverity &&
                     this.renderSelect("severity", "Severity", [

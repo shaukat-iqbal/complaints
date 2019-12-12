@@ -4,7 +4,8 @@ import {
   getCategories,
   deleteCategory,
   updateMultipleCategories,
-  deleteChildsOf
+  deleteChildsOf,
+  deleteMany
 } from "../services/categoryService";
 import Category from "./category";
 import CategoryForm from "./categoryForm";
@@ -295,9 +296,7 @@ class CategoriesList extends Component {
   };
 
   handleDelete = () => {
-    let { checkedRootCategories } = this.state;
     let { allCategories } = this.state;
-    let updated = [];
     confirmAlert({
       title: "Confirm to submit",
       message:
@@ -307,20 +306,26 @@ class CategoriesList extends Component {
           label: "Yes",
           onClick: async () => {
             this.setState({ isLoading: true });
+            let toBeDeleted = this.getToBeDeleted();
 
-            for (let index = 0; index < checkedRootCategories.length; index++) {
-              const category = checkedRootCategories[index];
-              await this.deleteOperation(category);
-              updated = allCategories.filter(
-                c => c._id !== category._id || c.parentCategory === category._id
-              );
-              let sidebarCategories = updated.filter(c => !c.parentCategory);
-              this.setState({
-                allCategories: updated,
-                sidebarCategories
-              });
-            }
-            this.setState({ checkedRootCategories: [], isLoading: false });
+            let updated = [...allCategories];
+            toBeDeleted.forEach(id => {
+              updated = updated.filter(category => category._id !== id);
+            });
+
+            let sidebarCategories = updated.filter(
+              category => !category.parentCategory
+            );
+            this.setState({
+              allCategories: updated,
+              sidebarCategories,
+              checkedRootCategories: [],
+              isLoading: false
+            });
+
+            try {
+              await deleteMany({ categories: toBeDeleted });
+            } catch (error) {}
           }
         },
         {
@@ -330,6 +335,20 @@ class CategoriesList extends Component {
     });
   };
 
+  getToBeDeleted = () => {
+    let { checkedRootCategories, allCategories } = this.state;
+    let toBeDeleted = [];
+    for (let index = 0; index < checkedRootCategories.length; index++) {
+      const rootCategory = checkedRootCategories[index];
+      toBeDeleted.push(rootCategory._id);
+      allCategories.forEach(location => {
+        if (location.parentCategory === rootCategory._id) {
+          toBeDeleted.push(location._id);
+        }
+      });
+    }
+    return toBeDeleted;
+  };
   deleteOperation = async selectedRootCategory => {
     console.log(selectedRootCategory);
 

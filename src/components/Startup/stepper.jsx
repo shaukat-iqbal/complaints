@@ -28,6 +28,7 @@ import { DialogTitle, Grow, Button } from "@material-ui/core";
 import CategoriesRenderer from "../../categories/CategoriesRenderer";
 import { getConfiguration } from "../../services/configurationService";
 import Registration from "../admin/usersManagement/Registration";
+import LocationRenderer from "../Locations/LocationRenderer";
 
 const useQontoStepIconStyles = makeStyles({
   root: {
@@ -174,6 +175,7 @@ function getSteps() {
     "Admin Account",
     "Features",
     "Categories",
+    "Location Tags",
     "Allowed Attachments",
     "Higher Authority Members",
     "Users registration"
@@ -213,10 +215,12 @@ function getStepContent(step, enableNext, props) {
     case 3:
       return <CategoriesRenderer enableNext={enableNext} isStepper={true} />;
     case 4:
-      return <Attachments enableNext={enableNext} />;
+      return <LocationRenderer enableNext={enableNext} isStepper={true} />;
     case 5:
-      return <Members enableNext={enableNext} />;
+      return <Attachments enableNext={enableNext} />;
     case 6:
+      return <Members enableNext={enableNext} />;
+    case 7:
       return <Registration isStepper={true} />;
     default:
       return "Unknown step";

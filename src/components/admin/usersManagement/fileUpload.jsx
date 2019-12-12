@@ -4,6 +4,7 @@ import CsvResponse from "./csvResponse";
 import { toast } from "react-toastify";
 import FileSaver from "file-saver";
 import { getSample } from "../../../services/csvService";
+import Spinner from "../../common/Spinner/Spinner";
 class FileUpload extends Component {
   state = {
     assignees: null,
@@ -18,6 +19,7 @@ class FileUpload extends Component {
   };
 
   createAccounts = async ({ currentTarget }) => {
+    this.setState({ isLoading: true });
     if (!this.state[currentTarget.name]) {
       alert("Please select file");
       return;
@@ -28,6 +30,7 @@ class FileUpload extends Component {
     const role = currentTarget.name;
     try {
       const { data: csvResponse } = await createUsers(role, fd);
+      this.setState({ isLoading: false });
       const rows = csvResponse.split("\n");
 
       //errors result will be= [array[],array[],array[]]
@@ -59,7 +62,7 @@ class FileUpload extends Component {
     this.setState({ dialog: false });
   };
 
-  renderDiv = (userType, name, onClick) => {
+  renderDiv = (userType, name, onClick, isLoading) => {
     return (
       <div className="d-flex jumbotron bg-white flex-column shadow-lg ">
         <div className="d-flex justify-content-end">
@@ -92,6 +95,14 @@ class FileUpload extends Component {
         >
           Create Accounts
         </button>
+        {isLoading && (
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "100%" }}
+          >
+            <Spinner />
+          </div>
+        )}
       </div>
     );
   };
@@ -112,8 +123,18 @@ class FileUpload extends Component {
           downloadUrl={this.state.url}
         />
 
-        {this.renderDiv("assignee", "assignee", this.createAccounts)}
-        {this.renderDiv("complainer", "complainer", this.createAccounts)}
+        {this.renderDiv(
+          "assignee",
+          "assignee",
+          this.createAccounts,
+          this.state.isLoading
+        )}
+        {this.renderDiv(
+          "complainer",
+          "complainer",
+          this.createAccounts,
+          this.state.isLoading
+        )}
       </div>
     );
   }

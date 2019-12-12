@@ -22,24 +22,23 @@ class ComplaintsTable extends Component {
         </>
       )
     }
-    // ,
-    // {
-    //   key: "assign",
-    //   content: complaint => (
-    //     <>
-    //       <button
-    //         onClick={() => this.props.onDetail(complaint)}
-    //         className="btn btn-info btn-sm"
-    //       >
-    //         Assign
-    //       </button>
-    //     </>
-    //   )
-    // }
   ];
+  state = {
+    complaints: []
+  };
+
+  constructor(props) {
+    super(props);
+    this.state.complaints = props.complaints;
+    this.state.complaints.map(complaint => {
+      // let date = new Date(complaint.timeStamp);
+      complaint.timeStamp = complaint.timeStamp.split("T")[0];
+      return complaint;
+    });
+  }
 
   render() {
-    const { complaints, onSort, sortColumn } = this.props;
+    let { complaints, onSort, sortColumn } = this.props;
 
     return (
       <>

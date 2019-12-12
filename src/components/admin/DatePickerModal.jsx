@@ -26,8 +26,12 @@ class DatePickerModal extends Form {
     let date = new Date();
     let d1 = new Date(this.state.data.from);
     let d2 = new Date(this.state.data.to);
-    if (date.getTime() < d2.getTime() || date.getTime() < d1.getTime()) {
-      toast.error("Date ' must be valid.");
+    if (
+      date.getDate() < d2.getDate() ||
+      date.getDate() < d1.getDate() ||
+      d1.getDate() > d2.getDate()
+    ) {
+      toast.error("Date must be valid.");
       this.setState({ data: { from: "", to: "" } });
       return;
     }

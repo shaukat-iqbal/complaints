@@ -80,3 +80,7 @@ export function getMultiplePaths(body) {
 export function getSinglePath(id) {
   return http.get(config.apiUrl + "/categories/fullPath/" + id);
 }
+
+export function deleteMany(ids) {
+  return http.post(config.apiUrl + "/categories/delete/many", ids);
+}
