@@ -95,7 +95,7 @@ class Dashboard extends Component {
   createNewComplaint = complaint => {
     const updatedComplaints = [...this.state.complaints];
     updatedComplaints.unshift(complaint);
-    this.countFeedbacks(updatedComplaints);
+    this.segmentsCount(updatedComplaints);
 
     this.setState({
       isLoading: false,
@@ -130,7 +130,7 @@ class Dashboard extends Component {
       if (!available) temp.push(complaint.category);
     });
     const categories = [{ _id: "", name: "All Categories" }, ...temp];
-    this.countFeedbacks(complaints);
+    this.segmentsCount(complaints);
     this.setState({
       isLoading: false,
       complaints,
@@ -173,7 +173,7 @@ class Dashboard extends Component {
     this.setState({ selectedComplaints });
   };
 
-  countFeedbacks = complaints => {
+  segmentsCount = complaints => {
     let config = getConfigToken();
     let delayedDays = 5;
     if (config.delayedDays) delayedDays = +config.delayedDays;
