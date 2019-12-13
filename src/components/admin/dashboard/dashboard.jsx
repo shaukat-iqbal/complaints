@@ -97,7 +97,11 @@ class Dashboard extends Component {
     updatedComplaints.unshift(complaint);
     this.countFeedbacks(updatedComplaints);
 
-    this.setState({ isLoading: false, complaints: updatedComplaints });
+    this.setState({
+      isLoading: false,
+      complaints: updatedComplaints,
+      selectedComplaints: updatedComplaints
+    });
   };
 
   replaceUpdatedComplaint = complaint => {
