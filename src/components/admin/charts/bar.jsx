@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Bar } from "react-chartjs-2";
-import { getAdminComplaints } from "../../../services/complaintService";
+import { calculateAggregate } from "../../../services/complaintService";
 
 class BarChart extends Component {
   state = {
@@ -42,50 +42,47 @@ class BarChart extends Component {
     },
     complaints: []
   };
-  componentWillReceiveProps(nextProps) {
-    const complaints = nextProps.complaints;
-    if (complaints.length < 1) return;
-    this.aggregateData(complaints);
-  }
+
+  // componentWillReceiveProps(nextProps) {
+  //   const complaints = nextProps.complaints;
+  //   if (complaints.length < 1) return;
+  //   this.aggregateData();
+  // }
+  // componentDidMount() {
+  //   //props say categories lain
+  //   // const { data: complaints } = await getAdminComplaints();
+  //   const complaints = this.props.complaints;
+  //   if (complaints.length < 1) return;
+  //   this.aggregateData();
+  // }
+
   componentDidMount() {
-    //props say categories lain
-    // const { data: complaints } = await getAdminComplaints();
-    const complaints = this.props.complaints;
-    if (complaints.length < 1) return;
-    this.aggregateData(complaints);
+    const datasets = { ...this.state.chartData.datasets };
+    datasets[0].data = this.props.monthwiseComplaints;
+    this.setState({ datasets });
   }
 
-  aggregateData = complaints => {
-    let months = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    for (let i = 0; i < complaints.length; i++) {
-      const element = complaints[i];
-      var date = new Date(element.timeStamp);
-      let index = date.getMonth();
-      months[index]++;
-    }
-    const datasets = { ...this.state.chartData.datasets };
-    datasets[0].data = months;
-    this.setState({ datasets, complaints });
-  };
+  // aggregateData = async () => {
+  //   let { data } = await calculateAggregate();
+  //   console.log(data);
+  //   const datasets = { ...this.state.chartData.datasets };
+  //   datasets[0].data = data.monthwise;
+  //   this.setState({ datasets });
+  // };
 
   render() {
     return (
       <div className="card bg-light border border-dark">
         <div className="container py-3">
-          {this.state.complaints.length === 0 && (
-            <h3>There are no In-Progress Complaints</h3>
-          )}
-          {this.state.complaints.length > 0 && (
-            <Bar
-              data={this.state.chartData}
-              width={130}
-              height={70}
-              options={{
-                maintainAspectRatio: true
-              }}
-              // options={}
-            />
-          )}
+          <Bar
+            data={this.state.chartData}
+            width={130}
+            height={70}
+            options={{
+              maintainAspectRatio: true
+            }}
+            // options={}
+          />
         </div>
       </div>
     );

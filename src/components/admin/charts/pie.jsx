@@ -23,17 +23,25 @@ class PieChart extends Component {
   };
 
   //WARNING! To be deprecated in React v17. Use new lifecycle static getDerivedStateFromProps instead.
-  componentWillReceiveProps(nextProps) {
-    const complaints = nextProps.complaints;
-    if (complaints.length < 1) return;
-    this.aggregateData(complaints);
-  }
-  async componentDidMount() {
-    //props say categories lain
-    // const { data: complaints } = await getAdminComplaints();
-    const complaints = this.props.complaints;
-    if (complaints.length < 1) return;
-    this.aggregateData(complaints);
+  // componentWillReceiveProps(nextProps) {
+  //   const complaints = nextProps.complaints;
+  //   if (complaints.length < 1) return;
+  //   this.aggregateData(complaints);
+  // }
+  // async componentDidMount() {
+  //   //props say categories lain
+  //   // const { data: complaints } = await getAdminComplaints();
+  //   const complaints = this.props.complaints;
+  //   if (complaints.length < 1) return;
+  //   this.aggregateData(complaints);
+  // }
+
+  componentDidMount() {
+    let { spam, resolved, inProgress } = this.props.summary;
+    let data = [inProgress, resolved, spam];
+    const datasets = { ...this.state.chartData.datasets };
+    datasets[0].data = data;
+    this.setState({ datasets });
   }
   aggregateData = complaints => {
     let resolved = 0,
@@ -58,21 +66,17 @@ class PieChart extends Component {
     return (
       <div className="card bg-light border border-dark">
         <div className="container py-3 ">
-          {this.state.complaints.length < 1 && <h5>No complaints Summary</h5>}
-          {this.state.complaints.length > 0 &&
-            this.state.chartData.datasets[0].data.length > 0 && (
-              <Pie
-                data={this.state.chartData}
-                width={130}
-                height={70}
-                options={{
-                  maintainAspectRatio: true,
-                  title: { display: true, text: "Complaints Summary" },
-                  legend: { display: true, position: "left" }
-                }}
-                // options={}
-              />
-            )}
+          <Pie
+            data={this.state.chartData}
+            width={130}
+            height={70}
+            options={{
+              maintainAspectRatio: true,
+              title: { display: true, text: "Complaints Summary" },
+              legend: { display: true, position: "left" }
+            }}
+            // options={}
+          />
         </div>
       </div>
     );

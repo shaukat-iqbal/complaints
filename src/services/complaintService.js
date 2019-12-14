@@ -42,8 +42,18 @@ export function viewFile(complaintId) {
 }
 
 // getting all admin complaints
-export function getAdminComplaints() {
-  return http.get(config.apiUrl + "/admin-complaints");
+export function getAdminComplaints(
+  pageNum = 1,
+  pageSize = 5,
+  searchBy = "",
+  searchKeyword = ""
+) {
+  console.log(
+    `${config.apiUrl}/admin-complaints/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}`
+  );
+  return http.get(
+    `${config.apiUrl}/admin-complaints/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}`
+  );
 }
 
 // getting all assignee complaints
@@ -125,4 +135,12 @@ export function getReportOfMonth(body) {
     config.apiUrl +
       `/admin-complaints/generateReport/${body.companyId}/${body.from}/${body.to}`
   );
+}
+
+export function segmentsCount() {
+  return http.get(config.apiUrl + `/admin-complaints/segments/count`);
+}
+
+export function calculateAggregate() {
+  return http.get(config.apiUrl + `/admin-complaints/aggregate/monthwise`);
 }

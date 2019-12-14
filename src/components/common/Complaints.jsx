@@ -6,18 +6,21 @@ import Pagination from "./pagination";
 import ComplaintsTable from "./ComplaintsTable";
 import _ from "lodash";
 import ComplaintDetail from "./ComplaintDetail";
+import { getAdminComplaints } from "../../services/complaintService";
 class Complaints extends Component {
   constructor(props) {
     super(props);
     this.state.complaints = props.complaints;
     this.state.categories = props.categories;
+    this.state.itemsCount = props.itemsCount;
   }
   state = {
-    pageSize: 9,
+    pageSize: 5,
     currentPage: 1,
     sortColumn: { path: "title", order: "asc" },
     searchQuery: "",
-    selectedCategory: null
+    selectedCategory: null,
+    searchBy: "title"
   };
 
   //WARNING! To be deprecated in React v17. Use new lifecycle static getDerivedStateFromProps instead.
@@ -34,8 +37,13 @@ class Complaints extends Component {
   };
 
   // handle pagination
-  handlePageChange = page => {
-    this.setState({ currentPage: page });
+  handlePageChange = async page => {
+    const { pageSize } = this.state;
+    const response = await getAdminComplaints(page, pageSize);
+    let complaints = response.data;
+    console.log(complaints);
+    let itemsCount = response.headers["itemscount"];
+    this.setState({ complaints, itemsCount, currentPage: page });
   };
 
   // handle Category Select
@@ -53,11 +61,19 @@ class Complaints extends Component {
   };
 
   // handle Search
-  handleSearch = query => {
+  handleSearch = async query => {
+    let { searchBy, pageSize } = this.state;
+    const response = await getAdminComplaints(1, pageSize, searchBy, query);
+    let complaints = response.data;
+    console.log(complaints, " Search result");
+    let itemsCount = response.headers["itemscount"];
+
     this.setState({
       searchQuery: query,
       selectedCategory: null,
-      currentPage: 1
+      currentPage: 1,
+      itemsCount,
+      complaints
     });
   };
 
@@ -68,7 +84,8 @@ class Complaints extends Component {
       sortColumn,
       currentPage,
       selectedCategory,
-      searchQuery
+      searchQuery,
+      itemsCount
     } = this.state;
     const { length: count } = this.state.complaints;
     let filtered = allComplaints;
@@ -84,7 +101,8 @@ class Complaints extends Component {
 
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
-    const complaints = paginate(sorted, currentPage, pageSize);
+    const complaints = sorted;
+    // const complaints = paginate(sorted, currentPage, pageSize);
     return (
       <>
         {count <= 0 ? (
@@ -120,7 +138,7 @@ class Complaints extends Component {
                   onDetail={this.handleDetail}
                 />
                 <Pagination
-                  itemsCount={filtered.length}
+                  itemsCount={itemsCount}
                   pageSize={pageSize}
                   currentPage={currentPage}
                   onPageChange={this.handlePageChange}

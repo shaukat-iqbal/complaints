@@ -1,5 +1,9 @@
 import React, { Component } from "react";
-import { getAdminComplaints } from "../../../services/complaintService";
+import {
+  getAdminComplaints,
+  segmentsCount,
+  calculateAggregate
+} from "../../../services/complaintService";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
 import Spinner from "../../common/Spinner/Spinner";
@@ -27,6 +31,9 @@ class Dashboard extends Component {
   }
 
   async componentDidMount() {
+    let { data } = await calculateAggregate();
+    console.log(data, "analalytics data");
+    this.setState({ analytics: data });
     this.getComplaints();
     this.checkingSocketConnection();
   }
@@ -95,7 +102,7 @@ class Dashboard extends Component {
   createNewComplaint = complaint => {
     const updatedComplaints = [...this.state.complaints];
     updatedComplaints.unshift(complaint);
-    this.segmentsCount(updatedComplaints);
+    segmentsCount(updatedComplaints);
 
     this.setState({
       isLoading: false,
@@ -123,20 +130,28 @@ class Dashboard extends Component {
   getComplaints = async () => {
     this.setState({ isLoading: true });
     let { data: months } = await countComplainers();
-    const { data: complaints } = await getAdminComplaints();
+    const response = await getAdminComplaints();
+    console.log(response);
+    let complaints = response.data;
+
+    let itemsCount = response.headers["itemscount"];
+    console.log(complaints, "Response on pagination");
     let temp = [];
     complaints.forEach(complaint => {
       let available = temp.find(ca => ca._id === complaint.category._id);
       if (!available) temp.push(complaint.category);
     });
     const categories = [{ _id: "", name: "All Categories" }, ...temp];
-    this.segmentsCount(complaints);
+    let { data: segments } = await segmentsCount(complaints);
+
     this.setState({
       isLoading: false,
       complaints,
       selectedComplaints: complaints,
+      itemsCount,
       categories,
-      countUsers: months
+      countUsers: months,
+      segments
     });
     // this.aggregateMonthWiseComplaints(complaints);
   };
@@ -173,33 +188,33 @@ class Dashboard extends Component {
     this.setState({ selectedComplaints });
   };
 
-  segmentsCount = complaints => {
-    let config = getConfigToken();
-    let delayedDays = 5;
-    if (config.delayedDays) delayedDays = +config.delayedDays;
-    let positiveFeedback = [],
-      delayed = [],
-      negativeFeedback = [],
-      spamComplaints = [];
-    complaints.forEach(complaint => {
-      if (complaint.spam) spamComplaints.push(complaint);
-      let days = this.calculateDays(complaint.timeStamp) + 1;
-      if (days > delayedDays) {
-        delayed.push(complaint);
-      }
-      if (complaint.feedbackTags) {
-        if (complaint.feedbackTags === "satisfied")
-          positiveFeedback.push(complaint);
-        else negativeFeedback.push(complaint);
-      }
-    });
-    this.setState({
-      positiveFeedback,
-      negativeFeedback,
-      delayed,
-      spamComplaints
-    });
-  };
+  // segmentsCount = complaints => {
+  //   let config = getConfigToken();
+  //   let delayedDays = 5;
+  //   if (config.delayedDays) delayedDays = +config.delayedDays;
+  //   let positiveFeedback = [],
+  //     delayed = [],
+  //     negativeFeedback = [],
+  //     spamComplaints = [];
+  //   complaints.forEach(complaint => {
+  //     if (complaint.spam) spamComplaints.push(complaint);
+  //     let days = this.calculateDays(complaint.timeStamp) + 1;
+  //     if (days > delayedDays) {
+  //       delayed.push(complaint);
+  //     }
+  //     if (complaint.feedbackTags) {
+  //       if (complaint.feedbackTags === "satisfied")
+  //         positiveFeedback.push(complaint);
+  //       else negativeFeedback.push(complaint);
+  //     }
+  //   });
+  //   this.setState({
+  //     positiveFeedback,
+  //     negativeFeedback,
+  //     delayed,
+  //     spamComplaints
+  //   });
+  // };
 
   // render
   render() {
@@ -223,34 +238,24 @@ class Dashboard extends Component {
 
     return (
       <React.Fragment>
-        {/* {this.state.isLoading && (
-          <div className="d-flex justify-content-center mt-5">
-            <Spinner />
-          </div>
-        )} */}
-
-        {/* <Showcase resolved={resolved} inprogress={inprogress} closed={closed} /> */}
         <div className="container">
-          {/* {this.state.isLoading && (
-            <div className="d-flex justify-content-center">
-              <Loading />
-            </div>
-          )} */}
-          {this.state.complaints.length > 0 && (
-            <GraphBanner
-              complaints={this.state.complaints}
-              usersCount={this.state.countUsers}
-            />
-          )}
+          {this.state.analytics.monthwise &&
+            this.state.analytics.monthwise.length > 0 && (
+              <GraphBanner
+                analytics={this.state.analytics}
+                complaints={this.state.complaints}
+                usersCount={this.state.countUsers}
+              />
+            )}
 
           {this.state.complaints.length > 0 && (
             <div className="mb-3">
               <DashboardCards
-                positive={this.state.positiveFeedback.length}
-                negative={this.state.negativeFeedback.length}
-                spam={this.state.spamComplaints.length}
-                delayed={this.state.delayed.length}
-                total={this.state.complaints.length}
+                positive={this.state.segments.positiveFeedback}
+                negative={this.state.segments.negativeFeedback}
+                spam={this.state.segments.spamComplaints}
+                delayed={this.state.segments.delayedComplaints}
+                total={this.state.segments.totalComplaints}
                 onClick={this.handleSelectedComplaints}
               />
             </div>
@@ -259,6 +264,7 @@ class Dashboard extends Component {
             <Complaints
               complaints={this.state.selectedComplaints}
               categories={this.state.categories}
+              itemsCount={this.state.itemsCount}
             />
           }
         </div>
