@@ -23,11 +23,13 @@ class PieChart extends Component {
   };
 
   //WARNING! To be deprecated in React v17. Use new lifecycle static getDerivedStateFromProps instead.
-  // componentWillReceiveProps(nextProps) {
-  //   const complaints = nextProps.complaints;
-  //   if (complaints.length < 1) return;
-  //   this.aggregateData(complaints);
-  // }
+  componentWillReceiveProps(nextProps) {
+    let { spam, resolved, inProgress } = nextProps.summary;
+    let data = [inProgress, resolved, spam];
+    const datasets = { ...this.state.chartData.datasets };
+    datasets[0].data = data;
+    this.setState({ datasets });
+  }
   // async componentDidMount() {
   //   //props say categories lain
   //   // const { data: complaints } = await getAdminComplaints();

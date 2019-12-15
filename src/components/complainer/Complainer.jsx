@@ -278,9 +278,14 @@ class Complainer extends Component {
             inprogress={inprogress}
             closed={closed}
           /> */}
-          {this.state.complaints.length > 0 && (
-            <GraphBanner complaints={this.state.complaints} />
-          )}
+          {this.state.analytics &&
+            this.state.analytics.monthwise &&
+            this.state.analytics.monthwise.length > 0 && (
+              <GraphBanner
+                analytics={this.state.analytics}
+                complaints={this.state.complaints}
+              />
+            )}
           <ComplaintForm
             isOpen={this.state.isFormEnabled}
             onSuccess={this.closeComplaintForm}

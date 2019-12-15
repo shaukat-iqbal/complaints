@@ -11,7 +11,6 @@ import GraphBanner from "../../common/GraphsBanner";
 import { countComplainers } from "../../../services/complainerService";
 import DashboardCards from "../DashboardCards";
 import Complaints from "../../common/Complaints";
-import { getConfigToken } from "../../../services/configurationService";
 import { getCurrentUser } from "../../../services/authService";
 import config from "../../../config.json";
 const socket = openSocket(config.apiEndpoint);
@@ -21,18 +20,18 @@ class Dashboard extends Component {
     complaints: [],
     categories: [],
     selectedComplaints: [],
-    isLoading: false
+    isLoading: false,
+    analytics: {}
   };
-  async componentDidUpdate(prevProps, prevState) {
-    if (prevState.complaints.length < this.state.complaints) {
-      let { data: months } = await countComplainers();
-      this.setState({ countUsers: months });
-    }
-  }
+  // async componentDidUpdate(prevProps, prevState) {
+  //   if (prevState.complaints.length < this.state.complaints) {
+  //     let { data: months } = await countComplainers();
+  //     this.setState({ countUsers: months });
+  //   }
+  // }
 
   async componentDidMount() {
     let { data } = await calculateAggregate();
-    console.log(data, "analalytics data");
     this.setState({ analytics: data });
     this.getComplaints();
     this.checkingSocketConnection();
@@ -100,14 +99,19 @@ class Dashboard extends Component {
   //}
   // create new complaint that is created now
   createNewComplaint = complaint => {
-    const updatedComplaints = [...this.state.complaints];
+    const { complaints, analytics, segments } = this.state;
+    const updatedComplaints = [...complaints];
     updatedComplaints.unshift(complaint);
-    segmentsCount(updatedComplaints);
-
+    segments.totalComplaints += 1;
+    analytics.summary.inProgress += 1;
+    let date = new Date(complaint.timeStamp);
+    analytics.monthwise[date.getMonth()] += 1;
     this.setState({
       isLoading: false,
       complaints: updatedComplaints,
-      selectedComplaints: updatedComplaints
+      selectedComplaints: updatedComplaints,
+      segments,
+      analytics
     });
   };
 
@@ -129,19 +133,11 @@ class Dashboard extends Component {
   // get complaints
   getComplaints = async () => {
     this.setState({ isLoading: true });
-    let { data: months } = await countComplainers();
     const response = await getAdminComplaints();
-    console.log(response);
     let complaints = response.data;
 
     let itemsCount = response.headers["itemscount"];
-    console.log(complaints, "Response on pagination");
-    let temp = [];
-    complaints.forEach(complaint => {
-      let available = temp.find(ca => ca._id === complaint.category._id);
-      if (!available) temp.push(complaint.category);
-    });
-    const categories = [{ _id: "", name: "All Categories" }, ...temp];
+
     let { data: segments } = await segmentsCount(complaints);
 
     this.setState({
@@ -149,20 +145,9 @@ class Dashboard extends Component {
       complaints,
       selectedComplaints: complaints,
       itemsCount,
-      categories,
-      countUsers: months,
       segments
     });
     // this.aggregateMonthWiseComplaints(complaints);
-  };
-
-  calculateDays = stamp => {
-    var date = new Date(stamp);
-    let d = new Date();
-    let days =
-      Math.ceil(Math.abs(d.getTime() - date.getTime()) / (1000 * 3600 * 24)) -
-      1;
-    return days;
   };
 
   handleSelectedComplaints = index => {
@@ -239,12 +224,13 @@ class Dashboard extends Component {
     return (
       <React.Fragment>
         <div className="container">
-          {this.state.analytics.monthwise &&
+          {this.state.analytics &&
+            this.state.analytics.monthwise &&
             this.state.analytics.monthwise.length > 0 && (
               <GraphBanner
                 analytics={this.state.analytics}
                 complaints={this.state.complaints}
-                usersCount={this.state.countUsers}
+                usersCount={this.state.analytics.usersCount}
               />
             )}
 
@@ -265,6 +251,7 @@ class Dashboard extends Component {
               complaints={this.state.selectedComplaints}
               categories={this.state.categories}
               itemsCount={this.state.itemsCount}
+              uniqueCategories={this.state.analytics.uniqueCategories}
             />
           }
         </div>

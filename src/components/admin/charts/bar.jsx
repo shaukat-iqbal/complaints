@@ -43,11 +43,12 @@ class BarChart extends Component {
     complaints: []
   };
 
-  // componentWillReceiveProps(nextProps) {
-  //   const complaints = nextProps.complaints;
-  //   if (complaints.length < 1) return;
-  //   this.aggregateData();
-  // }
+  componentWillReceiveProps(nextProps) {
+    const datasets = { ...this.state.chartData.datasets };
+    datasets[0].data = nextProps.monthwiseComplaints;
+    this.setState({ datasets });
+  }
+
   // componentDidMount() {
   //   //props say categories lain
   //   // const { data: complaints } = await getAdminComplaints();

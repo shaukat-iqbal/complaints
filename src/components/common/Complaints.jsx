@@ -15,7 +15,7 @@ class Complaints extends Component {
     this.state.itemsCount = props.itemsCount;
   }
   state = {
-    pageSize: 5,
+    pageSize: 3,
     currentPage: 1,
     sortColumn: { path: "title", order: "asc" },
     searchQuery: "",
@@ -38,16 +38,41 @@ class Complaints extends Component {
 
   // handle pagination
   handlePageChange = async page => {
+    if (this.state.selectedCategory) {
+      await this.getComplaints(
+        page,
+        "category",
+        this.state.selectedCategory._id,
+        "ObjectId"
+      );
+    } else {
+      await this.getComplaints(page);
+    }
+  };
+
+  getComplaints = async (
+    page = 1,
+    searchBy = "",
+    searchKeyword = "",
+    keywordType = "string"
+  ) => {
     const { pageSize } = this.state;
-    const response = await getAdminComplaints(page, pageSize);
+    const response = await getAdminComplaints(
+      page,
+      pageSize,
+      searchBy,
+      searchKeyword,
+      keywordType
+    );
     let complaints = response.data;
-    console.log(complaints);
+    console.log(complaints, "got response");
     let itemsCount = response.headers["itemscount"];
     this.setState({ complaints, itemsCount, currentPage: page });
   };
 
   // handle Category Select
-  handleCategorySelect = category => {
+  handleCategorySelect = async category => {
+    await this.getComplaints(1, "category", category._id, "ObjectId");
     this.setState({
       selectedCategory: category,
       searchQuery: "",
@@ -121,13 +146,16 @@ class Complaints extends Component {
             <div className="row">
               <div className="col-md-2">
                 <ListGroup
-                  items={this.state.categories}
+                  items={this.props.uniqueCategories}
                   selectedItem={this.state.selectedCategory}
                   onItemSelect={this.handleCategorySelect}
                 />
               </div>
               <div className="col-md-10">
-                <p>Showing {filtered.length} complaints</p>
+                <p>
+                  Showing {filtered.length} of {this.state.itemsCount}{" "}
+                  complaints
+                </p>
 
                 <SearchBox value={searchQuery} onChange={this.handleSearch} />
 

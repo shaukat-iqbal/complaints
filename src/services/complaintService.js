@@ -46,13 +46,14 @@ export function getAdminComplaints(
   pageNum = 1,
   pageSize = 5,
   searchBy = "",
-  searchKeyword = ""
+  searchKeyword = "",
+  keywordType
 ) {
   console.log(
-    `${config.apiUrl}/admin-complaints/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}`
+    `${config.apiUrl}/admin-complaints/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}&keywordType=${keywordType}`
   );
   return http.get(
-    `${config.apiUrl}/admin-complaints/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}`
+    `${config.apiUrl}/admin-complaints/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}&keywordType=${keywordType}`
   );
 }
 
