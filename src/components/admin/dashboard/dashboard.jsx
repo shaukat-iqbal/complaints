@@ -8,7 +8,6 @@ import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
 import Spinner from "../../common/Spinner/Spinner";
 import GraphBanner from "../../common/GraphsBanner";
-import { countComplainers } from "../../../services/complainerService";
 import DashboardCards from "../DashboardCards";
 import Complaints from "../../common/Complaints";
 import { getCurrentUser } from "../../../services/authService";
@@ -149,7 +148,9 @@ class Dashboard extends Component {
     });
     // this.aggregateMonthWiseComplaints(complaints);
   };
+  // getSegmentedComplaints= async ()=>{
 
+  // }
   handleSelectedComplaints = index => {
     console.log(index);
     let selectedComplaints = [];

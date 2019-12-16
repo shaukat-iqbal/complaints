@@ -9,8 +9,20 @@ export function register(user) {
   });
 }
 
-export function getAllUsers(role) {
-  return http.get(apiUrl + "/" + role + "/all");
+export function getAllUsers(
+  pageNum = 1,
+  pageSize = 5,
+  searchBy = "",
+  searchKeyword = "",
+  keywordType,
+  role
+) {
+  console.log(
+    `${apiUrl}/${role}/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}&keywordType=${keywordType}`
+  );
+  return http.get(
+    `${apiUrl}/${role}/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}&keywordType=${keywordType}`
+  );
 }
 
 export function registerUser(userData, isAssignee) {

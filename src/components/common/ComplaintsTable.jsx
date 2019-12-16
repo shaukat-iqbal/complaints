@@ -36,6 +36,15 @@ class ComplaintsTable extends Component {
       return complaint;
     });
   }
+  componentWillReceiveProps(nextProps) {
+    let complaints = nextProps.complaints;
+    complaints.map(complaint => {
+      // let date = new Date(complaint.timeStamp);
+      complaint.timeStamp = complaint.timeStamp.split("T")[0];
+      return complaint;
+    });
+    this.setState({ complaints });
+  }
 
   render() {
     let { complaints, onSort, sortColumn } = this.props;

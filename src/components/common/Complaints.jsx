@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import SearchBox from "./searchBox";
-import { paginate } from "../../utils/paginate";
 import ListGroup from "./listGroup";
 import Pagination from "./pagination";
 import ComplaintsTable from "./ComplaintsTable";
@@ -15,7 +14,7 @@ class Complaints extends Component {
     this.state.itemsCount = props.itemsCount;
   }
   state = {
-    pageSize: 3,
+    pageSize: 10,
     currentPage: 1,
     sortColumn: { path: "title", order: "asc" },
     searchQuery: "",
@@ -133,6 +132,9 @@ class Complaints extends Component {
         {count <= 0 ? (
           <div className="container  ">
             <h4>There are no complaints.</h4>
+            <div className="col-md-10">
+              <SearchBox value={searchQuery} onChange={this.handleSearch} />
+            </div>
           </div>
         ) : (
           <div className="container">
