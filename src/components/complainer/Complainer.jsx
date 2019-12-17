@@ -20,11 +20,8 @@ const socket = openSocket(config.apiEndpoint);
 class Complainer extends Component {
   state = {
     complaints: [],
-    categories: [],
     assignees: [],
     notifications: [],
-    pageSize: 9,
-    currentPage: 1,
     sortColumn: { path: "title", order: "asc" },
     searchQuery: "",
     selectedCategory: null,
@@ -47,12 +44,16 @@ class Complainer extends Component {
       window.location = "/login";
     }
 
-    let { data } = await calculateAggregate();
-    this.setState({ analytics: data });
-
+    let { data: analytics } = await calculateAggregate();
+    this.setState({ analytics });
     this.getAllComplaints(user);
+
     const { data: notifications } = await getAllNotifications();
     this.setState({ notifications });
+    this.listenEvents(user);
+  }
+
+  listenEvents = user => {
     socket.on("msg", data => {
       if (data.receiver === user._id) {
         toast.info("New Message: " + data.messageBody);
@@ -80,7 +81,8 @@ class Complainer extends Component {
         // this.getAllComplaints();
       }
     });
-  }
+  };
+
   // handling after dropping complaint from assignee
   replaceUpdatedComplaint = complaint => {
     this.setState(prevState => {
@@ -99,11 +101,11 @@ class Complainer extends Component {
     let itemsCount = response.headers["itemscount"];
 
     this.setState({ complaints, itemsCount, isLoading: false });
+
     const uniqueAssignees = this.getUniqueAssignees(complaints);
     this.setState(prevState => {
       return {
-        assignees: uniqueAssignees,
-        isLoading: false
+        assignees: uniqueAssignees
       };
     });
   };
@@ -134,32 +136,9 @@ class Complainer extends Component {
     this.setState({ selectedComplaint: null, isDetailFormEnabled: false });
   };
 
-  // handle Category Select
-  handleCategorySelect = category => {
-    this.setState({
-      selectedCategory: category,
-      searchQuery: "",
-      currentPage: 1
-    });
-  };
-
-  // handle pagination
-  handlePageChange = page => {
-    this.setState({ currentPage: page });
-  };
-
   // handle Sort
   handleSort = sortColumn => {
     this.setState({ sortColumn });
-  };
-
-  // handle Search
-  handleSearch = query => {
-    this.setState({
-      searchQuery: query,
-      selectedCategory: null,
-      currentPage: 1
-    });
   };
 
   closeComplaintForm = complaint => {
@@ -182,58 +161,13 @@ class Complainer extends Component {
     const {
       complaints: allComplaints,
       sortColumn,
-      selectedCategory,
-      searchQuery,
       assignees,
       notifications,
       isLoading
     } = this.state;
-    // const { length: count } = this.state.complaints;
-    const { length: count } = this.state.complaints;
-
-    if (count === 0) {
-      return (
-        <>
-          <Navbar
-            user={this.state.user}
-            assignees={assignees}
-            notifications={notifications}
-            {...this.props}
-          />
-          <ComplaintForm
-            isOpen={this.state.isFormEnabled}
-            onSuccess={this.closeComplaintForm}
-            onClose={this.toggleComplaintForm}
-          />
-          <div className="container">
-            {isLoading && <Loading />}
-            <button
-              type="button"
-              onClick={this.toggleComplaintForm}
-              // to="/complainer/new-complaint"
-              className="btn button-primary mb-2"
-            >
-              New Complaint &rarr;
-            </button>
-            <h4>There are no complaints in the database</h4>
-          </div>
-        </>
-      );
-    }
-
-    let filtered = allComplaints;
-    if (searchQuery) {
-      filtered = allComplaints.filter(c =>
-        c.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    } else if (selectedCategory && selectedCategory._id) {
-      filtered = allComplaints.filter(
-        c => c.category._id === selectedCategory._id
-      );
-    }
-
+    let { length: count } = this.state.complaints;
     const complaints = _.orderBy(
-      filtered,
+      allComplaints,
       [sortColumn.path],
       [sortColumn.order]
     );
@@ -254,37 +188,52 @@ class Complainer extends Component {
           notifications={notifications}
           {...this.props}
         />
+        <ComplaintForm
+          isOpen={this.state.isFormEnabled}
+          onSuccess={this.closeComplaintForm}
+          onClose={this.toggleComplaintForm}
+        />
         {this.state.isLoading && <Loading />}
-
-        <div className="container">
-          {/* {this.state.user && <h3>Hello {this.state.user.name} !</h3>}
-          <hr /> */}
-          {/* <Showcase
-            resolved={resolved}
-            inprogress={inprogress}
-            closed={closed}
-          /> */}
-          {this.state.analytics &&
-            this.state.analytics.monthwise &&
-            this.state.analytics.monthwise.length > 0 && (
-              <GraphBanner
-                analytics={this.state.analytics}
-                complaints={this.state.complaints}
+        {count < 1 ? (
+          <div className="container">
+            {isLoading && <Loading />}
+            <button
+              type="button"
+              onClick={this.toggleComplaintForm}
+              // to="/complainer/new-complaint"
+              className="btn button-primary mb-2"
+            >
+              New Complaint &rarr;
+            </button>
+            <h4>There are no complaints in the database</h4>
+          </div>
+        ) : (
+          <div className="container">
+            {this.state.analytics &&
+              this.state.analytics.monthwise &&
+              this.state.analytics.monthwise.length > 0 && (
+                <GraphBanner
+                  analytics={this.state.analytics}
+                  complaints={this.state.complaints}
+                />
+              )}
+            <button
+              type="button"
+              onClick={this.toggleComplaintForm}
+              // to="/complainer/new-complaint"
+              className="btn button-primary mb-2"
+            >
+              New Complaint &rarr;
+            </button>
+            {complaints.length > 0 && (
+              <Complaints
+                complaints={complaints}
+                itemsCount={this.state.itemsCount}
+                uniqueCategories={this.state.analytics.uniqueCategories}
               />
             )}
-          <ComplaintForm
-            isOpen={this.state.isFormEnabled}
-            onSuccess={this.closeComplaintForm}
-            onClose={this.toggleComplaintForm}
-          />
-          {this.state.complaints.length > 0 && (
-            <Complaints
-              complaints={complaints}
-              itemsCount={this.state.itemsCount}
-              uniqueCategories={this.state.analytics.uniqueCategories}
-            />
-          )}
-        </div>
+          </div>
+        )}
       </React.Fragment>
     );
   }

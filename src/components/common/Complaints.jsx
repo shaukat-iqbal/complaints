@@ -96,6 +96,7 @@ class Complaints extends Component {
       pageSize,
       searchBy,
       query,
+      "string",
       user.role
     );
     let complaints = response.data;
@@ -111,27 +112,46 @@ class Complaints extends Component {
     });
   };
 
+  handleSearchKeyword = query => {
+    this.setState({ searchQuery: query });
+  };
+
+  searchBar = searchQuery => {
+    return (
+      <>
+        <div className="align-self-end mr-4 ">
+          <div className="input-group">
+            <SearchBox
+              value={searchQuery}
+              onChange={this.handleSearchKeyword}
+            />
+
+            <button
+              className="btn btn-info my-3"
+              type="button"
+              onClick={() => {
+                this.handleSearch(searchQuery);
+              }}
+            >
+              Search
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   render() {
     const {
       complaints: allComplaints,
       pageSize,
       sortColumn,
       currentPage,
-      selectedCategory,
       searchQuery,
       itemsCount
     } = this.state;
     const { length: count } = this.state.complaints;
     let filtered = allComplaints;
-    if (searchQuery) {
-      filtered = allComplaints.filter(c =>
-        c.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    } else if (selectedCategory && selectedCategory._id) {
-      filtered = allComplaints.filter(
-        c => c.category._id === selectedCategory._id
-      );
-    }
 
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
@@ -142,9 +162,7 @@ class Complaints extends Component {
         {count <= 0 ? (
           <div className="container  ">
             <h4>There are no complaints.</h4>
-            <div className="col-md-10">
-              <SearchBox value={searchQuery} onChange={this.handleSearch} />
-            </div>
+            {this.searchBar(searchQuery)}
           </div>
         ) : (
           <div className="container">
@@ -180,7 +198,7 @@ class Complaints extends Component {
                   )}
                 </div>
 
-                <SearchBox value={searchQuery} onChange={this.handleSearch} />
+                {this.searchBar(searchQuery)}
 
                 <ComplaintsTable
                   complaints={complaints}
