@@ -5,21 +5,24 @@ import Pagination from "./pagination";
 import ComplaintsTable from "./ComplaintsTable";
 import _ from "lodash";
 import ComplaintDetail from "./ComplaintDetail";
-import { getAdminComplaints } from "../../services/complaintService";
+import { getComplaintsByRole } from "../../services/complaintService";
+import { getCurrentUser } from "../../services/authService";
 class Complaints extends Component {
   constructor(props) {
     super(props);
     this.state.complaints = props.complaints;
-    this.state.categories = props.categories;
     this.state.itemsCount = props.itemsCount;
+    this.state.user = getCurrentUser();
   }
+
   state = {
     pageSize: 10,
     currentPage: 1,
     sortColumn: { path: "title", order: "asc" },
     searchQuery: "",
     selectedCategory: null,
-    searchBy: "title"
+    searchBy: "title",
+    user: {}
   };
 
   //WARNING! To be deprecated in React v17. Use new lifecycle static getDerivedStateFromProps instead.
@@ -55,13 +58,14 @@ class Complaints extends Component {
     searchKeyword = "",
     keywordType = "string"
   ) => {
-    const { pageSize } = this.state;
-    const response = await getAdminComplaints(
+    const { pageSize, user } = this.state;
+    const response = await getComplaintsByRole(
       page,
       pageSize,
       searchBy,
       searchKeyword,
-      keywordType
+      keywordType,
+      user.role
     );
     let complaints = response.data;
     console.log(complaints, "got response");
@@ -86,8 +90,14 @@ class Complaints extends Component {
 
   // handle Search
   handleSearch = async query => {
-    let { searchBy, pageSize } = this.state;
-    const response = await getAdminComplaints(1, pageSize, searchBy, query);
+    let { searchBy, pageSize, user } = this.state;
+    const response = await getComplaintsByRole(
+      1,
+      pageSize,
+      searchBy,
+      query,
+      user.role
+    );
     let complaints = response.data;
     console.log(complaints, " Search result");
     let itemsCount = response.headers["itemscount"];
@@ -147,17 +157,28 @@ class Complaints extends Component {
             )}
             <div className="row">
               <div className="col-md-2">
-                <ListGroup
-                  items={this.props.uniqueCategories}
-                  selectedItem={this.state.selectedCategory}
-                  onItemSelect={this.handleCategorySelect}
-                />
+                {this.props.uniqueCategories &&
+                  this.props.uniqueCategories.length > 0 && (
+                    <ListGroup
+                      items={this.props.uniqueCategories}
+                      selectedItem={this.state.selectedCategory}
+                      onItemSelect={this.handleCategorySelect}
+                    />
+                  )}
               </div>
               <div className="col-md-10">
-                <p>
+                <div>
                   Showing {filtered.length} of {this.state.itemsCount}{" "}
                   complaints
-                </p>
+                  {this.state.selectedCategory ? (
+                    <p>
+                      Category:{" "}
+                      <strong>{this.state.selectedCategory.name}</strong>
+                    </p>
+                  ) : (
+                    ""
+                  )}
+                </div>
 
                 <SearchBox value={searchQuery} onChange={this.handleSearch} />
 

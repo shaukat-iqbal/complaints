@@ -3,13 +3,10 @@ import _ from "lodash";
 import { toast } from "react-toastify";
 import Navbar from "./navbar/navbar";
 import auth from "../../services/authService";
-import { getComplaints } from "../../services/complaintService";
-import Pagination from "../common/pagination";
-import { paginate } from "../../utils/paginate";
-import ListGroup from "../common/listGroup";
-import { getCategories } from "../../services/categoryService";
-import CompalinerTable from "./complainerTable/complainerTable";
-import SearchBox from "./searchBox";
+import {
+  calculateAggregate,
+  getComplaintsByRole
+} from "../../services/complaintService";
 import openSocket from "socket.io-client";
 import GraphBanner from "../common/GraphsBanner";
 import ComplaintForm from "./ComplaintForm/complaintForm";
@@ -17,6 +14,7 @@ import Loading from "../common/loading";
 import ComplaintDetail from "../common/ComplaintDetail";
 import { getAllNotifications } from "../../services/notificationService";
 import config from "./../../config.json";
+import Complaints from "../common/Complaints";
 const socket = openSocket(config.apiEndpoint);
 
 class Complainer extends Component {
@@ -36,24 +34,25 @@ class Complainer extends Component {
   //   socket.disconnect(true);
   // }
   async componentDidMount() {
+    const user = auth.getCurrentUser();
     try {
       this.setState({ isLoading: true });
-      const user = auth.getCurrentUser();
       if (!user || user.role !== "complainer") {
         toast.error("Access denied to this Route!");
         this.props.history.replace("/");
       }
-      const { data } = await getAllNotifications();
-      console.log("notifications", data);
-      this.setState({ user, notifications: data });
+
+      this.setState({ user });
     } catch (ex) {
       window.location = "/login";
     }
 
-    this.getAllComplaints();
+    let { data } = await calculateAggregate();
+    this.setState({ analytics: data });
 
-    const user = auth.getCurrentUser();
-
+    this.getAllComplaints(user);
+    const { data: notifications } = await getAllNotifications();
+    this.setState({ notifications });
     socket.on("msg", data => {
       if (data.receiver === user._id) {
         toast.info("New Message: " + data.messageBody);
@@ -93,21 +92,13 @@ class Complainer extends Component {
   };
 
   // getting all complaints
-  getAllComplaints = async () => {
+  getAllComplaints = async user => {
     this.setState({ isLoading: true });
-    const { data: complaints } = await getComplaints();
-    const { data: allcategories } = await getCategories();
+    const response = await getComplaintsByRole(1, 10, "", "", "", user.role);
+    let complaints = response.data;
+    let itemsCount = response.headers["itemscount"];
 
-    let temp = [];
-    // To render side bar of only those categories of which complainer has made a complaint
-    complaints.forEach(complaint => {
-      let cat = allcategories.find(c => c._id === complaint.category._id);
-      let available = temp.find(ca => ca._id === cat._id);
-      if (!available) temp.push(cat);
-    });
-    const categories = [{ _id: "", name: "All Categories" }, ...temp];
-
-    this.setState({ complaints, categories, isLoading: false });
+    this.setState({ complaints, itemsCount, isLoading: false });
     const uniqueAssignees = this.getUniqueAssignees(complaints);
     this.setState(prevState => {
       return {
@@ -133,11 +124,6 @@ class Complainer extends Component {
     return uniqueAssignees;
   };
 
-  // // handle detail
-  // handleDetail = complaint => {
-  //   // console.log(complaint);
-  //   this.props.history.replace(`/complainer/${complaint._id}`);
-  // };
   // handle detail
   handleDetail = complaint => {
     // console.log(complaint);
@@ -195,9 +181,7 @@ class Complainer extends Component {
     // get paged data
     const {
       complaints: allComplaints,
-      pageSize,
       sortColumn,
-      currentPage,
       selectedCategory,
       searchQuery,
       assignees,
@@ -248,9 +232,11 @@ class Complainer extends Component {
       );
     }
 
-    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
-
-    const complaints = paginate(sorted, currentPage, pageSize);
+    const complaints = _.orderBy(
+      filtered,
+      [sortColumn.path],
+      [sortColumn.order]
+    );
 
     // get paged data end
     return (
@@ -291,58 +277,12 @@ class Complainer extends Component {
             onSuccess={this.closeComplaintForm}
             onClose={this.toggleComplaintForm}
           />
-          {count !== 0 && (
-            <div className="row">
-              <div className="col-md-2 mb-2">
-                <ListGroup
-                  items={this.state.categories}
-                  selectedItem={this.state.selectedCategory}
-                  onItemSelect={this.handleCategorySelect}
-                />
-              </div>
-              <div className="col-md-10">
-                <button
-                  type="button"
-                  onClick={this.toggleComplaintForm}
-                  // to="/complainer/new-complaint"
-                  className="btn button-primary mb-2"
-                >
-                  New Complaint &rarr;
-                </button>
-
-                {sorted.length > 0 ? (
-                  <>
-                    <p>Showing {filtered.length} complaints</p>
-
-                    <SearchBox
-                      value={searchQuery}
-                      onChange={this.handleSearch}
-                    />
-
-                    <CompalinerTable
-                      complaints={complaints}
-                      sortColumn={sortColumn}
-                      onSort={this.handleSort}
-                      onDetail={this.handleDetail}
-                    />
-                    <Pagination
-                      itemsCount={filtered.length}
-                      pageSize={pageSize}
-                      currentPage={currentPage}
-                      onPageChange={this.handlePageChange}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <h4 className="mt-2">No Complaint </h4>
-                    <SearchBox
-                      value={searchQuery}
-                      onChange={this.handleSearch}
-                    />
-                  </>
-                )}
-              </div>
-            </div>
+          {this.state.complaints.length > 0 && (
+            <Complaints
+              complaints={complaints}
+              itemsCount={this.state.itemsCount}
+              uniqueCategories={this.state.analytics.uniqueCategories}
+            />
           )}
         </div>
       </React.Fragment>

@@ -17,6 +17,7 @@ import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { toast } from "react-toastify";
 import SearchBox from "../components/common/searchBox";
 import Loading from "../components/common/loading";
+import RootSideBar from "../components/common/RootSideBar";
 class CategoriesList extends Component {
   state = {
     allCategories: [],
@@ -25,7 +26,8 @@ class CategoriesList extends Component {
     csvUploadComponent: false,
     searchQuery: "",
     checkedRootCategories: [],
-    sidebarCategories: []
+    sidebarCategories: [],
+    checkedItems: {}
   };
   constructor(props) {
     super(props);
@@ -283,7 +285,7 @@ class CategoriesList extends Component {
   };
 
   toggleChecked = e => {
-    let { checkedRootCategories, allCategories } = this.state;
+    let { checkedRootCategories, allCategories, checkedItems } = this.state;
     if (e.target.checked) {
       let root = allCategories.find(c => c._id == e.target.name);
       if (root) checkedRootCategories.push(root);
@@ -291,8 +293,8 @@ class CategoriesList extends Component {
       let index = checkedRootCategories.findIndex(c => c._id == e.target.name);
       if (index >= 0) checkedRootCategories.splice(index, 1);
     }
-
-    this.setState({ checkedRootCategories, [e.target.name]: e.target.checked });
+    checkedItems[e.target.name] = e.target.checked;
+    this.setState({ checkedRootCategories, checkedItems });
   };
 
   handleDelete = () => {
@@ -356,7 +358,7 @@ class CategoriesList extends Component {
     await deleteCategory(selectedRootCategory._id);
   };
   render() {
-    const { allCategories, sidebarCategories } = this.state;
+    const { allCategories, sidebarCategories, checkedItems } = this.state;
     // const rootCategories = allCategories.filter(c => !c.parentCategory);
     // const length = rootCategories.length;
     // const { searchQuery } = this.state;
@@ -372,35 +374,11 @@ class CategoriesList extends Component {
         {!this.state.csvUploadComponent ? (
           <div className="row">
             <div className=" col-md-2 ">
-              {sidebarCategories.length > 0 && (
-                <div
-                  className="border border-light p-3 rounded-lg  ml-1"
-                  style={{
-                    backgroundColor: "#FDFDFD",
-                    marginTop: "35px",
-                    maxHeight: "400px",
-                    overflow: "auto"
-                  }}
-                >
-                  {sidebarCategories.map(category => {
-                    return (
-                      <div className="form-check p-1">
-                        <input
-                          className=" form-check-input"
-                          type="checkbox"
-                          checked={this.state[category._id]}
-                          onClick={e => this.toggleChecked(e)}
-                          name={category._id}
-                          key={uuid()}
-                        />
-                        <label className="form-check-label" htmlFor="">
-                          {category.name}
-                        </label>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <RootSideBar
+                items={sidebarCategories}
+                checkedItems={checkedItems}
+                onCheck={this.toggleChecked}
+              />
             </div>
             <div className="col-md-10">
               <div className="container card p-1  ">

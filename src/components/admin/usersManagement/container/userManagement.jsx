@@ -91,7 +91,6 @@ function UserManagement(props) {
   // get NOtifications
   const getNotifications = async () => {
     const { data } = await getAllNotifications();
-    console.log(data);
     setNotifications(oldNotifications => [...oldNotifications, ...data]);
   };
 

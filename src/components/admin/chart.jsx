@@ -4,7 +4,7 @@ import { useState } from "react";
 import config from "../../config.json";
 import {
   getReportOfMonth,
-  getAdminComplaints
+  getComplaintsByRole
 } from "../../services/complaintService";
 import { sendEmailToAuthorities } from "../../services/emailService";
 import { toast } from "react-toastify";
@@ -43,7 +43,7 @@ const Chart = props => {
   };
   useEffect(() => {
     async function setAttributes() {
-      let { data: complaints } = await getAdminComplaints();
+      let { data: complaints } = await getComplaintsByRole();
       let { data: months } = await countComplainers();
       setComplainersCount(months);
       setComplaints(complaints);

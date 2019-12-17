@@ -3,8 +3,7 @@ import CategoriesList from "./categoriesList";
 import {
   getCategoriesWithNoParent,
   getSiblingsOf,
-  getChildsOf,
-  getCategoryById
+  getChildsOf
 } from "../../services/categoryService";
 import "./../admin/usersManagement/categories.css";
 

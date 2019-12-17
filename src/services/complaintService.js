@@ -41,22 +41,6 @@ export function viewFile(complaintId) {
   );
 }
 
-// getting all admin complaints
-export function getAdminComplaints(
-  pageNum = 1,
-  pageSize = 10,
-  searchBy = "",
-  searchKeyword = "",
-  keywordType
-) {
-  console.log(
-    `${config.apiUrl}/admin-complaints/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}&keywordType=${keywordType}`
-  );
-  return http.get(
-    `${config.apiUrl}/admin-complaints/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}&keywordType=${keywordType}`
-  );
-}
-
 // getting all assignee complaints
 export function getAssigneeComplaints() {
   return http.get(config.apiUrl + "/assignee-complaints");
@@ -144,4 +128,20 @@ export function segmentsCount() {
 
 export function calculateAggregate() {
   return http.get(config.apiUrl + `/admin-complaints/aggregate/monthwise`);
+}
+
+export function getComplaintsByRole(
+  pageNum = 1,
+  pageSize = 10,
+  searchBy = "",
+  searchKeyword = "",
+  keywordType,
+  role = "admin"
+) {
+  console.log(
+    `${config.apiUrl}/${role}-complaints/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}&keywordType=${keywordType}`
+  );
+  return http.get(
+    `${config.apiUrl}/${role}-complaints/paginated/${pageNum}/${pageSize}?searchBy=${searchBy}&searchKeyword=${searchKeyword}&keywordType=${keywordType}`
+  );
 }

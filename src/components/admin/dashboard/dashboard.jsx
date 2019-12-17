@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {
-  getAdminComplaints,
+  getComplaintsByRole,
   segmentsCount,
   calculateAggregate
 } from "../../../services/complaintService";
@@ -30,9 +30,15 @@ class Dashboard extends Component {
   // }
 
   async componentDidMount() {
+    this.setState({ isLoading: true });
+    let { data: segments } = await segmentsCount();
+
+    this.setState({
+      segments
+    });
+    await this.getComplaints();
     let { data } = await calculateAggregate();
     this.setState({ analytics: data });
-    this.getComplaints();
     this.checkingSocketConnection();
   }
   componentWillUnmount() {
@@ -131,21 +137,16 @@ class Dashboard extends Component {
   };
   // get complaints
   getComplaints = async () => {
-    this.setState({ isLoading: true });
-    const response = await getAdminComplaints();
+    const response = await getComplaintsByRole();
     let complaints = response.data;
-
     let itemsCount = response.headers["itemscount"];
-
-    let { data: segments } = await segmentsCount(complaints);
-
     this.setState({
-      isLoading: false,
       complaints,
       selectedComplaints: complaints,
       itemsCount,
-      segments
+      isLoading: false
     });
+
     // this.aggregateMonthWiseComplaints(complaints);
   };
   // getSegmentedComplaints= async ()=>{
@@ -210,7 +211,7 @@ class Dashboard extends Component {
 
     if (count === 0) {
       return (
-        <div className="container d-flex  justify-content-center  ">
+        <div className="container d-flex justify-content-center  ">
           {this.state.isLoading ? (
             <div className="d-flex justify-content-center mt-5">
               <Spinner />
@@ -230,12 +231,11 @@ class Dashboard extends Component {
             this.state.analytics.monthwise.length > 0 && (
               <GraphBanner
                 analytics={this.state.analytics}
-                complaints={this.state.complaints}
                 usersCount={this.state.analytics.usersCount}
               />
             )}
 
-          {this.state.complaints.length > 0 && (
+          {this.state.segments && (
             <div className="mb-3">
               <DashboardCards
                 positive={this.state.segments.positiveFeedback}
@@ -247,14 +247,14 @@ class Dashboard extends Component {
               />
             </div>
           )}
-          {
+          {this.state.selectedComplaints.length > 0 && (
             <Complaints
               complaints={this.state.selectedComplaints}
               categories={this.state.categories}
               itemsCount={this.state.itemsCount}
               uniqueCategories={this.state.analytics.uniqueCategories}
             />
-          }
+          )}
         </div>
       </React.Fragment>
     );

@@ -31,23 +31,29 @@ class LocationForm extends Form {
   };
   async componentDidMount() {
     this.setState({ isLoading: true });
-    const { data: allCategories } = await getLocations();
-    this.setState({ allCategories });
-    this.populateForm(this.props.category, allCategories);
+    try {
+      const { data: allLocations } = await getLocations();
+      this.setState({ allLocations });
+
+      this.populateForm(this.props.location, allLocations);
+    } catch (error) {
+      this.setState({ isLoading: false });
+      this.populateForm(this.props.location);
+    }
   }
 
-  populateForm = async (category, allCategories) => {
+  populateForm = async location => {
     let { data } = this.state;
     let parentLocationName = null;
     if (this.props.requestType === "addChild") {
-      data.parentLocation = category._id;
-      parentLocationName = this.getparentCategoryName(category._id).name;
+      data.parentLocation = location._id;
+      parentLocationName = this.getparentLocationName(location._id).name;
     } else if (this.props.requestType === "edit") {
-      data.name = category.name;
-      data.hasChild = category.hasChild;
-      if (category.parentLocation) {
-        data.parentLocation = category.parentLocation;
-        parentLocationName = this.getparentCategoryName(category.parentLocation)
+      data.name = location.name;
+      data.hasChild = location.hasChild;
+      if (location.parentLocation) {
+        data.parentLocation = location.parentLocation;
+        parentLocationName = this.getparentLocationName(location.parentLocation)
           .name;
       } else {
         let { data: root } = await getRootLocation();
@@ -66,19 +72,19 @@ class LocationForm extends Form {
       data,
       requestType: this.props.requestType,
       parentLocationName,
-      category,
+      location,
       isLoading: false
     });
   };
 
-  getparentCategoryName = id => {
-    let parentLocation = this.state.allCategories.find(c => c._id === id);
+  getparentLocationName = id => {
+    let parentLocation = this.state.allLocations.find(c => c._id === id);
     return parentLocation;
   };
-  handleOnCategorySeletion = id => {
+  handleOnLocationSeletion = id => {
     let { data } = this.state;
     data.parentLocation = id;
-    let parentLocationName = this.getparentCategoryName(id).name;
+    let parentLocationName = this.getparentLocationName(id).name;
     this.setState({
       data,
       parentLocationName,
@@ -89,22 +95,22 @@ class LocationForm extends Form {
   doSubmit = async () => {
     this.setState({ isLoading: true });
     try {
-      let category = null;
+      let location = null;
       if (this.state.requestType === "edit") {
         let { data } = await updateLocationById(
-          this.state.category._id,
+          this.state.location._id,
           this.state.data
         );
-        category = data.location;
-        console.log(category);
+        location = data.location;
+        console.log(location);
       } else if (this.state.requestType === "addChild") {
         let { data } = await createLocation(this.state.data);
-        category = data;
+        location = data;
       } else if (this.state.requestType === "new") {
         let { data } = await createLocation(this.state.data);
-        category = data;
+        location = data;
       }
-      this.props.onSubmitForm(category);
+      this.props.onSubmitForm(location);
     } catch (error) {
       console.log(error);
     }
@@ -141,7 +147,7 @@ class LocationForm extends Form {
                 </div>
                 <Locations
                   isLoading={true}
-                  onCategorySeletion={this.handleOnCategorySeletion}
+                  onCategorySeletion={this.handleOnLocationSeletion}
                   isOpen={this.state.showCategoriesDialog}
                   onClose={this.handleDialogClose}
                   isCrud={true}

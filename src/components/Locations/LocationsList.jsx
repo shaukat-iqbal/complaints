@@ -17,29 +17,32 @@ import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { toast } from "react-toastify";
 import Loading from "../common/loading";
 import SearchBox from "../common/searchBox";
+import RootSideBar from "../common/RootSideBar";
 class LocationsList extends Component {
   state = {
-    allCategories: [],
+    allLocations: [],
     categoryFormEnabled: false,
     selectedCategory: "",
     csvUploadComponent: false,
     searchQuery: "",
-    checkedRootCategories: [],
-    sidebarCategories: []
+    checkedRootLocations: [],
+    sidebarLocations: [],
+    checkedItems: {}
   };
   constructor(props) {
     super(props);
-    if (props.categories) this.state.allCategories = props.categories;
+    if (props.locations && props.locations.length > 0)
+      this.state.allLocations = props.locations;
   }
 
   async componentDidMount() {
-    if (this.state.allCategories.length < 1) {
-      const { data: allCategories } = await getLocations();
-      // const { data: categories } = await getLocationsWithNoParent();
-      let categories = allCategories.filter(c => c.name !== "Root");
-      // let checkedRootCategories = categories.filter(c => !c.parentLocation);
-      let sidebarCategories = allCategories.filter(c => !c.parentLocation);
-      this.setState({ allCategories: categories, sidebarCategories });
+    if (this.state.allLocations.length < 1) {
+      const { data: allLocations } = await getLocations();
+      // const { data: locations } = await getLocationsWithNoParent();
+      let locations = allLocations.filter(c => c.name !== "Root");
+      // let checkedRootLocations = locations.filter(c => !c.parentLocation);
+      let sidebarLocations = allLocations.filter(c => !c.parentLocation);
+      this.setState({ allLocations: locations, sidebarLocations });
     }
   }
 
@@ -59,9 +62,9 @@ class LocationsList extends Component {
     const parentCategoryId = event.target.id;
     console.log("Location that is going to be parent", parentCategoryId);
     console.log("Dropped categoy id", categoryId);
-    const { allCategories } = this.state;
-    console.log(allCategories);
-    const categoryToUpdate = allCategories.find(
+    const { allLocations } = this.state;
+    console.log(allLocations);
+    const categoryToUpdate = allLocations.find(
       category => category._id == categoryId
     );
     console.log(categoryToUpdate);
@@ -72,7 +75,7 @@ class LocationsList extends Component {
     if (!oldSiblings) {
       //oldPArent should have hasChild false
       if (categoryToUpdate.parentLocation)
-        allCategories.map(category => {
+        allLocations.map(category => {
           if (category._id == categoryToUpdate.parentLocation)
             category.hasChild = false;
 
@@ -82,12 +85,12 @@ class LocationsList extends Component {
 
     //agar null ha matlab category ko root category bna do by deleting parent category id
     if (!parentCategoryId) {
-      let index = allCategories.findIndex(c => c._id == categoryId);
-      if (index >= 0) allCategories[index].parentLocation = null;
+      let index = allLocations.findIndex(c => c._id == categoryId);
+      if (index >= 0) allLocations[index].parentLocation = null;
 
       let orderChanged = this.state.orderChanged;
       if (!orderChanged) orderChanged = true;
-      this.setState({ allCategories, orderChanged });
+      this.setState({ allLocations, orderChanged });
       return;
     }
     //agar null ni hai tou check karo khud ko khud pay drop kar raha h? do nothing
@@ -95,7 +98,7 @@ class LocationsList extends Component {
     //check karo k kya dobara usi parent ka child ban raha hai? do nothing
     if (categoryToUpdate.parentLocation == parentCategoryId) return;
 
-    const categoryTobeParent = allCategories.find(
+    const categoryTobeParent = allLocations.find(
       category => category._id == parentCategoryId
     );
     console.log("dragged category", categoryToUpdate);
@@ -109,24 +112,24 @@ class LocationsList extends Component {
     }
 
     console.log("Sending body", categoryToUpdate);
-    let index = allCategories.findIndex(c => c._id == categoryId);
-    if (index >= 0) allCategories[index] = categoryToUpdate;
+    let index = allLocations.findIndex(c => c._id == categoryId);
+    if (index >= 0) allLocations[index] = categoryToUpdate;
 
-    console.log("Categories updated ", allCategories);
+    console.log("Categories updated ", allLocations);
     console.log("Location dropped is", categoryId);
 
-    // Make sure some changes occured in hirarchi of categories
+    // Make sure some changes occured in hirarchi of locations
     let orderChanged = this.state.orderChanged;
     if (!orderChanged) orderChanged = true;
-    this.setState({ allCategories, orderChanged });
+    this.setState({ allLocations, orderChanged });
   };
 
   doesHaveSiblings = category => {
     console.log(category, " The category I am tring to check who has siblings");
     if (!category.parentLocation) return false;
 
-    const { allCategories } = this.state;
-    const siblings = allCategories.filter(
+    const { allLocations } = this.state;
+    const siblings = allLocations.filter(
       c => c.parentLocation == category.parentLocation
     );
     console.log("length of siblings before", siblings.length);
@@ -136,32 +139,32 @@ class LocationsList extends Component {
 
   handleSubmitCategoryForm = category => {
     if (category) {
-      let { allCategories, sidebarCategories } = this.state;
+      let { allLocations, sidebarLocations } = this.state;
       if (this.state.requestType === "addChild") {
-        let parentCategoryIndex = allCategories.findIndex(
+        let parentCategoryIndex = allLocations.findIndex(
           c => c._id === category.parentLocation
         );
         if (parentCategoryIndex >= 0)
-          allCategories[parentCategoryIndex].hasChild = true;
-        console.log(parentCategoryIndex, allCategories[parentCategoryIndex]);
-        allCategories.unshift(category);
+          allLocations[parentCategoryIndex].hasChild = true;
+        console.log(parentCategoryIndex, allLocations[parentCategoryIndex]);
+        allLocations.unshift(category);
       } else if (this.state.requestType === "edit") {
-        let index = allCategories.findIndex(c => c._id === category._id);
+        let index = allLocations.findIndex(c => c._id === category._id);
         if (index >= 0) {
-          allCategories[index] = category;
+          allLocations[index] = category;
         }
-        index = sidebarCategories.findIndex(c => c._id === category._id);
+        index = sidebarLocations.findIndex(c => c._id === category._id);
         if (index >= 0) {
-          sidebarCategories[index] = category;
+          sidebarLocations[index] = category;
         }
       } else if (this.state.requestType === "new") {
-        sidebarCategories.unshift(category);
-        allCategories.unshift(category);
+        sidebarLocations.unshift(category);
+        allLocations.unshift(category);
       }
       this.setState({
-        allCategories,
+        allLocations,
         categoryFormEnabled: false,
-        sidebarCategories
+        sidebarLocations
       });
     } else {
       this.setState({ categoryFormEnabled: false });
@@ -202,28 +205,28 @@ class LocationsList extends Component {
             try {
               if (!category.hasChild) {
                 await deleteLocation(category._id);
-                let { allCategories } = this.state;
-                let updated = allCategories.filter(c => c._id !== category._id);
+                let { allLocations } = this.state;
+                let updated = allLocations.filter(c => c._id !== category._id);
                 if (category.parentLocation) {
                   if (!this.doesHaveSiblings(category)) {
-                    let parentIndex = allCategories.findIndex(
+                    let parentIndex = allLocations.findIndex(
                       c => c._id == category.parentLocation
                     );
                     if (parentIndex >= 0)
-                      allCategories[parentIndex].hasChild = false;
+                      allLocations[parentIndex].hasChild = false;
                   }
                 }
-                let { sidebarCategories, checkedRootCategories } = this.state;
-                sidebarCategories = sidebarCategories.filter(
+                let { sidebarLocations, checkedRootLocations } = this.state;
+                sidebarLocations = sidebarLocations.filter(
                   c => c._id !== category._id
                 );
-                checkedRootCategories = checkedRootCategories.filter(
+                checkedRootLocations = checkedRootLocations.filter(
                   c => c._id !== category._id
                 );
                 this.setState({
-                  allCategories: updated,
-                  sidebarCategories,
-                  checkedRootCategories
+                  allLocations: updated,
+                  sidebarLocations,
+                  checkedRootLocations
                 });
               } else {
                 toast.warn(
@@ -244,7 +247,7 @@ class LocationsList extends Component {
 
   handleSave = async () => {
     try {
-      await updateMultipleLocations(this.state.allCategories);
+      await updateMultipleLocations(this.state.allLocations);
       toast.success("Categories successfully updated.");
     } catch (error) {
       console.log(error);
@@ -265,42 +268,43 @@ class LocationsList extends Component {
   };
 
   getPagedData = () => {
-    const { searchQuery, allCategories, checkedRootCategories } = this.state;
-    let categories = allCategories;
-    if (checkedRootCategories.length > 0) categories = checkedRootCategories;
-    let filtered = categories;
+    const { searchQuery, allLocations, checkedRootLocations } = this.state;
+    let locations = allLocations;
+    if (checkedRootLocations.length > 0) locations = checkedRootLocations;
+    let filtered = locations;
     if (searchQuery) {
-      filtered = categories.filter(
+      filtered = locations.filter(
         category =>
           !category.parentLocation &&
           category.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     } else {
-      filtered = categories.filter(category => !category.parentLocation);
+      filtered = locations.filter(category => !category.parentLocation);
     }
 
     return { totalCount: filtered.length, data: filtered };
   };
 
   toggleChecked = e => {
-    let { checkedRootCategories, allCategories } = this.state;
+    let { checkedRootLocations, allLocations, checkedItems } = this.state;
+    console.log(e.target.checked);
     if (e.target.checked) {
-      let root = allCategories.find(c => c._id == e.target.name);
-      if (root) checkedRootCategories.push(root);
+      let root = allLocations.find(c => c._id == e.target.name);
+      if (root) checkedRootLocations.push(root);
     } else {
-      let index = checkedRootCategories.findIndex(c => c._id == e.target.name);
-      if (index >= 0) checkedRootCategories.splice(index, 1);
+      let index = checkedRootLocations.findIndex(c => c._id == e.target.name);
+      if (index >= 0) checkedRootLocations.splice(index, 1);
     }
-
-    this.setState({ checkedRootCategories, [e.target.name]: e.target.checked });
+    checkedItems[e.target.name] = e.target.checked;
+    this.setState({ checkedRootLocations, checkedItems });
   };
 
   handleDelete = () => {
-    let { allCategories } = this.state;
+    let { allLocations } = this.state;
     confirmAlert({
       title: "Confirm to submit",
       message:
-        "Do you really want to delete All sub-categories of selected category(ies).",
+        "Do you really want to delete All sub-locations of selected category(ies).",
       buttons: [
         {
           label: "Yes",
@@ -308,18 +312,18 @@ class LocationsList extends Component {
             this.setState({ isLoading: true });
             let toBeDeleted = this.getToBeDeleted();
 
-            let updated = [...allCategories];
+            let updated = [...allLocations];
             toBeDeleted.forEach(id => {
               updated = updated.filter(location => location._id !== id);
             });
 
-            let sidebarCategories = updated.filter(
+            let sidebarLocations = updated.filter(
               location => !location.parentLocation
             );
             this.setState({
-              allCategories: updated,
-              sidebarCategories,
-              checkedRootCategories: [],
+              allLocations: updated,
+              sidebarLocations,
+              checkedRootLocations: [],
               isLoading: false
             });
 
@@ -336,12 +340,12 @@ class LocationsList extends Component {
   };
 
   getToBeDeleted = () => {
-    let { checkedRootCategories, allCategories } = this.state;
+    let { checkedRootLocations, allLocations } = this.state;
     let toBeDeleted = [];
-    for (let index = 0; index < checkedRootCategories.length; index++) {
-      const rootLocation = checkedRootCategories[index];
+    for (let index = 0; index < checkedRootLocations.length; index++) {
+      const rootLocation = checkedRootLocations[index];
       toBeDeleted.push(rootLocation._id);
-      allCategories.forEach(location => {
+      allLocations.forEach(location => {
         if (location.parentLocation === rootLocation._id) {
           toBeDeleted.push(location._id);
         }
@@ -357,15 +361,20 @@ class LocationsList extends Component {
     await deleteLocation(selectedRootCategory._id);
   };
   render() {
-    const { allCategories, sidebarCategories } = this.state;
-    // const rootCategories = allCategories.filter(c => !c.parentLocation);
+    const {
+      allLocations,
+      sidebarLocations,
+      checkedItems,
+      isLoading
+    } = this.state;
+    // const rootCategories = allLocations.filter(c => !c.parentLocation);
     // const length = rootCategories.length;
     // const { searchQuery } = this.state;
 
     const { totalCount: length, data: rootCategories } = this.getPagedData();
     return (
       <div>
-        {this.state.isLoading && <Loading />}
+        {isLoading && <Loading />}
 
         {/* <div className="p-3 border rounded-sm d-flex justify-content-center mb-1 gradiantHeading">
           <h3 style={{ color: "white" }}>Categories</h3>
@@ -373,35 +382,11 @@ class LocationsList extends Component {
         {!this.state.csvUploadComponent ? (
           <div className="row">
             <div className=" col-md-2 ">
-              {sidebarCategories.length > 0 && (
-                <div
-                  className="border border-light p-3 rounded-lg  ml-1"
-                  style={{
-                    backgroundColor: "#FDFDFD",
-                    marginTop: "35px",
-                    maxHeight: "400px",
-                    overflow: "auto"
-                  }}
-                >
-                  {sidebarCategories.map(category => {
-                    return (
-                      <div className="form-check p-1">
-                        <input
-                          className=" form-check-input"
-                          type="checkbox"
-                          checked={this.state[category._id]}
-                          onClick={e => this.toggleChecked(e)}
-                          name={category._id}
-                          key={uuid()}
-                        />
-                        <label className="form-check-label" htmlFor="">
-                          {category.name}
-                        </label>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <RootSideBar
+                items={sidebarLocations}
+                onCheck={this.toggleChecked}
+                checkedItems={checkedItems}
+              />
             </div>
             <div className="col-md-10">
               <div className="container card p-1  ">
@@ -422,7 +407,7 @@ class LocationsList extends Component {
                         Upload Csv
                       </button>
                     </div>
-                    {this.state.checkedRootCategories.length > 0 && (
+                    {this.state.checkedRootLocations.length > 0 && (
                       <button
                         className="btn btn-primary btn-round mb-3"
                         onClick={this.handleDelete}
@@ -470,7 +455,7 @@ class LocationsList extends Component {
                                 onEdit={this.handleEditCategory}
                                 onAddChild={this.handleAddChild}
                                 onDelete={this.handleDeleteCategory}
-                                allCategories={allCategories}
+                                allLocations={allLocations}
                                 onDragOver={this.onDragOver}
                                 onDrop={this.onDrop}
                                 onDragStart={this.onDragStart}
@@ -510,10 +495,9 @@ class LocationsList extends Component {
         {this.state.categoryFormEnabled && (
           <LocationForm
             requestType={this.state.requestType}
-            category={this.state.selectedCategory}
+            location={this.state.selectedCategory}
             isOpen={this.state.categoryFormEnabled}
             onSubmitForm={this.handleSubmitCategoryForm}
-            allCategories={allCategories}
             onClose={this.handleCloseCategoryForm}
           />
         )}
