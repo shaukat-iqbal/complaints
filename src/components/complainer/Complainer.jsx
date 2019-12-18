@@ -54,6 +54,7 @@ class Complainer extends Component {
   }
 
   listenEvents = user => {
+    let { complaints } = this.state;
     socket.on("msg", data => {
       if (data.receiver === user._id) {
         toast.info("New Message: " + data.messageBody);
@@ -69,7 +70,7 @@ class Complainer extends Component {
       }
 
       if (data.action === "status changed") {
-        this.replaceUpdatedComplaint(data.complaint);
+        this.replaceUpdatedComplaint(data.complaint, complaints);
         toast.info(
           `Complaints: "${data.complaint.title}'s" status is changed to "${data.status}"`
         );
@@ -84,12 +85,13 @@ class Complainer extends Component {
   };
 
   // handling after dropping complaint from assignee
-  replaceUpdatedComplaint = complaint => {
-    this.setState(prevState => {
-      const updatedComplaints = [...prevState.complaints];
-      let index = updatedComplaints.findIndex(c => c._id === complaint._id);
-      if (index >= 0) updatedComplaints[index] = complaint;
-      return { complaints: updatedComplaints, isLoading: false };
+  replaceUpdatedComplaint = (complaint, oldComplaints) => {
+    const updatedComplaints = [...oldComplaints];
+    let index = updatedComplaints.findIndex(c => c._id === complaint._id);
+    if (index >= 0) updatedComplaints[index] = complaint;
+    this.setState({
+      complaints: updatedComplaints,
+      isLoading: false
     });
   };
 
