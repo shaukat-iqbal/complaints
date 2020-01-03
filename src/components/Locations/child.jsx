@@ -5,30 +5,30 @@ import Location from "./Location";
 class Childs extends Component {
   state = { childs: [] };
   async componentDidMount() {
-    const { category, allCategories } = this.props;
+    const { category, allLocations } = this.props;
     //getChildsOfCategory
     if (category && category._id) {
-      let childs = this.getChildsOf(category, allCategories);
+      let childs = this.getChildsOf(category, allLocations);
       // const { data: childs } = await getChildsOf(category._id);
-      this.setState({ childs, allCategories });
+      this.setState({ childs, allLocations });
     }
   }
   componentDidUpdate(prevProps, prevState) {
-    const { category, allCategories } = this.props;
+    const { category, allLocations } = this.props;
     //getChildsOfCategory
     if (category && category._id) {
-      let childs = this.getChildsOf(category, allCategories);
+      let childs = this.getChildsOf(category, allLocations);
       // const { data: childs } = await getChildsOf(category._id);
       if (
         prevState.childs.length !== childs.length ||
-        prevState.allCategories !== this.props.allCategories
+        prevState.allLocations !== this.props.allLocations
       )
-        this.setState({ childs, allCategories });
+        this.setState({ childs, allLocations });
     }
   }
 
-  getChildsOf = (category, allCategories) => {
-    const childs = allCategories.filter(c => category._id == c.parentLocation);
+  getChildsOf = (category, allLocations) => {
+    const childs = allLocations.filter(c => category._id == c.parentLocation);
     return childs;
   };
 
@@ -59,7 +59,7 @@ class Childs extends Component {
                 />
                 <Childs
                   key={uuid()}
-                  allCategories={this.props.allCategories}
+                  allLocations={this.props.allLocations}
                   category={childCategory}
                   onEdit={this.props.onEdit}
                   onAddChild={this.props.onAddChild}
