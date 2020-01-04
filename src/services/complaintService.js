@@ -114,6 +114,12 @@ export function getReport() {
   return http.get(config.apiUrl + `/admin-complaints/generate/pdf/v1`);
 }
 
+// getting all positive feedback complaints
+export function getPositiveFeedbackComplaints() {
+  return http.get(
+    config.apiUrl + `/admin-complaints/get/positiveFeedbackComplaints`
+  );
+}
 // Generating report of specified month
 export function getReportOfMonth(body) {
   return http.get(
