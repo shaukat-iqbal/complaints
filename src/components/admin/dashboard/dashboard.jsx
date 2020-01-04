@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import {
   getComplaintsByRole,
   segmentsCount,
-  calculateAggregate
+  calculateAggregate,
+  getPositiveFeedbackComplaints
 } from "../../../services/complaintService";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
@@ -152,27 +153,27 @@ class Dashboard extends Component {
   // getSegmentedComplaints= async ()=>{
 
   // }
-  handleSelectedComplaints = index => {
-    console.log(index);
-    let selectedComplaints = [];
-    switch (index) {
-      case 1:
-        selectedComplaints = this.state.positiveFeedback;
-        break;
-      case 2:
-        selectedComplaints = this.state.negativeFeedback;
-        break;
-      case 3:
-        selectedComplaints = this.state.delayed;
-        break;
-      case 4:
-        selectedComplaints = this.state.complaints;
-        break;
-
-      default:
-        break;
-    }
-    this.setState({ selectedComplaints });
+  handleSelectedComplaints = async index => {
+    // console.log(index);
+    // let selectedComplaints = [];
+    // switch (index) {
+    //   case 1:
+    //     selectedComplaints =
+    //     await getPositiveFeedbackComplaints();
+    //     break;
+    //   case 2:
+    //     selectedComplaints = this.state.negativeFeedback;
+    //     break;
+    //   case 3:
+    //     selectedComplaints = this.state.delayed;
+    //     break;
+    //   case 4:
+    //     selectedComplaints = this.state.complaints;
+    //     break;
+    //   default:
+    //     break;
+    // }
+    // this.setState({ selectedComplaints });
   };
 
   // segmentsCount = complaints => {
