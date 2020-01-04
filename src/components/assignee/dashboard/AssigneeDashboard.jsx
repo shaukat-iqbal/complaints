@@ -11,7 +11,10 @@ import AssigneeTable from "../AssigneeTable";
 import Pagination from "../../common/pagination";
 import ListGroup from "../../common/listGroup";
 
-import { dropResponsibility } from "../../../services/complaintService";
+import {
+  dropResponsibility,
+  calculateAggregate
+} from "../../../services/complaintService";
 import { paginate } from "../../../utils/paginate";
 import { toast } from "react-toastify";
 import { getAssigneeCategories } from "../../../services/categoryService";
@@ -46,6 +49,8 @@ class AssigneeDashboard extends Component {
     this.setState({ complaints: nextProps.complaints });
   }
   async componentDidMount() {
+    let { data: analytics } = await calculateAggregate();
+    this.setState({ analytics });
     this.getAllCategories();
   }
 
@@ -288,9 +293,14 @@ class AssigneeDashboard extends Component {
             closed={closed}
           /> */}
           <div className="container">
-            {this.state.complaints.length > 0 && (
-              <GraphBanner complaints={[...this.state.complaints]} />
-            )}
+            {this.state.analytics &&
+              this.state.analytics.monthwise &&
+              this.state.analytics.monthwise.length > 0 && (
+                <GraphBanner
+                  analytics={this.state.analytics}
+                  complaints={this.state.complaints}
+                />
+              )}
 
             {this.state.selectedComplaint && (
               <ComplaintDetail

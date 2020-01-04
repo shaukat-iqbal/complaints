@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import {
   getComplaintsByRole,
   segmentsCount,
-  calculateAggregate,
-  getPositiveFeedbackComplaints
+  calculateAggregate
 } from "../../../services/complaintService";
 import openSocket from "socket.io-client";
 import { toast } from "react-toastify";
@@ -32,14 +31,16 @@ class Dashboard extends Component {
 
   async componentDidMount() {
     this.setState({ isLoading: true });
-    let { data: segments } = await segmentsCount();
-
-    this.setState({
-      segments
+    segmentsCount().then(({ data: segments }) => {
+      this.setState({
+        segments
+      });
     });
-    await this.getComplaints();
-    let { data } = await calculateAggregate();
-    this.setState({ analytics: data });
+
+    this.getComplaints();
+    calculateAggregate().then(({ data }) => {
+      this.setState({ analytics: data });
+    });
     this.checkingSocketConnection();
   }
   componentWillUnmount() {

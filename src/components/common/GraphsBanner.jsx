@@ -21,13 +21,19 @@ class GraphBanner extends Component {
     // }
 
     if (props.usersCount && props.usersCount.length > 0) {
-      this.state.usersCount = props.usersCount;
       if (user.role === "admin") {
         let chartData = {};
-        chartData.data = this.state.usersCount;
+        chartData.data = props.usersCount;
         chartData.label = "Users Count";
         this.state.chartData = chartData;
       }
+    }
+
+    if (user.role !== "admin") {
+      let chartData = {};
+      chartData.data = this.props.analytics.monthwiseResolvedComplaints;
+      chartData.label = "Resolved Complaints";
+      this.state.chartData = chartData;
     }
   }
   // componentWillReceiveProps(nextProps) {

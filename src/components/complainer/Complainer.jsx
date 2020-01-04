@@ -25,7 +25,8 @@ class Complainer extends Component {
     sortColumn: { path: "title", order: "asc" },
     searchQuery: "",
     selectedCategory: null,
-    isLoading: false
+    isLoading: false,
+    analytics: { uniqueCategories: [] }
   };
   // componentWillUnmount() {
   //   socket.disconnect(true);
@@ -42,10 +43,12 @@ class Complainer extends Component {
       this.setState({ user });
     } catch (ex) {
       window.location = "/login";
+      return;
     }
 
-    let { data: analytics } = await calculateAggregate();
-    this.setState({ analytics });
+    calculateAggregate().then(({ data: analytics }) => {
+      this.setState({ analytics, isLoading: false });
+    });
     this.getAllComplaints(user);
 
     const { data: notifications } = await getAllNotifications();
