@@ -113,6 +113,12 @@ export function getAllprogressComplaints() {
 export function getAllResolvedComplaints() {
   return http.get(config.apiUrl + `/complainer-complaints/get/all/resolved`);
 }
+// getting all positive feedback complaints
+export function getPositiveFeedbackComplaints() {
+  return http.get(
+    config.apiUrl + `/admin-complaints/get/positiveFeedbackComplaints`
+  );
+}
 
 // getting all Resolved complaints
 export function getReport() {

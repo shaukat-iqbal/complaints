@@ -150,12 +150,13 @@ class Dashboard extends Component {
     return days;
   };
 
-  handleSelectedComplaints = index => {
+  handleSelectedComplaints = async index => {
     console.log(index);
     let selectedComplaints = [];
     switch (index) {
       case 1:
         selectedComplaints = this.state.positiveFeedback;
+
         break;
       case 2:
         selectedComplaints = this.state.negativeFeedback;
