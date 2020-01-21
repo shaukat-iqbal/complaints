@@ -62,13 +62,16 @@ class RegisterForm extends Form {
   constructor(props) {
     super(props);
     let user = getCurrentUser();
+    let configToken = getConfigToken();
     if (!user) {
       user = { role: "guest" };
-      let configToken = getConfigToken();
       if (configToken) {
         this.state.companyId = configToken.companyId;
         user.companyId = configToken.companyId;
       }
+    }
+    if (props.match && !configToken) {
+      this.state.companyId = props.match.params.companyId;
     }
     this.state.currentUser = user;
     this.state.companyId = user.companyId;
@@ -90,9 +93,6 @@ class RegisterForm extends Form {
         .required()
         .min(8)
         .label("Confirm Password");
-    }
-    if (props.match) {
-      this.state.companyId = props.match.params.companyId;
     }
   }
 
