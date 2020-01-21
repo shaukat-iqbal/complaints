@@ -4,7 +4,8 @@ import { useState } from "react";
 import config from "../../config.json";
 import {
   getReportOfMonth,
-  getComplaintsByRole
+  getComplaintsByRole,
+  calculateAggregate
 } from "../../services/complaintService";
 import { sendEmailToAuthorities } from "../../services/emailService";
 import { toast } from "react-toastify";
@@ -16,10 +17,12 @@ import BarChart from "./charts/bar";
 import LineChart from "./charts/LineChart";
 import { getConfigToken } from "../../services/configurationService.js";
 import { countComplainers } from "../../services/complainerService.js";
+import GraphBanner from "../common/GraphsBanner.jsx";
 
 const Chart = props => {
   const [reportname, setReportname] = useState("");
   const [reportPath, setReportPath] = useState("");
+  const [analytics, setAnalytics] = useState({});
   const [isOpen, setIsOpen] = useState(false);
   const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
   const [complaints, setComplaints] = useState([]);
@@ -43,10 +46,12 @@ const Chart = props => {
   };
   useEffect(() => {
     async function setAttributes() {
-      let { data: complaints } = await getComplaintsByRole();
-      let { data: months } = await countComplainers();
-      setComplainersCount(months);
-      setComplaints(complaints);
+      const { data } = await calculateAggregate();
+      setAnalytics(data);
+      // let { data: complaints } = await getComplaintsByRole();
+      // let { data: months } = await countComplainers();
+      // setComplainersCount(months);
+      // setComplaints(complaints);
     }
     setAttributes();
   }, []);
@@ -107,6 +112,15 @@ const Chart = props => {
         onSubmit={handleEmailSend}
       />
 
+      <div className="container">
+        {analytics && analytics.monthwise && analytics.monthwise.length > 0 && (
+          <GraphBanner
+            analytics={analytics}
+            usersCount={analytics.usersCount}
+          />
+        )}
+      </div>
+      {/* 
       <div className="row">
         <div className="col-lg-4 col-md-6 col-sm-12 ">
           <BarChart complaints={complaints} />
@@ -122,7 +136,7 @@ const Chart = props => {
         <div className="col-lg-4 col-md-6 col-sm-12  ">
           <PieChart complaints={complaints} />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

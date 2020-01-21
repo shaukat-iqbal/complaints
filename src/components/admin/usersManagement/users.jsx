@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { deleteAssignee } from "../../../services/assigneeService";
 import _ from "lodash";
-import { paginate } from "./../../../utils/paginate";
 import Pagination from "./../../common/pagination";
 import SearchBox from "./../../common/searchBox";
 import { getAllUsers } from "../../../services/userService";
@@ -12,6 +11,8 @@ import User from "./user";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import uuid from "uuid";
+import { Dialog, DialogContent, DialogActions } from "@material-ui/core";
+import RegisterForm from "./Register";
 class Users extends Component {
   state = {
     users: [],
@@ -20,6 +21,7 @@ class Users extends Component {
     searchQuery: "",
     sortColumn: { path: "name", order: "asc" },
     isLoading: true,
+    isOpen: false,
     searchCriteria: "Name"
   };
 
@@ -121,14 +123,23 @@ class Users extends Component {
     this.setState({ searchQuery: query });
   };
   handleProfile = user => {
-    this.props.history.push(
-      `/admin/users/profile/${user._id}/${this.props.type}`
-    );
+    this.setState({
+      isEditView: false,
+      isProfileView: true,
+      selectedUserId: user._id,
+      isOpen: true
+    });
+    // this.props.history.push(
+    //   `/admin/users/profile/${user._id}/${this.props.type}`
+    // );
   };
   handleEdit = user => {
-    this.props.history.replace(
-      "/admin/users/edit/" + user._id + "/" + this.props.type
-    );
+    this.setState({
+      isEditView: true,
+      isProfileView: false,
+      selectedUserId: user._id,
+      isOpen: true
+    });
   };
 
   handleSort = sortColumn => {
@@ -171,11 +182,13 @@ class Users extends Component {
     let searchCriteria = e.target.value;
     this.setState({ searchCriteria });
   };
-
+  handleClose = () => {
+    this.setState({ isOpen: false });
+  };
   searchBar = (totalCount, searchQuery) => {
     return (
       <>
-        <div className="align-self-end mr-4 ">
+        <div className="align-self-end ">
           <p className="m-0">Showing {totalCount} Users.</p>
           <div className="input-group">
             <SearchBox
@@ -230,11 +243,37 @@ class Users extends Component {
 
   render() {
     const { length: count } = this.state.users;
-    const { pageSize, currentPage, searchQuery, itemsCount } = this.state;
+    const {
+      pageSize,
+      currentPage,
+      searchQuery,
+      itemsCount,
+      isOpen
+    } = this.state;
 
     const { totalCount, data: users } = this.getPagedData();
     return (
-      <div>
+      <div style={{ position: "relative" }}>
+        <Dialog
+          open={isOpen}
+          onClose={this.handleClose}
+          aria-labelledby="form-dialog-title"
+          // maxWidth="sm"
+          // fullWidth={true}
+        >
+          <div className="d-flex justify-content-center">
+            <RegisterForm
+              isEditView={this.state.isEditView}
+              isProfileView={this.state.isProfileView}
+              match={{
+                params: {
+                  id: this.state.selectedUserId,
+                  role: this.props.type
+                }
+              }}
+            />
+          </div>
+        </Dialog>
         {!this.state.isLoading ? (
           count < 1 ? (
             <>
@@ -246,39 +285,31 @@ class Users extends Component {
             </>
           ) : (
             <>
-              <div className="d-flex flex-wrap flex-column mx-5 ">
+              <div className="d-flex flex-column mx-5 ">
                 {this.searchBar(totalCount, searchQuery)}
-                {totalCount > 0 ? (
-                  <div
-                    style={{ minHeight: "500px" }}
-                    className="d-flex flex-column align-content-between justify-content-between "
-                  >
-                    <div className="card container shadow-lg mb-3">
-                      <div className="card-body">
-                        {users.map(user => (
-                          <User
-                            key={uuid()}
-                            showCrudBtns={!this.props.isAssigning}
-                            user={user}
-                            onProfileView={this.handleProfile}
-                            onDelete={this.handleDelete}
-                            onEdit={this.handleEdit}
-                            onUserSelected={this.props.onUserSelected}
-                          />
-                        ))}
-                      </div>
+                <div style={{ minHeight: "500px" }}>
+                  <div className="card  shadow-lg mb-3">
+                    <div className="card-body">
+                      {users.map(user => (
+                        <User
+                          key={uuid()}
+                          showCrudBtns={!this.props.isAssigning}
+                          user={user}
+                          onProfileView={this.handleProfile}
+                          onDelete={this.handleDelete}
+                          onEdit={this.handleEdit}
+                          onUserSelected={this.props.onUserSelected}
+                        />
+                      ))}
                     </div>
-
-                    <Pagination
-                      itemsCount={itemsCount}
-                      pageSize={pageSize}
-                      currentPage={currentPage}
-                      onPageChange={this.handlePageChange}
-                    />
                   </div>
-                ) : (
-                  <div>No User Found</div>
-                )}
+                </div>
+                <Pagination
+                  itemsCount={itemsCount}
+                  pageSize={pageSize}
+                  currentPage={currentPage}
+                  onPageChange={this.handlePageChange}
+                />
               </div>
             </>
           )

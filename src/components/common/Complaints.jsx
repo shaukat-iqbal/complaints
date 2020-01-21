@@ -119,7 +119,7 @@ class Complaints extends Component {
   searchBar = searchQuery => {
     return (
       <>
-        <div className="align-self-end mr-4 ">
+        <div className="align-self-end ">
           <div className="input-group">
             <SearchBox
               value={searchQuery}
@@ -159,63 +159,65 @@ class Complaints extends Component {
     // const complaints = paginate(sorted, currentPage, pageSize);
     return (
       <>
-        {count <= 0 ? (
-          <div className="container  ">
-            <h4>There are no complaints.</h4>
-            {this.searchBar(searchQuery)}
-          </div>
-        ) : (
-          <div className="container">
-            {this.state.selectedComplaint && (
-              <ComplaintDetail
-                isOpen={this.state.isDetailFormEnabled}
-                onClose={this.handleClose}
-                complaint={this.state.selectedComplaint}
-              />
-            )}
-            <div className="row">
-              <div className="col-md-2">
-                {this.props.uniqueCategories &&
-                  this.props.uniqueCategories.length > 0 && (
-                    <ListGroup
-                      items={this.props.uniqueCategories}
-                      selectedItem={this.state.selectedCategory}
-                      onItemSelect={this.handleCategorySelect}
-                    />
-                  )}
-              </div>
-              <div className="col-md-10">
-                <div>
-                  Showing {filtered.length} of {this.state.itemsCount}{" "}
-                  complaints
-                  {this.state.selectedCategory ? (
-                    <p>
-                      Category:{" "}
-                      <strong>{this.state.selectedCategory.name}</strong>
-                    </p>
-                  ) : (
-                    ""
-                  )}
+        <div className="container">
+          {this.state.selectedComplaint && (
+            <ComplaintDetail
+              isOpen={this.state.isDetailFormEnabled}
+              onClose={this.handleClose}
+              complaint={this.state.selectedComplaint}
+            />
+          )}
+          <div className="row">
+            <div className="col-md-2">
+              {this.props.uniqueCategories &&
+                this.props.uniqueCategories.length > 0 && (
+                  <ListGroup
+                    items={this.props.uniqueCategories}
+                    selectedItem={this.state.selectedCategory}
+                    onItemSelect={this.handleCategorySelect}
+                  />
+                )}
+            </div>
+            <div className="col-md-10">
+              {count <= 0 ? (
+                <div className="container  ">
+                  <h4>There are no complaints.</h4>
+                  {this.searchBar(searchQuery)}
                 </div>
+              ) : (
+                <>
+                  <div>
+                    Showing {filtered.length} of {this.state.itemsCount}{" "}
+                    complaints
+                    {this.state.selectedCategory ? (
+                      <p>
+                        Category:{" "}
+                        <strong>{this.state.selectedCategory.name}</strong>
+                      </p>
+                    ) : (
+                      ""
+                    )}
+                  </div>
 
-                {this.searchBar(searchQuery)}
+                  {this.searchBar(searchQuery)}
 
-                <ComplaintsTable
-                  complaints={complaints}
-                  sortColumn={sortColumn}
-                  onSort={this.handleSort}
-                  onDetail={this.handleDetail}
-                />
-                <Pagination
-                  itemsCount={itemsCount}
-                  pageSize={pageSize}
-                  currentPage={currentPage}
-                  onPageChange={this.handlePageChange}
-                />
-              </div>
+                  <ComplaintsTable
+                    complaints={complaints}
+                    sortColumn={sortColumn}
+                    onSort={this.handleSort}
+                    onDetail={this.handleDetail}
+                  />
+                  <Pagination
+                    itemsCount={itemsCount}
+                    pageSize={pageSize}
+                    currentPage={currentPage}
+                    onPageChange={this.handlePageChange}
+                  />
+                </>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </>
     );
   }

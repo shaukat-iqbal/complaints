@@ -22,6 +22,8 @@ class FileUpload extends Component {
     this.setState({ isLoading: true });
     if (!this.state[currentTarget.name]) {
       alert("Please select file");
+      this.setState({ isLoading: false });
+
       return;
     }
     const fd = new FormData();

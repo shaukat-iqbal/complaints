@@ -20,7 +20,9 @@ class Dashboard extends Component {
     categories: [],
     selectedComplaints: [],
     isLoading: false,
-    analytics: {}
+    analytics: {
+      uniqueCategories: []
+    }
   };
   // async componentDidUpdate(prevProps, prevState) {
   //   if (prevState.complaints.length < this.state.complaints) {
@@ -249,7 +251,7 @@ class Dashboard extends Component {
               />
             </div>
           )}
-          {this.state.selectedComplaints.length > 0 && (
+          {this.state.analytics.uniqueCategories.length > 0 && (
             <Complaints
               complaints={this.state.selectedComplaints}
               categories={this.state.categories}
