@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { deleteAssignee } from "../../../services/assigneeService";
 import _ from "lodash";
-import { paginate } from "./../../../utils/paginate";
 import Pagination from "./../../common/pagination";
 import SearchBox from "./../../common/searchBox";
 import { getAllUsers } from "../../../services/userService";
@@ -20,6 +19,7 @@ class Users extends Component {
     searchQuery: "",
     sortColumn: { path: "name", order: "asc" },
     isLoading: true,
+    isOpen: false,
     searchCriteria: "Name"
   };
 
