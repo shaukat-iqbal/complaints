@@ -97,13 +97,14 @@ class RegisterForm extends Form {
   }
 
   async componentDidMount() {
+    this.setState({ isLoading: true });
+
     if (this.props.match) {
       const { id, role } = this.props.match.params;
       if (id && role) {
         this.populateUserDetails(id, role.substring(0, role.length - 1));
       }
     }
-    this.setState({ isLoading: false });
   }
 
   getToolTips = async responsibilities => {
@@ -138,7 +139,7 @@ class RegisterForm extends Form {
       if (role === "assignee") {
         isAssignee = true;
         responsibilities = user.responsibilities;
-        tooltips = this.getToolTips(responsibilities);
+        // tooltips = this.getToolTips(responsibilities);
       }
       data.name = user.name;
       data.email = user.email;
@@ -160,6 +161,7 @@ class RegisterForm extends Form {
       if (error.response && error.response.status === "404") {
         alert("user not found");
       }
+      this.setState({ isLoading: false });
     }
   };
 
