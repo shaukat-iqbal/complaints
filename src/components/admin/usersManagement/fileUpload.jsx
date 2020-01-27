@@ -57,6 +57,7 @@ class FileUpload extends Component {
         alert("In-Valid Format: File should have (name,email,phone) header");
       }
       console.log(error);
+      this.setState({ isLoading: false });
     }
   };
 

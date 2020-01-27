@@ -105,6 +105,7 @@ class RegisterForm extends Form {
         this.populateUserDetails(id, role.substring(0, role.length - 1));
       }
     }
+    this.setState({ isLoading: false });
   }
 
   getToolTips = async responsibilities => {
