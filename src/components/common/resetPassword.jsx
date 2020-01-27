@@ -53,6 +53,7 @@ class ResetPassword extends Form {
   handleCancel = () => {
     this.props.history.goBack();
   };
+
   doSubmit = async () => {
     const errors = { ...this.state.errors };
     const errorMessage = this.validatePassword();
@@ -73,7 +74,6 @@ class ResetPassword extends Form {
     try {
       const { data: response } = await resetPassword(body);
       alert(response);
-      this.props.history.goBack();
     } catch (error) {
       if (error.response && error.response.status === 400) {
         const errors = this.state.errors;

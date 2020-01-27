@@ -14,6 +14,7 @@ export function login(email, password, companyId, apiEndpoint) {
     password,
     companyId
   });
+
   // console.log(response);
   // let profilePicture = "";
   // if (response.data.profilePicture)
@@ -24,6 +25,13 @@ export function login(email, password, companyId, apiEndpoint) {
   // localStorage.setItem("profilePicture", profilePicture);
 }
 
+export function superAdminLogin(email, password) {
+  const Endpoint = apiUrl + "/auth-superAdmin";
+  return http.post(Endpoint, {
+    email,
+    password
+  });
+}
 export function logout() {
   localStorage.removeItem(tokenKey);
   if (localStorage.getItem("profilePicture"))

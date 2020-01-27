@@ -182,7 +182,7 @@ class Form extends Component {
       </button>
     );
   }
-  renderSelect(name, label, options) {
+  renderSelect(name, label, options, disabled = false) {
     const { data, errors } = this.state;
     return (
       <Select
@@ -192,6 +192,7 @@ class Form extends Component {
         options={options}
         onChange={this.handleChange}
         error={errors[name]}
+        disabled={disabled}
       />
     );
   }

@@ -17,7 +17,9 @@ class CompanyDetailsForm extends Form {
     data: {
       name: "",
       address: "",
-      phone: ""
+      phone: "",
+      email: "",
+      status: "active"
     },
     profile: "",
     profilePath: null,
@@ -33,7 +35,13 @@ class CompanyDetailsForm extends Form {
     address: Joi.string()
       .required()
       .label("Address"),
-
+    email: Joi.string()
+      .required()
+      .email()
+      .label("Email"),
+    status: Joi.string()
+      .required()
+      .label("Status of Company"),
     phone: Joi.string()
       .required()
       .min(9)
@@ -44,24 +52,34 @@ class CompanyDetailsForm extends Form {
     super(props);
     this.state.isProfileView = props.isProfileView;
     this.state.isEditView = props.isEditView;
+    if (this.props.match && this.props.match.params.id) {
+      this.state.companyId = this.props.match.params.id;
+    }
+    if (props.company) {
+      this.state.companyId = props.company._id;
+    }
   }
 
-  componentDidMount() {
-    if (this.props.match) {
-      const { id: companyId } = this.props.match.params;
-      this.populateUserDetails(companyId);
+  async componentDidMount() {
+    let { companyId } = this.state;
+    if (this.props.company) {
+      this.populateUserDetails(this.props.company);
+    } else if (companyId) {
+      const { data: company } = await getCompany(companyId);
+      this.populateUserDetails(company);
     } else {
       this.setState({ isLoading: false });
     }
   }
 
-  populateUserDetails = async companyId => {
+  populateUserDetails = company => {
     try {
-      const { data: company } = await getCompany(companyId);
       let data = {};
       data.name = company.name;
       data.address = company.address;
       data.phone = company.phone;
+      data.status = company.status;
+      data.email = company.email;
       if (company.profilePicture) {
         var profilePicture = convertToPicture(company.profilePicture.data);
       }
@@ -77,6 +95,7 @@ class CompanyDetailsForm extends Form {
       }
     }
   };
+
   handleRemoveProfilePicture = () => {
     this.setState({ profile: null, profilePath: null });
   };
@@ -97,14 +116,12 @@ class CompanyDetailsForm extends Form {
 
   doSubmit = async () => {
     this.setState({ isLoading: true });
-    let companyId;
-    if (this.props.match) {
-      const { id } = this.props.match.params;
-      companyId = id;
-    }
+    let { isEditView, companyId } = this.state;
+
     const fd = createDetailsFormData(this.state);
+
     try {
-      if (companyId) {
+      if (isEditView) {
         await updateCompanyDetails(fd, companyId);
         toast.success("Company profile updated");
         // this.props.history.push("/login");
@@ -113,6 +130,7 @@ class CompanyDetailsForm extends Form {
         toast.success("New Company added.");
       }
       this.setState({ isLoading: false });
+
       if (this.props.enableNext) this.props.enableNext();
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -129,25 +147,29 @@ class CompanyDetailsForm extends Form {
   };
 
   render() {
-    let companyId;
-    if (this.props.match) {
-      const { id } = this.props.match.params;
-      companyId = id;
-    }
-    // let companyId = "helo";
-    const { isEditView, isProfileView, profile, isLoading } = this.state;
+    const { isEditView, isProfileView, profile, isLoading, data } = this.state;
+
+    let options = [
+      { _id: "Active", name: "Active" },
+      { _id: "De-Activated", name: "De-Activated" }
+    ];
+    options.forEach(option => {
+      if (option.name === data.status) option.selected = true;
+      return option;
+    });
+
     let heading = "Enter";
     if (isEditView) heading = "Edit";
-    if (isProfileView) heading = "Profile";
+    if (isProfileView) heading = "";
     return (
       <div>
-        <div className="card w-50 mb-4 shadow-lg" style={{ minWidth: "400px" }}>
+        <div className="card shadow-lg">
           {isLoading && <Loading />}
           <div className="card-header d-flex justify-content-center">
             <h5 className="h5 pt-2">{heading} Company Details</h5>
           </div>
           <form onSubmit={this.handleSubmit}>
-            <div className="card-body px-5">
+            <div className="card-body px-5 ">
               <div className="d-flex justify-content-center align-items-center p-2">
                 {this.renderPictureUpload(
                   "profilePath",
@@ -157,15 +179,43 @@ class CompanyDetailsForm extends Form {
                   this.handleRemoveProfilePicture
                 )}
               </div>
-              {this.renderInput("name", "Company Name", "text", isProfileView)}
-              {this.renderInput("address", "Address", "text", isProfileView)}
-              {this.renderInput("phone", "Phone#", "tel", isProfileView)}
+              <div className="row">
+                <div className="col-lg-6">
+                  {this.renderInput(
+                    "name",
+                    "Company Name",
+                    "text",
+                    isProfileView
+                  )}
+                  {this.renderInput(
+                    "email",
+                    "Company Email",
+                    "email",
+                    isProfileView
+                  )}
+                  {this.renderInput("phone", "Phone#", "tel", isProfileView)}
+                </div>
+                <div className="col-lg-6">
+                  {this.renderSelect(
+                    "status",
+                    "Status",
+                    options,
+                    isProfileView
+                  )}
+                  {this.renderInput(
+                    "address",
+                    "Address",
+                    "text",
+                    isProfileView
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="d-flex justify-content-end pr-5  mb-4">
               {isProfileView
                 ? this.renderEditButton()
-                : companyId
+                : isEditView
                 ? this.renderButton("Update")
                 : this.renderButton("Register")}
             </div>
