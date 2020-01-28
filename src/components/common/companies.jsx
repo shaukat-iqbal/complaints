@@ -10,8 +10,8 @@ class Companies extends Component {
   };
 
   async componentDidMount() {
-    const { data: companies } = await getAllCompanies();
-
+    let { data: companies } = await getAllCompanies();
+    // companies = companies.filter(company => company.status !== "De-Activated");
     this.setState({
       companies,
       isLoading: false,

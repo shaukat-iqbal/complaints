@@ -12,33 +12,27 @@ import { toast } from "react-toastify";
 
 import DatePickerModal from "./DatePickerModal";
 import MembersModal from "./MembersModal";
-import PieChart from "./charts/pie";
-import BarChart from "./charts/bar";
-import LineChart from "./charts/LineChart";
-import { getConfigToken } from "../../services/configurationService.js";
-import { countComplainers } from "../../services/complainerService.js";
+
 import GraphBanner from "../common/GraphsBanner.jsx";
+import { getCurrentUser } from "../../services/authService.js";
 
 const Chart = props => {
   const [reportname, setReportname] = useState("");
-  const [reportPath, setReportPath] = useState("");
   const [analytics, setAnalytics] = useState({});
   const [isOpen, setIsOpen] = useState(false);
   const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
-  const [complaints, setComplaints] = useState([]);
-  const [complainersCount, setComplainersCount] = useState([]);
+
   // handleGenerateReport
   const handleGenerateReport = async body => {
-    let companyId = getConfigToken().companyId;
-    window.open(
-      `${config.apiUrl}/admin-complaints/generateReport/${companyId}/${body.from}/${body.to}`
-    );
+    let companyId = getCurrentUser().companyId;
+    // window.open(
+    //   `${config.apiUrl}/admin-complaints/generateReport/${companyId}/${body.from}/${body.to}`
+    // );
     body.companyId = companyId;
     try {
       const { headers } = await getReportOfMonth(body);
       console.log(headers);
       setReportname(headers.filename.split("\\")[3]);
-      setReportPath(headers.filename);
       setIsOpen(false);
     } catch (error) {
       toast.error("Some error occured");

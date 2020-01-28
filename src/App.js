@@ -18,6 +18,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import AdminForm from "./components/common/adminForm";
 import CustomizedSteppers from "./components/Startup/stepper";
+import SuperAdmin from "./components/Super Admin/SuperAdmin";
 // const Complainer = lazy(() => import("./components/complainer/Complainer"));
 
 class App extends Component {
@@ -65,9 +66,9 @@ class App extends Component {
 
           <Route path="/login" component={Login} />
           <Route path="/logout" component={Logout} />
-          <Route path="/complainer/me" component={Complainer} />
           <Route path="/complainer" component={Complainer} />
           <Route path="/assignee" component={Assignee} />
+          <Route path="/superAdmin" component={SuperAdmin} />
           <Route path="/assignee/:id" component={Assignee} />
           <Route path="/admin" component={mainAdmin} />
           <Route path="/c/message/:id" component={Message} />

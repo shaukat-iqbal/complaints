@@ -31,7 +31,10 @@ import AdminForm from "../../../common/adminForm";
 import ResetPassword from "../../../common/resetPassword";
 import AdminMessages from "../../AdminMessages";
 import { setProfilePictureToken } from "../../../../services/imageService";
-import { getConfigToken } from "../../../../services/configurationService";
+import {
+  getConfigToken,
+  getConfiguration
+} from "../../../../services/configurationService";
 import LocationsList from "../../../Locations/LocationsList";
 // import { getConfigToken } from "./../";
 
@@ -95,6 +98,8 @@ function UserManagement(props) {
   };
 
   useEffect(() => {
+    if (!getConfigToken())
+      window.location = "/welcome/" + currentUser.companyId;
     getNotifications();
     async function setProfilePicture() {
       if (!localStorage.getItem("profilePicture")) {
@@ -102,6 +107,7 @@ function UserManagement(props) {
         setIsDp(true);
       }
     }
+
     setIsMessaging(getConfigToken().isMessaging);
     setProfilePicture();
     listenEvents();

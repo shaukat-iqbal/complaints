@@ -10,19 +10,17 @@ export function updateCompanyDetails(details, id) {
   return http.put(endPoint + "/" + id, details);
 }
 
-export function createDetailsFormData({ data, profilePath }) {
+export function createDetailsFormData({ data, profilePath, profilePicture }) {
   const fd = new FormData();
   let body = data;
   if (body.confirmPassword) delete body.confirmPassword;
   for (const key in body) {
     fd.append(key, body[key]);
   }
-  if (profilePath) {
-    if (typeof profilePath === "object") {
-      fd.append("profilePicture", profilePath, profilePath.name);
-    } else {
-      fd.append("profilePath", profilePath);
-    }
+  fd.append("profilePath", profilePath);
+
+  if (profilePicture) {
+    fd.append("profilePicture", profilePicture, profilePicture.name);
   }
 
   return fd;

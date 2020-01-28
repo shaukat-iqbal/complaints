@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { getProfilePicture } from "../../services/userService";
+import React from "react";
 import { getCurrentUser } from "../../services/authService";
 import { Avatar } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -17,23 +16,17 @@ const useStyles = makeStyles({
     height: 60
   }
 });
+
 const UserLogo = props => {
   const classes = useStyles();
-  if (localStorage.getItem("profilePicture")) {
+  let profilePath = getCurrentUser().profilePath;
+  if (profilePath) {
     return (
       <Avatar
         alt="logo"
-        src={getProfilePicture()}
+        src={profilePath}
         className={props.management ? classes.management : classes.bigAvatar}
       />
-
-      // <img
-      //   className="rounded-circle"
-      //   src={getProfilePicture()}
-      //   width={width}
-      //   height={height}
-      //   alt="logo"
-      // />
     );
   } else {
     return (

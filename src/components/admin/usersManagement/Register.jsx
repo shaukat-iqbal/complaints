@@ -160,6 +160,7 @@ class RegisterForm extends Form {
     } catch (error) {
       if (error.response && error.response.status === "404") {
         alert("user not found");
+        this.setState({ isLoading: false });
       }
       this.setState({ isLoading: false });
     }

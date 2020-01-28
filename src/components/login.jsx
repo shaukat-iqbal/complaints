@@ -84,9 +84,9 @@ class Login extends Form {
         this.props.history.replace(`/${user.role}`);
       }
     } catch (error) {
-      if (error.response && error.response.status === 404) {
-        window.location = "/welcome/" + id;
-      }
+      // if (error.response && error.response.status === 404) {
+      //   window.location = "/welcome/" + id;
+      // }
     }
   };
   render() {
