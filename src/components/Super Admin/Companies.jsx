@@ -8,6 +8,11 @@ import SearchBox from "../common/searchBox";
 import CompanyDetailsForm from "../common/companyDetailsForm";
 import { Dialog } from "@material-ui/core";
 import Loading from "../common/loading";
+import { getCurrentUser } from "../../services/authService";
+import config from "../../config.json";
+import openSocket from "socket.io-client";
+import { formatCreatedDate } from "../../services/helper";
+const socket = openSocket(config.apiEndpoint);
 
 class Companies extends Component {
   state = {
@@ -23,8 +28,9 @@ class Companies extends Component {
 
   async componentDidMount() {
     let { data: companies } = await getAllCompanies();
-    console.log("Companies returned", companies);
+    companies = formatCreatedDate(companies);
     this.setState({ companies, isLoading: false });
+    this.checkingSocketConnection();
   }
 
   handleDetail = company => {
@@ -39,6 +45,32 @@ class Companies extends Component {
 
   handleClose = () => {
     this.setState({ selectedCompany: null, isDetailFormEnabled: false });
+  };
+
+  checkingSocketConnection = () => {
+    let user = getCurrentUser();
+    socket.on("company", data => {
+      console.log(data);
+      if (
+        user.role === "superAdmin" ||
+        (user.companyId === data.company._id && user.role === "admin")
+      )
+        if (data.action === "company updated") {
+          console.log(data.company);
+          this.replaceUpdatedComplaint(data.company);
+        }
+    });
+  };
+
+  replaceUpdatedComplaint = company => {
+    this.setState(prevState => {
+      const updatedCompanies = [...prevState.companies];
+      let index = updatedCompanies.findIndex(c => c._id === company._id);
+      if (index > -1) updatedCompanies[index] = company;
+      return {
+        companies: updatedCompanies
+      };
+    });
   };
 
   handleEdit = company => {

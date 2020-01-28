@@ -2,7 +2,6 @@ import React from "react";
 import Form from "./form";
 import Loading from "./loading";
 import Joi from "joi-browser";
-import _ from "lodash";
 import { compressImage } from "../../services/imageService";
 import {
   updateCompanyDetails,
@@ -11,7 +10,6 @@ import {
 } from "../../services/companyDetailsService";
 import { toast } from "react-toastify";
 import { getCompany } from "../../services/companiesService";
-import { convertToPicture } from "../../services/userService";
 class CompanyDetailsForm extends Form {
   state = {
     data: {
@@ -58,6 +56,14 @@ class CompanyDetailsForm extends Form {
     if (props.company) {
       this.state.companyId = props.company._id;
     }
+    let { isProfileView, isEditView } = this.state;
+
+    if (!isProfileView && !isEditView) {
+      this.schema.adminEmail = Joi.string()
+        .required()
+        .email()
+        .label("Admin email");
+    }
   }
 
   async componentDidMount() {
@@ -80,13 +86,12 @@ class CompanyDetailsForm extends Form {
       data.phone = company.phone;
       data.status = company.status;
       data.email = company.email;
-      if (company.profilePicture) {
-        var profilePicture = convertToPicture(company.profilePicture.data);
+      if (company.profilePath === "null") {
+        company.profilePath = null;
       }
       this.setState({
         data,
         profilePath: company.profilePath,
-        profile: profilePicture,
         isLoading: false
       });
     } catch (error) {
@@ -101,16 +106,16 @@ class CompanyDetailsForm extends Form {
   };
 
   handleProfilePicture = async event => {
-    let { profile, profilePath } = this.state;
+    let { profilePath, profilePicture } = this.state;
     if (event.target.files[0]) {
-      profile = URL.createObjectURL(event.target.files[0]);
-      this.setState({ profile });
-      profilePath = await compressImage(event.target.files[0]);
-      profile = URL.createObjectURL(profilePath);
+      profilePath = URL.createObjectURL(event.target.files[0]);
+      this.setState({ profilePath });
+      profilePicture = await compressImage(event.target.files[0]);
+      profilePath = URL.createObjectURL(profilePicture);
     }
     this.setState({
-      profilePath,
-      profile
+      profilePicture,
+      profilePath
     });
   };
 
@@ -123,7 +128,7 @@ class CompanyDetailsForm extends Form {
     try {
       if (isEditView) {
         await updateCompanyDetails(fd, companyId);
-        toast.success("Company profile updated");
+        toast.success("Company details updated");
         // this.props.history.push("/login");
       } else {
         await insertCompanyDetails(fd);
@@ -136,18 +141,24 @@ class CompanyDetailsForm extends Form {
       if (error.response && error.response.status === 400) {
         let errors = { ...this.state.errors };
         errors.name = error.response.data;
-        this.setState({ errors });
+        this.setState({ errors, isLoading: false });
       } else if (error.response && error.response.status === 404) {
         toast.warn("Not Found: Company Id");
         let errors = { ...this.state.errors };
         errors.name = error.response.data;
-        this.setState({ errors });
+        this.setState({ errors, isLoading: false });
       }
     }
   };
 
   render() {
-    const { isEditView, isProfileView, profile, isLoading, data } = this.state;
+    const {
+      isEditView,
+      isProfileView,
+      profilePath,
+      isLoading,
+      data
+    } = this.state;
 
     let options = [
       { _id: "Active", name: "Active" },
@@ -174,7 +185,7 @@ class CompanyDetailsForm extends Form {
                 {this.renderPictureUpload(
                   "profilePath",
                   this.handleProfilePicture,
-                  profile,
+                  profilePath,
                   isProfileView,
                   this.handleRemoveProfilePicture
                 )}
@@ -208,6 +219,9 @@ class CompanyDetailsForm extends Form {
                     "text",
                     isProfileView
                   )}
+                  {!isProfileView &&
+                    !isEditView &&
+                    this.renderInput("adminEmail", "Admin Email", "text")}
                 </div>
               </div>
             </div>

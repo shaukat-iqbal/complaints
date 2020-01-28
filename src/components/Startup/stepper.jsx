@@ -186,41 +186,21 @@ function getStepContent(step, enableNext, props) {
   switch (step) {
     case 0:
       return (
-        <div className=" d-flex justify-content-center align-items-center">
-          <CompanyDetailsForm
-            enableNext={enableNext}
-            {...props}
-            isEditView={true}
-          />
-        </div>
-      );
-    case 1:
-      return (
-        <div className=" d-flex justify-content-center align-items-center">
-          <AdminForm
-            isStepper={true}
-            enableNext={enableNext}
-            companyId={props.match.params.id}
-          />
-        </div>
-      );
-    case 2:
-      return (
         <Features
           isStepper={true}
           enableNext={enableNext}
           companyId={props.match.params.id}
         />
       );
-    case 3:
+    case 1:
       return <CategoriesRenderer enableNext={enableNext} isStepper={true} />;
-    case 4:
+    case 2:
       return <LocationRenderer enableNext={enableNext} isStepper={true} />;
-    case 5:
+    case 3:
       return <Attachments enableNext={enableNext} />;
-    case 6:
+    case 4:
       return <Members enableNext={enableNext} />;
-    case 7:
+    case 5:
       return <Registration isStepper={true} />;
     default:
       return "Unknown step";

@@ -34,29 +34,14 @@ class CompaniesTable extends Component {
 
   constructor(props) {
     super(props);
-    let companies = this.formatCreatedDate(props.companies);
-    this.state.companies = companies;
-  }
-  componentDidMount() {
-    let companies = this.formatCreatedDate(this.state.companies);
-    this.setState({ companies });
-  }
-  componentWillReceiveProps(nextProps) {
-    let companies = this.formatCreatedDate(nextProps.companies);
-    this.setState({ companies });
+    this.state.companies = props.companies;
   }
 
-  formatCreatedDate = companies => {
-    return companies.map(company => {
-      if (company.createdAt) {
-        let date = new Date(company.createdAt);
+  // componentWillReceiveProps(nextProps) {
+  //   let companies = this.formatCreatedDate(nextProps.companies);
+  //   this.setState({ companies });
+  // }
 
-        company.createdAt =
-          date.getDate() + ":" + date.getMonth() + 1 + ":" + date.getFullYear();
-      }
-      return company;
-    });
-  };
   render() {
     let { companies, onSort, sortColumn } = this.props;
 

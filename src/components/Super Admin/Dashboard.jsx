@@ -22,6 +22,7 @@ import { setProfilePictureToken } from "../../services/imageService";
 import Companies from "./Companies";
 import CompanyDetailsForm from "../common/companyDetailsForm";
 import RegisterForm from "../admin/usersManagement/Register";
+import SuperAdminForm from "./SuperAdminForm";
 // import { getConfigToken } from "./../";
 
 const drawerWidth = 220;
@@ -96,7 +97,7 @@ function SuperAdminDashboard(props) {
         {currentUser && (
           <NavLink
             className="nav-item nav-link d-flex align-items-center p-0 pl-2 text-white "
-            to={`/superAdmin/dashboard/profile/${currentUser._id}`}
+            to={`/superAdmin/dashboard/profile`}
           >
             <UserLogo management={true} />
             <p className="p-0 m-0 ml-2 drawerLogo">
@@ -202,7 +203,11 @@ function SuperAdminDashboard(props) {
           <Switch>
             <Route
               path="/superAdmin/dashboard/registerCompany"
-              component={CompanyDetailsForm}
+              render={props => (
+                <div className="mt-3 ">
+                  <CompanyDetailsForm {...props} />
+                </div>
+              )}
             />
             <Route
               path="/superAdmin/dashboard/companies"
@@ -213,8 +218,12 @@ function SuperAdminDashboard(props) {
               component={ResetPassword}
             />
             <Route
-              path="/superAdmin/dashboard/profile/:id/:role"
-              render={props => <RegisterForm isProfileView={true} {...props} />}
+              path="/superAdmin/dashboard/profile/"
+              render={props => (
+                <div className="mt-3 d-flex justify-content-center">
+                  <SuperAdminForm isProfileView={true} {...props} />
+                </div>
+              )}
             />
             <Redirect
               exact
