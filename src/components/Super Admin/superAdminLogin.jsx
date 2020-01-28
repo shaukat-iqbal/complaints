@@ -38,7 +38,7 @@ class SuperAdminLogin extends Form {
     try {
       const response = await superAdminLogin(data.email, data.password);
       localStorage.setItem("token", response.headers["x-auth-token"]);
-      this.props.history.push("/superAdmin/dashboard");
+      window.location = "/superAdmin/dashboard";
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         const errors = { ...this.state.errors };

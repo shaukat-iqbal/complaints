@@ -76,6 +76,7 @@ function SuperAdminDashboard(props) {
   }
 
   useEffect(() => {
+    console.log(currentUser);
     if (!currentUser || currentUser.role !== "superAdmin")
       window.location = "/";
 
